@@ -3,6 +3,8 @@
  *
  * - Knappar
  * - Ämneskort
+ * - Returning hero (återkommande besökare)
+ * - About strip (ny besökare – vad är sidan?)
  * - Inläggskort
  * - Gilla-knapp
  * - Följ-knapp
@@ -305,4 +307,76 @@
     background: var(--color-accent);
     color: #fff;
     border-color: var(--color-accent);
+}
+
+/* ── Returning hero (återkommande besökare) ─────────────────────────────────── */
+.returning-hero {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-lg) var(--space-md);
+}
+
+.returning-hero__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.returning-hero__avatar {
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.returning-hero__welcome {
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.returning-hero__since {
+    font-size: .85rem;
+    color: var(--color-muted);
+    margin: 0;
+}
+
+/* ── About strip (ny besökare) ──────────────────────────────────────────────── */
+.about-strip {
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-xl) var(--space-md);
+}
+
+.about-strip__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+}
+
+@media (min-width: 600px) {
+    .about-strip__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.about-strip__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.about-strip__icon {
+    font-size: 1.8rem;
+}
+
+.about-strip__item h3 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.about-strip__item p {
+    font-size: .9rem;
+    color: var(--color-muted);
+    margin: 0;
 }
