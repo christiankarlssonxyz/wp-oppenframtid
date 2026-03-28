@@ -424,6 +424,20 @@
     padding: var(--space-xl) var(--space-md);
 }
 
+/* ── Frontpage bannerbild ────────────────────────────────────────────────────── */
+.frontpage-banner {
+    padding: var(--space-xl) var(--space-md) 0;
+}
+
+.frontpage-banner__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    aspect-ratio: 1200 / 500;
+}
+
 /* ── Ämnesgrid ──────────────────────────────────────────────────────────────── */
 .topics-grid {
     display: grid;

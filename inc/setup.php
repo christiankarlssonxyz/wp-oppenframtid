@@ -36,11 +36,32 @@ add_action('after_setup_theme', function () {
     // Bildstorlekar
     add_image_size('blogtree-card', 600, 400, true);
     add_image_size('blogtree-hero', 1200, 600, true);
+    add_image_size('blogtree-frontpage-banner', 1200, 500, true);
 
 });
 
 // ── Stäng av admin-toolbar för alla användare ──────────────────────────────────
 add_filter('show_admin_bar', '__return_false');
+
+// ── Startsida – bannerbild i Customizer ───────────────────────────────────────
+add_action('customize_register', function ($wp_customize) {
+
+    $wp_customize->add_section('blogtree_frontpage_banner', [
+        'title'       => 'Startsida – bannerbild',
+        'description' => 'Bild som visas ovanför senaste inlägg. Rekommenderat format: 1 200 × 500 px (2,4:1). Ladda upp minst 1 200 px bred för bäst kvalitet.',
+        'priority'    => 20,
+    ]);
+
+    $wp_customize->add_setting('blogtree_frontpage_banner_id', [
+        'default'           => 0,
+        'sanitize_callback' => 'absint',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'blogtree_frontpage_banner_id', [
+        'label'     => 'Välj bild',
+        'section'   => 'blogtree_frontpage_banner',
+        'mime_type' => 'image',
+    ]));
+});
 
 // ── Sidebar-textbox i Customizer ───────────────────────────────────────────────
 add_action('customize_register', function ($wp_customize) {

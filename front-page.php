@@ -103,6 +103,21 @@ get_header();
     </section>
     <?php endif; ?>
 
+    <!-- ── Bannerbild ───────────────────────────────────────────────────── -->
+    <?php
+    $_banner_id  = (int) get_theme_mod('blogtree_frontpage_banner_id', 0);
+    $_banner_src = $_banner_id ? wp_get_attachment_image_src($_banner_id, 'blogtree-frontpage-banner') : false;
+    if ($_banner_src): ?>
+    <div class="frontpage-banner">
+        <img src="<?php echo esc_url($_banner_src[0]); ?>"
+             width="<?php echo (int) $_banner_src[1]; ?>"
+             height="<?php echo (int) $_banner_src[2]; ?>"
+             alt=""
+             class="frontpage-banner__img"
+             loading="lazy">
+    </div>
+    <?php endif; ?>
+
     <!-- Alla senaste inlägg -->
     <section class="posts-section">
         <h2 class="section-title">Senaste</h2>
@@ -270,6 +285,21 @@ get_header();
             <?php endforeach; ?>
         </div>
     </section>
+    <?php endif; ?>
+
+    <!-- ── Bannerbild ───────────────────────────────────────────────────── -->
+    <?php
+    $_banner_id  = (int) get_theme_mod('blogtree_frontpage_banner_id', 0);
+    $_banner_src = $_banner_id ? wp_get_attachment_image_src($_banner_id, 'blogtree-frontpage-banner') : false;
+    if ($_banner_src): ?>
+    <div class="frontpage-banner">
+        <img src="<?php echo esc_url($_banner_src[0]); ?>"
+             width="<?php echo (int) $_banner_src[1]; ?>"
+             height="<?php echo (int) $_banner_src[2]; ?>"
+             alt=""
+             class="frontpage-banner__img"
+             loading="lazy">
+    </div>
     <?php endif; ?>
 
     <!-- ── Senaste inlägg ─────────────────────────────────────────────────── -->
