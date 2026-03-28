@@ -405,16 +405,7 @@
     }
   ],
   "recommendations_prioritized": {
-    "immediate_critical": [
-      "OM-PRIV-001: Lägg till GDPR-samtyckescheckbox i Open Messages kontaktformulär",
-      "OM-PRIV-002: Implementera manuell raderingsfunktion per e-postadress i Open Messages",
-      "OM-PRIV-009: Integrera Open Messages med WordPress Privacy API",
-      "OM-SEC-003: Kasta exception om AUTH_KEY saknas i Open Messages"
-    ],
     "high_priority": [
-      "OM-SEC-001: Åtgärda SQL-interpolation i cleanup med prepare()",
-      "OM-PRIV-003: Registrera register_personal_data_exporter() i Open Messages",
-      "OM-PRIV-006: Dokumentera och förstärk skyddet kring wp-config.php",
       "TEMA-PRIV-004: Inaktivera Gravatar som fallback eller informera vid registrering"
     ],
     "medium_priority": [
@@ -422,10 +413,6 @@
       "TEMA-SEC-003: Lägg till filstorleksgräns (512 KB) vid JSON-uppladdning",
       "TEMA-SEC-004: Implementera rate-limiting på AJAX-kommentarer",
       "TEMA-SEC-005: Implementera rate-limiting på community-insändare",
-      "OM-SEC-004: Byt AES-CBC till AES-GCM i Open Messages",
-      "OM-SEC-006: Implementera IP-baserad rate-limiting på Open Messages kontaktformulär",
-      "OM-PRIV-005: Anonymisera IP-adress i transient-nyckel i Open Messages",
-      "OM-PRIV-004: Kommunicera lagringstid i Open Messages formulär",
       "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
     ],
     "low_priority": [
@@ -434,16 +421,28 @@
       "TEMA-PRIV-001: Registrera delete_user-hook för att rensa followed_topics",
       "TEMA-PRIV-002: Registrera delete_user-hook för att rensa liked_by-data",
       "TEMA-PRIV-003: Skydda blogtree_liked_by från REST API",
-      "OM-SEC-007: Lägg till nonce-verifiering på GET-parametrar i Open Messages admin",
-      "OM-SEC-010: Lägg till session_regenerate_id() i Open Messages CAPTCHA",
-      "OM-PRIV-008: Implementera audit-logg för admin-åtgärder i Open Messages",
       "ASB-PRIV-002: Dokumentera landblockering i integritetspolicyn om den används"
     ],
     "info": [
       "ASB-PASS-001: Antispam Bee – inga externa API-anrop (godkänt)",
       "ASB-PASS-002: Antispam Bee – öppen källkod (godkänt)",
-      "ASB-SEC-001: Antispam Bee honeypot-klassnamn – kombinera med fler skyddslager",
-      "OM-PRIV-007: Open Messages – överväg separat tabell för svar för granulär radering"
+      "ASB-SEC-001: Antispam Bee honeypot-klassnamn – kombinera med fler skyddslager"
+    ],
+    "remediated": [
+      "OM-PRIV-001: GDPR-samtyckescheckbox tillagd med lagringstid och Privacy Policy-länk",
+      "OM-PRIV-002: Rätten att bli glömd – sök och radera per e-postadress implementerat",
+      "OM-PRIV-003: register_personal_data_exporter() implementerat via OM_Privacy",
+      "OM-PRIV-004: Lagringstid visas dynamiskt i formuläret med länk till integritetspolicy",
+      "OM-PRIV-005: IP-anonymisering (IPv4 sista oktet, IPv6 sista 64 bitar) implementerat",
+      "OM-PRIV-006: README uppdaterat med krav på skyddad wp-config.php och AUTH_KEY ≥ 32 tecken",
+      "OM-PRIV-008: om_audit_log-tabell skapad – loggar read/reply/delete/star med användar-ID",
+      "OM-PRIV-009: WordPress Privacy API integrerat via OM_Privacy (eraser + exporter)",
+      "OM-SEC-001: SQL-interpolation ersatt med $wpdb->update() per ID",
+      "OM-SEC-003: Hårdkodad fallback-nyckel borttagen – kastar RuntimeException om AUTH_KEY saknas",
+      "OM-SEC-004: AES-256-CBC ersatt med AES-256-GCM (AEAD)",
+      "OM-SEC-006: Transient-baserad rate-limiting (max 5/10 min per IP) implementerat",
+      "OM-SEC-007: wp_verify_nonce() tillagd på GET-parametrar i admin-vyer",
+      "OM-SEC-010: session_regenerate_id(true) + migrering till WordPress-transients"
     ]
   }
 }

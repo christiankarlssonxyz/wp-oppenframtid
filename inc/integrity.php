@@ -413,6 +413,7 @@ function blogtree_integrity_admin_page(): void {
                 'medium_priority'    => ['🟡 Medium prioritet',   '#fffde7'],
                 'low_priority'       => ['🔵 Låg prioritet',      '#e8f4fd'],
                 'info'               => ['ℹ️ Info',               '#f0f0f0'],
+                'remediated'         => ['✅ Åtgärdade',          '#e8f5e9'],
             ];
             foreach ($data['_recommendations'] as $key => $items):
                 [$label, $bg] = $prio_labels[$key] ?? [$key, '#f9f9f9'];
@@ -574,6 +575,7 @@ function blogtree_render_integrity_content(array $data): string {
             'medium_priority'    => ['Medium prioritet',   'audit-warn'],
             'low_priority'       => ['Låg prioritet',      'audit-info'],
             'info'               => ['Info',               'audit-info'],
+            'remediated'         => ['✅ Åtgärdade',       'audit-pass audit-fixed'],
         ];
         foreach ($data['_recommendations'] as $key => $items):
             [$label, $cls] = $prio[$key] ?? [$key, 'audit-info'];
