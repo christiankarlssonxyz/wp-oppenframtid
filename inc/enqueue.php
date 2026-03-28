@@ -33,6 +33,12 @@ add_action('wp_enqueue_scripts', function () {
         'nonce' => wp_create_nonce('blogtree_follow'),
     ]);
 
+    // Sökning
+    wp_enqueue_script('blogtree-search', $uri . '/assets/js/search.js', [], $version, true);
+    wp_localize_script('blogtree-search', 'blogtreeSearch', [
+        'restUrl' => esc_url_raw(rest_url()),
+    ]);
+
     // Användarmeny dropdown + mörkt/ljust läge
     wp_add_inline_script('blogtree-follow', "
 (function () {

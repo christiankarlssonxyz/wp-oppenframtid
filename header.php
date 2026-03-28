@@ -23,6 +23,13 @@
             <?php bloginfo('name'); ?>
         </a>
 
+        <button class="search-trigger" id="search-trigger" aria-label="Öppna sökning" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span>Sök</span>
+        </button>
+
         <button class="site-header__menu-btn" aria-label="Meny" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
@@ -80,3 +87,54 @@
 
     </div>
 </header>
+
+<!-- ── Sökoverlay ──────────────────────────────────────────────────────────── -->
+<div class="search-overlay" id="search-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Sökning">
+    <div class="search-overlay__backdrop" id="search-backdrop"></div>
+    <div class="search-overlay__panel">
+
+        <div class="search-overlay__top">
+            <h2 class="search-overlay__heading">Sök</h2>
+            <button class="search-overlay__close" id="search-close" aria-label="Stäng sökning">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <input type="search" id="search-input" class="search-overlay__input"
+               placeholder="Skriv för att söka…" autocomplete="off" spellcheck="false" aria-label="Sökterm">
+
+        <div class="search-filter-box">
+            <h3 class="search-filter-box__title">Inlägg</h3>
+            <div class="search-filter-box__row">
+                <div class="search-filter-col">
+                    <label class="search-filter__label" for="search-sort">Sortering</label>
+                    <select id="search-sort" class="search-filter__select">
+                        <option value="newest">Nyast</option>
+                        <option value="oldest">Äldst</option>
+                    </select>
+                </div>
+                <div class="search-filter-col">
+                    <label class="search-filter__label" for="search-date">Datum</label>
+                    <select id="search-date" class="search-filter__select">
+                        <option value="">När som helst</option>
+                        <option value="today">Idag</option>
+                        <option value="week">Senaste veckan</option>
+                        <option value="month">Senaste månaden</option>
+                        <option value="halfyear">6 månader</option>
+                    </select>
+                </div>
+                <div class="search-filter-col search-filter-col--check">
+                    <label class="search-filter__checkbox">
+                        <input type="checkbox" id="search-title-only">
+                        <span>Sök endast rubriker</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-results" id="search-results" aria-live="polite" aria-atomic="true"></div>
+
+    </div>
+</div>
