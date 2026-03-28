@@ -115,6 +115,40 @@
     align-items: center;
 }
 
+.nav-login-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 99px;
+    padding: 5px 14px 5px 8px;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: border-color .15s, background .15s;
+}
+
+.nav-login-btn:hover {
+    border-color: var(--color-accent-alt);
+    background: var(--color-surface);
+    text-decoration: none;
+}
+
+.nav-login-btn__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+    flex-shrink: 0;
+}
+
 .nav-avatar img {
     border-radius: 50%;
     width: 32px;
