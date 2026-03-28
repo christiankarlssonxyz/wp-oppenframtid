@@ -29,10 +29,23 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-md);
+    padding: var(--space-md) var(--space-md) 0;
     max-width: 1100px;
     margin-inline: auto;
     gap: var(--space-md);
+}
+
+/* Rad 2: nav centrerad under logon */
+.site-header__nav-row {
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-sm);
+}
+
+.site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-left: auto;
 }
 
 .site-header__logo {
@@ -72,6 +85,7 @@
     padding: var(--space-md);
     flex-direction: column;
     gap: var(--space-md);
+    z-index: 99;
 }
 
 .site-header__nav.is-open {
@@ -214,6 +228,18 @@
 @media (min-width: 768px) {
     .site-header__menu-btn { display: none; }
 
+    .site-header__inner {
+        padding-bottom: var(--space-md);
+    }
+
+    .site-header__nav-row {
+        display: flex;
+        justify-content: center;
+        padding: var(--space-sm) var(--space-md);
+        max-width: 1100px;
+        margin-inline: auto;
+    }
+
     .site-header__nav {
         display: flex;
         position: static;
@@ -222,6 +248,7 @@
         flex-direction: row;
         align-items: center;
         gap: var(--space-lg);
+        background: none;
     }
 
     .nav-list {

@@ -17,30 +17,25 @@
 <?php wp_body_open(); ?>
 
 <header class="site-header">
+
+    <!-- ── Rad 1: Logo + Sök + Avatar ───────────────────────────────────────── -->
     <div class="site-header__inner">
 
         <a href="<?php echo esc_url(home_url('/')); ?>" class="site-header__logo">
             <?php bloginfo('name'); ?>
         </a>
 
-        <a href="<?php echo esc_url(home_url('/sok/')); ?>" class="search-trigger" aria-label="Gå till söksidan">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <span>Sök</span>
-        </a>
-
         <button class="site-header__menu-btn" aria-label="Meny" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
 
-        <nav class="site-header__nav" aria-label="Huvudmeny">
-            <?php wp_nav_menu([
-                'theme_location' => 'primary',
-                'container'      => false,
-                'menu_class'     => 'nav-list',
-                'fallback_cb'    => false,
-            ]); ?>
+        <div class="site-header__actions">
+            <a href="<?php echo esc_url(home_url('/sok/')); ?>" class="search-trigger" aria-label="Gå till söksidan">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <span>Sök</span>
+            </a>
 
             <?php if (is_user_logged_in()):
                 $user        = wp_get_current_user();
@@ -83,8 +78,21 @@
             <?php else: ?>
                 <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>" class="nav-link nav-link--login">Logga in</a>
             <?php endif; ?>
-        </nav>
+        </div>
 
     </div>
+
+    <!-- ── Rad 2: Centrerad nav (desktop) / Mobilmeny ───────────────────────── -->
+    <div class="site-header__nav-row">
+        <nav class="site-header__nav" aria-label="Huvudmeny">
+            <?php wp_nav_menu([
+                'theme_location' => 'primary',
+                'container'      => false,
+                'menu_class'     => 'nav-list',
+                'fallback_cb'    => false,
+            ]); ?>
+        </nav>
+    </div>
+
 </header>
 
