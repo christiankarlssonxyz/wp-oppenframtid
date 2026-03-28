@@ -1,0 +1,153 @@
+<?php
+/**
+ * index.php – Startsidan
+ *
+ * Visar:
+ * - Hero: vem är du, vad är sidan, för vem
+ * - Ämnen: fokusområden som berättar vad sidan handlar om
+ * - Senaste inlägg
+ */
+get_header();
+?>
+
+<!-- ── HERO ──────────────────────────────────────────────────────────────────── -->
+<section class="hero">
+    <div class="hero__inner">
+
+        <div class="hero__profile">
+            <?php if (has_custom_logo()):
+                the_custom_logo();
+            else: ?>
+                <img src="<?php echo esc_url(get_avatar_url(1, ['size' => 200])); ?>"
+                     alt="<?php bloginfo('name'); ?>"
+                     class="hero__avatar">
+            <?php endif; ?>
+        </div>
+
+        <div class="hero__text">
+            <p class="hero__label">Personlig blogg</p>
+            <h1 class="hero__name"><?php bloginfo('name'); ?></h1>
+            <?php if (get_bloginfo('description')): ?>
+                <p class="hero__bio"><?php bloginfo('description'); ?></p>
+            <?php endif; ?>
+
+            <div class="hero__actions">
+                <a href="#senaste" class="btn btn--primary">Läs senaste</a>
+                <a href="<?php echo esc_url(get_permalink(get_page_by_path('om'))); ?>" class="btn btn--ghost">Om mig</a>
+            </div>
+
+            <?php
+            // Sociala ikoner från temainställningar
+            $socials = [
+                'mastodon'  => ['label' => 'Mastodon',  'icon' => 'M21.327 8.566c0-4.339-2.843-5.61-2.843-5.61-1.433-.658-3.894-.935-6.451-.956h-.062c-2.557.021-5.016.298-6.45.956 0 0-2.843 1.271-2.843 5.61 0 .993-.019 2.181.012 3.441.103 4.243.778 8.425 4.701 9.463 1.809.479 3.362.579 4.612.51 2.268-.126 3.541-.809 3.541-.809l-.075-1.646s-1.621.511-3.441.449c-1.804-.062-3.707-.194-3.999-2.409a4.523 4.523 0 0 1-.04-.621s1.77.433 4.014.536c1.372.063 2.658-.08 3.965-.236 2.506-.299 4.688-1.843 4.962-3.254.434-2.223.398-5.424.398-5.424zm-3.353 5.59h-2.081V9.057c0-1.075-.452-1.62-1.357-1.62-1 0-1.501.647-1.501 1.927v2.791h-2.069V9.364c0-1.28-.501-1.927-1.502-1.927-.905 0-1.357.545-1.357 1.62v5.099H5.026V8.903c0-1.074.273-1.927.823-2.558.567-.631 1.307-.955 2.228-.955 1.065 0 1.872.409 2.405 1.228l.518.869.519-.869c.533-.819 1.34-1.228 2.4-1.228.92 0 1.66.324 2.233.955.549.631.822 1.484.822 2.558v5.253z'/></svg>'],
+                'threads'   => ['label' => 'Threads',   'icon' => 'M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068V12c.024-6.75 4.834-11.5 10.686-11.5h.007c3.281.024 6.084 1.205 8.1 3.423 1.874 2.06 2.843 4.802 2.868 8.077v.067c-.025 3.275-.994 6.017-2.868 8.077-2.016 2.218-4.819 3.399-8.1 3.423l-.007-.567zm-.017-3.856c2.194 0 3.94-.656 5.19-1.951 1.203-1.246 1.831-2.991 1.863-5.186-.032-2.219-.66-3.964-1.863-5.21-1.25-1.295-2.996-1.951-5.19-1.951-1.922 0-3.55.572-4.842 1.7-1.266 1.105-1.961 2.618-2.066 4.497.105 1.879.8 3.392 2.066 4.497 1.292 1.128 2.92 1.7 4.842 1.7l-.007-.096z'],
+                'x'         => ['label' => 'X / Twitter', 'icon' => 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.736l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z'],
+            ];
+            $has_social = false;
+            foreach ($socials as $key => $_) {
+                if (get_theme_mod('blogtree_' . $key)) { $has_social = true; break; }
+            }
+            if ($has_social): ?>
+            <div class="hero__social">
+                <?php foreach ($socials as $key => $data):
+                    $url = get_theme_mod('blogtree_' . $key);
+                    if (!$url) continue; ?>
+                    <a href="<?php echo esc_url($url); ?>"
+                       class="social-link"
+                       aria-label="<?php echo esc_attr($data['label']); ?>"
+                       target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+                            <path d="<?php echo esc_attr($data['icon']); ?>"/>
+                        </svg>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+
+    </div>
+</section>
+
+<!-- ── ÄMNEN ─────────────────────────────────────────────────────────────────── -->
+<?php
+$topics = get_terms([
+    'taxonomy'   => 'topic',
+    'parent'     => 0,
+    'hide_empty' => true,
+    'number'     => 8,
+]);
+if ($topics && !is_wp_error($topics)): ?>
+<section class="topics-section">
+    <div class="container">
+        <h2 class="section-title">Fokusområden</h2>
+        <p class="section-sub">Det här skriver jag om</p>
+        <div class="topics-grid">
+            <?php foreach ($topics as $topic):
+                $color = get_term_meta($topic->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+            ?>
+            <a href="<?php echo esc_url(get_term_link($topic)); ?>"
+               class="topic-card"
+               style="--topic-color: <?php echo esc_attr($color); ?>">
+                <span class="topic-card__name"><?php echo esc_html($topic->name); ?></span>
+                <span class="topic-card__count"><?php echo $topic->count; ?> inlägg</span>
+            </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- ── SENASTE INLÄGG ─────────────────────────────────────────────────────────── -->
+<section class="posts-section" id="senaste">
+    <div class="container">
+        <h2 class="section-title">Senaste</h2>
+
+        <?php
+        $posts_query = new WP_Query([
+            'posts_per_page'      => 6,
+            'ignore_sticky_posts' => true,
+        ]);
+        if ($posts_query->have_posts()): ?>
+        <div class="post-grid">
+            <?php while ($posts_query->have_posts()): $posts_query->the_post();
+                $topics     = get_the_terms(get_the_ID(), 'topic');
+                $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
+            ?>
+            <article class="post-card">
+                <?php if (has_post_thumbnail()): ?>
+                <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
+                    <?php the_post_thumbnail('medium'); ?>
+                </a>
+                <?php endif; ?>
+                <div class="post-card__body">
+                    <?php if ($first_topic): ?>
+                    <a href="<?php echo esc_url(get_term_link($first_topic)); ?>" class="post-card__topic">
+                        <?php echo esc_html($first_topic->name); ?>
+                    </a>
+                    <?php endif; ?>
+                    <h3 class="post-card__title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h3>
+                    <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
+                    <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
+                        <?php echo get_the_date(); ?>
+                    </time>
+                </div>
+            </article>
+            <?php endwhile; wp_reset_postdata(); ?>
+        </div>
+
+        <?php if ($posts_query->max_num_pages > 1): ?>
+        <div class="pagination">
+            <?php echo paginate_links(['total' => $posts_query->max_num_pages, 'prev_text' => '&larr;', 'next_text' => '&rarr;']); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php else: ?>
+        <p>Inga inlägg ännu.</p>
+        <?php endif; ?>
+
+    </div>
+</section>
+
+<?php get_footer(); ?>

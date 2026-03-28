@@ -1,0 +1,309 @@
+/*
+ * layout.css – Sidlayout
+ *
+ * - Container (max-bredd + padding)
+ * - Header
+ * - Footer
+ * - Post-grid
+ * - Mobil-first: mobil är default, desktop via min-width: 768px
+ */
+
+/* ── Container ──────────────────────────────────────────────────────────────── */
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin-inline: auto;
+    padding-inline: var(--space-md);
+}
+
+/* ── Site Header ────────────────────────────────────────────────────────────── */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md);
+    max-width: 1100px;
+    margin-inline: auto;
+    gap: var(--space-md);
+}
+
+.site-header__logo {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-text);
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+/* Hamburgermeny-knapp (visas på mobil) */
+.site-header__menu-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: var(--space-sm);
+}
+
+.site-header__menu-btn span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-text);
+    border-radius: 2px;
+    transition: opacity .2s;
+}
+
+/* Nav (dold på mobil, visas när is-open) */
+.site-header__nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-md);
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.site-header__nav.is-open {
+    display: flex;
+}
+
+.nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.nav-list a,
+.nav-link {
+    color: var(--color-text);
+    font-weight: 500;
+    padding: var(--space-sm) 0;
+    display: block;
+}
+
+.nav-avatar img {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+
+/* Desktop nav */
+@media (min-width: 768px) {
+    .site-header__menu-btn { display: none; }
+
+    .site-header__nav {
+        display: flex;
+        position: static;
+        border: none;
+        padding: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-lg);
+    }
+
+    .nav-list {
+        flex-direction: row;
+        gap: var(--space-lg);
+    }
+
+    .nav-list a,
+    .nav-link {
+        padding: 0;
+    }
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────────── */
+.hero {
+    padding: var(--space-2xl) var(--space-md);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.hero__inner {
+    max-width: 1100px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    text-align: center;
+}
+
+.hero__avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-border);
+}
+
+.hero__label {
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: var(--space-sm);
+}
+
+.hero__name {
+    font-size: clamp(2rem, 6vw, 3rem);
+    margin-bottom: var(--space-md);
+}
+
+.hero__bio {
+    font-size: 1.1rem;
+    color: var(--color-muted);
+    max-width: 480px;
+    margin-inline: auto;
+    margin-bottom: var(--space-lg);
+}
+
+.hero__actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero__social {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    margin-top: var(--space-md);
+}
+
+.social-link {
+    color: var(--color-muted);
+    transition: color .2s;
+}
+
+.social-link:hover {
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+/* Två kolumner på desktop */
+@media (min-width: 768px) {
+    .hero__inner {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .hero__profile {
+        flex-shrink: 0;
+    }
+
+    .hero__avatar { width: 160px; height: 160px; }
+
+    .hero__bio { margin-inline: 0; }
+
+    .hero__actions,
+    .hero__social { justify-content: flex-start; }
+}
+
+/* ── Sektioner ──────────────────────────────────────────────────────────────── */
+.topics-section,
+.posts-section {
+    padding: var(--space-xl) var(--space-md);
+}
+
+/* ── Ämnesgrid ──────────────────────────────────────────────────────────────── */
+.topics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+}
+
+@media (min-width: 600px) {
+    .topics-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 900px) {
+    .topics-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── Inläggsgrid ────────────────────────────────────────────────────────────── */
+.post-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+}
+
+@media (min-width: 600px) {
+    .post-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+    .post-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── Single post / Page ─────────────────────────────────────────────────────── */
+.single-post,
+.page-content {
+    padding: var(--space-xl) var(--space-md);
+    max-width: 720px;
+}
+
+/* ── Ämnesrubrik ────────────────────────────────────────────────────────────── */
+.topic-header {
+    padding: var(--space-xl) var(--space-md);
+    border-bottom: 4px solid var(--topic-color, var(--color-accent));
+    background: var(--color-surface);
+}
+
+/* ── Paginering ─────────────────────────────────────────────────────────────── */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
+}
+
+/* ── Site Footer ────────────────────────────────────────────────────────────── */
+.site-footer {
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-xl) var(--space-md);
+    text-align: center;
+}
+
+.site-footer__inner {
+    max-width: 1100px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.footer-nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    justify-content: center;
+}
+
+.footer-nav-list a {
+    color: var(--color-muted);
+    font-size: .9rem;
+}
+
+.site-footer__copy {
+    font-size: .85rem;
+    color: var(--color-muted);
+    margin: 0;
+}

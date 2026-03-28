@@ -1,0 +1,116 @@
+/*
+ * base.css – Grundstil
+ *
+ * - CSS-variabler (färger, typografi, spacing)
+ * - Reset
+ * - Typografi
+ * - Mobil-first: basregler gäller för mobil, desktop läggs till med min-width
+ */
+
+/* ── Variabler ──────────────────────────────────────────────────────────────── */
+:root {
+    /* Färger */
+    --color-bg:         #ffffff;
+    --color-surface:    #f8f8f8;
+    --color-border:     #e5e5e5;
+    --color-text:       #1a1a1a;
+    --color-muted:      #6b7280;
+    --color-accent:     #2c3e50;
+    --color-accent-alt: #3498db;
+    --color-danger:     #e74c3c;
+
+    /* Typografi */
+    --font-sans:  system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-size:  1rem;
+    --line-height: 1.65;
+
+    /* Spacing */
+    --space-xs:  4px;
+    --space-sm:  8px;
+    --space-md:  16px;
+    --space-lg:  24px;
+    --space-xl:  40px;
+    --space-2xl: 64px;
+
+    /* Radie */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    /* Skugga */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.1);
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-sans);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    color: var(--color-text);
+    background: var(--color-bg);
+}
+
+img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+a {
+    color: var(--color-accent-alt);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+/* ── Typografi ──────────────────────────────────────────────────────────────── */
+h1, h2, h3, h4 {
+    line-height: 1.25;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+h1 { font-size: clamp(1.6rem, 5vw, 2.4rem); }
+h2 { font-size: clamp(1.3rem, 4vw, 1.8rem); }
+h3 { font-size: clamp(1.1rem, 3vw, 1.3rem); }
+
+p { margin-bottom: var(--space-md); }
+p:last-child { margin-bottom: 0; }
+
+/* ── Rubriker för sektioner ─────────────────────────────────────────────────── */
+.section-title {
+    font-size: 1.4rem;
+    margin-bottom: var(--space-xs);
+}
+
+.section-sub {
+    color: var(--color-muted);
+    margin-bottom: var(--space-lg);
+    font-size: .95rem;
+}
