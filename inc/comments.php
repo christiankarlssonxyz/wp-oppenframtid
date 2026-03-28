@@ -33,6 +33,14 @@ function blogtree_handle_comment(): void {
         wp_send_json_error('Du måste vara inloggad för att kommentera');
     }
 
+    // Rate-limiting: max 10 kommentarer per användare per timme
+    $rate_key   = 'blogtree_comment_rate_' . $user_id;
+    $rate_count = (int) get_transient($rate_key);
+    if ($rate_count >= 10) {
+        wp_send_json_error('Du har kommenterat för mycket. Försök igen om en stund.');
+    }
+    set_transient($rate_key, $rate_count + 1, HOUR_IN_SECONDS);
+
     $user = wp_get_current_user();
 
     $comment_id = wp_insert_comment([

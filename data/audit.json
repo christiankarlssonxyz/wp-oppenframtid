@@ -16,8 +16,8 @@
       "medium": 6,
       "low": 7,
       "info": 3,
-      "remediated": 25,
-      "open": 10
+      "remediated": 28,
+      "open": 7
     }
   },
   "findings": [
@@ -56,11 +56,13 @@
       "title": "Ingen filstorleksgräns vid JSON-uppladdning i admin",
       "type": "Denial of Service",
       "severity": "medium",
+      "status": "fixed",
       "file": "inc/integrity.php",
       "line": 52,
       "description": "file_get_contents() körs på den uppladdade temporära filen utan att kontrollera filstorleken. En administratör (eller komprometterat admin-konto) kan ladda upp en extremt stor JSON-fil som orsakar minnesproblem.",
       "code_snippet": "$content = file_get_contents($tmp);",
       "recommendation": "Kontrollera $files['size'][$i] < 512 * 1024 (max 512 KB) innan file_get_contents() anropas.",
+      "fix": "Storlekskontroll tillagd före file_get_contents(): filer > 512 KB avvisas med felmeddelande.",
       "references": ["OWASP A05:2021 – Security Misconfiguration"]
     },
     {
@@ -68,11 +70,13 @@
       "title": "Rate-limiting saknas på AJAX-kommentarer",
       "type": "Denial of Service",
       "severity": "medium",
+      "status": "fixed",
       "file": "inc/comments.php",
       "line": 17,
       "description": "wp_ajax_blogtree_post_comment saknar begränsning på antal kommentarer per användare eller tidsperiod. En inloggad användare kan spamma obegränsat antal kommentarer och fylla databasen.",
       "code_snippet": "add_action('wp_ajax_blogtree_post_comment', 'blogtree_handle_comment');",
       "recommendation": "Implementera transient-baserad rate-limiting: max t.ex. 10 kommentarer per användare per timme via get_transient('blogtree_comment_rate_' . $user_id).",
+      "fix": "Transient-baserad räknare per user_id: max 10 kommentarer per timme. Avvisar med felmeddelande vid överskridning.",
       "references": ["OWASP A05:2021 – Security Misconfiguration"]
     },
     {
@@ -80,11 +84,13 @@
       "title": "Rate-limiting saknas på community-insändare",
       "type": "Denial of Service",
       "severity": "medium",
+      "status": "fixed",
       "file": "inc/community.php",
       "line": 12,
       "description": "blogtree_handle_submission saknar begränsning på hur många inlägg en inloggad användare kan skicka in. En användare kan skicka in hundratals inlägg och belasta databasen.",
       "code_snippet": "add_action('wp_ajax_blogtree_submit_post', 'blogtree_handle_submission');",
       "recommendation": "Använd transient per user_id för att begränsa t.ex. 3 insändare per 24 timmar.",
+      "fix": "Transient-baserad räknare per user_id: max 3 insändare per 24 timmar. Avvisar med felmeddelande vid överskridning.",
       "references": ["OWASP A05:2021 – Security Misconfiguration"]
     },
     {
@@ -499,9 +505,6 @@
       "TEMA-PRIV-004: Inaktivera Gravatar som fallback eller informera vid registrering"
     ],
     "medium_priority": [
-      "TEMA-SEC-003: Lägg till filstorleksgräns (512 KB) vid JSON-uppladdning",
-      "TEMA-SEC-004: Implementera rate-limiting på AJAX-kommentarer",
-      "TEMA-SEC-005: Implementera rate-limiting på community-insändare",
       "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
     ],
     "low_priority": [
@@ -538,7 +541,10 @@
       "OM-PRIV-007: Ny om_replies-tabell – granulär radering av svar (dataminimering)",
       "TEMA-SEC-001: setcookie() för blogtree_visited uppdaterad med HttpOnly, Secure och SameSite=Lax",
       "TEMA-SEC-002: str_contains() ersatt med strpos() !== false – PHP 7.x-kompatibelt",
-      "TEMA-SEC-006: Admin-avatar hämtar ID dynamiskt via admin_email istället för hårdkodat ID 1"
+      "TEMA-SEC-006: Admin-avatar hämtar ID dynamiskt via admin_email istället för hårdkodat ID 1",
+      "TEMA-SEC-003: Storlekskontroll (max 512 KB) tillagd vid JSON-uppladdning i admin",
+      "TEMA-SEC-004: Rate-limiting på AJAX-kommentarer – max 10/timme per användare",
+      "TEMA-SEC-005: Rate-limiting på community-insändare – max 3/dygn per användare"
     ]
   }
 }

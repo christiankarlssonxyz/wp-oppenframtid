@@ -196,6 +196,10 @@ function blogtree_integrity_admin_page(): void {
         if (!empty($files['tmp_name'])) {
             foreach ($files['tmp_name'] as $i => $tmp) {
                 if (empty($tmp) || $files['error'][$i] !== UPLOAD_ERR_OK) continue;
+                if (($files['size'][$i] ?? 0) > 512 * 1024) {
+                    $invalid[] = esc_html($files['name'][$i]) . ' (för stor, max 512 KB)';
+                    continue;
+                }
                 $content = file_get_contents($tmp);
                 $decoded = json_decode($content, true);
                 if ($decoded === null) {

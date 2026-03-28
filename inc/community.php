@@ -18,6 +18,15 @@ function blogtree_handle_submission(): void {
         wp_send_json_error('Du måste vara inloggad');
     }
 
+    // Rate-limiting: max 3 insändare per användare per 24 timmar
+    $user_id    = get_current_user_id();
+    $rate_key   = 'blogtree_submit_rate_' . $user_id;
+    $rate_count = (int) get_transient($rate_key);
+    if ($rate_count >= 3) {
+        wp_send_json_error('Du har skickat in för många inlägg idag. Försök igen imorgon.');
+    }
+    set_transient($rate_key, $rate_count + 1, DAY_IN_SECONDS);
+
     $title   = sanitize_text_field(wp_unslash($_POST['title']   ?? ''));
     $content = wp_kses_post(wp_unslash($_POST['content'] ?? ''));
     $topic   = (int) ($_POST['topic'] ?? 0);
