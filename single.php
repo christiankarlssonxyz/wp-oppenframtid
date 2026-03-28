@@ -7,7 +7,7 @@ get_header();
 
 <?php if (have_posts()): while (have_posts()): the_post(); ?>
 
-<div class="content-with-sidebar">
+<div class="content-with-sidebar container">
 <article class="single-post">
 
     <header class="single-post__header">

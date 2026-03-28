@@ -48,56 +48,61 @@ $paged = get_query_var('paged') ?: 1;
 
 <!-- ── INLÄGG + SIDEBAR ───────────────────────────────────────────────────────── -->
 <div class="content-with-sidebar container" style="padding-top: var(--space-xl)">
-    <?php
-    $loop = new WP_Query([
-        'post_type'      => 'post',
-        'tax_query'      => [[
-            'taxonomy'         => 'topic',
-            'field'            => 'term_id',
-            'terms'            => [$term->term_id],
-            'include_children' => false,
-        ]],
-        'paged'          => $paged,
-        'posts_per_page' => (int) get_option('posts_per_page', 10),
-    ]);
 
-    if ($loop->have_posts()): ?>
-    <div class="post-grid">
-        <?php while ($loop->have_posts()): $loop->the_post(); ?>
-        <article class="post-card">
-            <?php if (has_post_thumbnail()): ?>
-            <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                <?php the_post_thumbnail('medium'); ?>
-            </a>
-            <?php endif; ?>
-            <div class="post-card__body">
-                <h3 class="post-card__title">
-                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                </h3>
-                <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
-                <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
-                    <?php echo get_the_date(); ?>
-                </time>
-            </div>
-        </article>
-        <?php endwhile; wp_reset_postdata(); ?>
+    <!-- Huvudinnehåll -->
+    <div>
+        <?php
+        $loop = new WP_Query([
+            'post_type'      => 'post',
+            'tax_query'      => [[
+                'taxonomy'         => 'topic',
+                'field'            => 'term_id',
+                'terms'            => [$term->term_id],
+                'include_children' => false,
+            ]],
+            'paged'          => $paged,
+            'posts_per_page' => (int) get_option('posts_per_page', 10),
+        ]);
+
+        if ($loop->have_posts()): ?>
+        <div class="post-grid">
+            <?php while ($loop->have_posts()): $loop->the_post(); ?>
+            <article class="post-card">
+                <?php if (has_post_thumbnail()): ?>
+                <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
+                    <?php the_post_thumbnail('medium'); ?>
+                </a>
+                <?php endif; ?>
+                <div class="post-card__body">
+                    <h3 class="post-card__title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h3>
+                    <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
+                    <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
+                        <?php echo get_the_date(); ?>
+                    </time>
+                </div>
+            </article>
+            <?php endwhile; wp_reset_postdata(); ?>
+        </div>
+
+        <div class="pagination">
+            <?php echo paginate_links([
+                'total'     => $loop->max_num_pages,
+                'current'   => $paged,
+                'prev_text' => '&larr;',
+                'next_text' => '&rarr;',
+            ]); ?>
+        </div>
+
+        <?php else: ?>
+        <p>Inga inlägg hittades.</p>
+        <?php endif; ?>
     </div>
 
-    <div class="pagination">
-        <?php echo paginate_links([
-            'total'     => $loop->max_num_pages,
-            'current'   => $paged,
-            'prev_text' => '&larr;',
-            'next_text' => '&rarr;',
-        ]); ?>
-    </div>
+    <!-- Sidebar -->
+    <?php get_sidebar(); ?>
 
-    <?php else: ?>
-    <p>Inga inlägg hittades.</p>
-    <?php endif; ?>
-</div>
-
-<?php get_sidebar(); ?>
 </div>
 
 <?php get_footer(); ?>
