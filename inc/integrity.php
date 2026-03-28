@@ -218,6 +218,26 @@ function blogtree_integrity_admin_page(): void {
         }
     }
 
+    // ── Synka från standardfil ─────────────────────────────────────────────────
+    if (isset($_POST['_nonce_sync']) && wp_verify_nonce($_POST['_nonce_sync'], 'blogtree_integrity_sync')) {
+        $default = get_template_directory() . '/data/audit.json';
+        if (!file_exists($default)) {
+            $error = 'Filen data/audit.json hittades inte.';
+        } else {
+            $content = file_get_contents($default);
+            $decoded = json_decode($content, true);
+            if (!$decoded) {
+                $error = 'data/audit.json innehåller ogiltig JSON.';
+            } else {
+                if (blogtree_detect_audit_format($decoded) === 'findings') {
+                    $decoded = blogtree_convert_findings_to_checklist($decoded);
+                }
+                update_option('blogtree_audit_data', wp_json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                $message = 'Synkad från data/audit.json.';
+            }
+        }
+    }
+
     // ── Skapa / uppdatera integritetssida ──────────────────────────────────────
     if (isset($_POST['_nonce_generate']) && wp_verify_nonce($_POST['_nonce_generate'], 'blogtree_integrity_generate')) {
         $result = blogtree_generate_integrity_page();
@@ -298,12 +318,19 @@ function blogtree_integrity_admin_page(): void {
                 </script>
             </div>
 
-            <!-- ── Ladda ner ─────────────────────────────────────────────────── -->
+            <!-- ── Ladda ner + synka ─────────────────────────────────────────── -->
             <div class="postbox" style="padding:20px">
-                <h2 class="hndle">Ladda ner JSON</h2>
-                <p class="description">Exportera det sammanfogade granskningsdokumentet.</p>
+                <h2 class="hndle">Ladda ner / Synka</h2>
+                <p class="description">Exportera det aktiva granskningsdokumentet.</p>
                 <a href="<?php echo esc_url(admin_url('admin-post.php?action=blogtree_download_audit&_wpnonce=' . wp_create_nonce('blogtree_download_audit'))); ?>"
                    class="button button-secondary">Ladda ner audit.json</a>
+
+                <hr style="margin:16px 0">
+                <p class="description">Läs in <code>data/audit.json</code> från temat direkt (synkar ändrade filer utan uppladdning).</p>
+                <form method="post">
+                    <?php wp_nonce_field('blogtree_integrity_sync', '_nonce_sync'); ?>
+                    <?php submit_button('Synka från standardfil', 'secondary', 'submit', false); ?>
+                </form>
             </div>
         </div>
 
