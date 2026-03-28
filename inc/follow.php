@@ -7,6 +7,11 @@
  * Hanteras via AJAX.
  */
 
+// GDPR Art. 17 – rensa följda ämnen vid kontoborttagning
+add_action('delete_user', function (int $user_id): void {
+    delete_user_meta($user_id, 'blogtree_followed_topics');
+});
+
 add_action('wp_ajax_blogtree_follow_topic', 'blogtree_handle_follow');
 
 function blogtree_handle_follow(): void {

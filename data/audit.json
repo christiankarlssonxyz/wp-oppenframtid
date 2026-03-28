@@ -16,8 +16,8 @@
       "medium": 6,
       "low": 7,
       "info": 3,
-      "remediated": 28,
-      "open": 7
+      "remediated": 31,
+      "open": 4
     }
   },
   "findings": [
@@ -112,11 +112,13 @@
       "title": "liked_by-lista lagrar alla användares ID:n i post meta",
       "type": "Privacy / GDPR",
       "severity": "low",
+      "status": "fixed",
       "file": "inc/likes.php",
       "line": 22,
       "description": "blogtree_liked_by sparar en array av alla user IDs som gillat ett inlägg. Om WordPress REST API är aktiverat kan denna meta vara tillgänglig publikt. User IDs kan i kombination med profil-URL kopplas till identifierbara personer.",
       "code_snippet": "$liked_by = (array) get_post_meta($post_id, 'blogtree_liked_by', true);",
       "recommendation": "Registrera meta-fältet med 'show_in_rest' => false och lägg till ett auth_callback för att säkra åtkomst via REST API.",
+      "fix": "register_post_meta() för blogtree_liked_by och blogtree_likes med show_in_rest: false och auth_callback: __return_false. Skyddar mot REST API-exponering.",
       "references": ["GDPR Art. 4(1) – Definition of personal data", "WordPress REST API Handbook"]
     },
     {
@@ -124,11 +126,13 @@
       "title": "Följda ämnen raderas inte vid kontoborttagning",
       "type": "Privacy / GDPR",
       "severity": "low",
+      "status": "fixed",
       "file": "inc/follow.php",
       "line": 1,
       "description": "blogtree_followed_topics sparas i user meta men ingen hook på delete_user rensar datan. Vid kontoborttagning finns kvarliggande data i wp_usermeta-tabellen.",
       "code_snippet": "update_user_meta($user_id, 'blogtree_followed_topics', $followed);",
       "recommendation": "Lägg till add_action('delete_user', function($user_id) { delete_user_meta($user_id, 'blogtree_followed_topics'); });",
+      "fix": "delete_user-hook registrerad i follow.php: delete_user_meta($user_id, 'blogtree_followed_topics') körs automatiskt vid kontoborttagning.",
       "references": ["GDPR Art. 17 – Right to erasure"]
     },
     {
@@ -136,11 +140,13 @@
       "title": "Gilla-data raderas inte vid kontoborttagning",
       "type": "Privacy / GDPR",
       "severity": "low",
+      "status": "fixed",
       "file": "inc/likes.php",
       "line": 1,
       "description": "User IDs i blogtree_liked_by rensas inte när ett konto raderas. En raderad användares ID kvarstår i post meta och kan kopplas till anonymiserat eller återanvänt konto.",
       "code_snippet": "// Ingen delete_user-hook registrerad",
       "recommendation": "Vid delete_user: iterera igenom alla posts och ta bort user_id från blogtree_liked_by-arrayen.",
+      "fix": "delete_user-hook i likes.php: söker via SQL efter alla inlägg där user_id finns i blogtree_liked_by, tar bort ID:t och uppdaterar räknaren.",
       "references": ["GDPR Art. 17 – Right to erasure"]
     },
     {
@@ -508,9 +514,6 @@
       "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
     ],
     "low_priority": [
-      "TEMA-PRIV-001: Registrera delete_user-hook för att rensa followed_topics",
-      "TEMA-PRIV-002: Registrera delete_user-hook för att rensa liked_by-data",
-      "TEMA-PRIV-003: Skydda blogtree_liked_by från REST API",
       "ASB-PRIV-002: Dokumentera landblockering i integritetspolicyn om den används",
       "ASB-SEC-001: Aktivera Antispam Bees tidsbaserade kontroll, språkfilter och BBCode för flerlagersskydd"
     ],
@@ -544,7 +547,10 @@
       "TEMA-SEC-006: Admin-avatar hämtar ID dynamiskt via admin_email istället för hårdkodat ID 1",
       "TEMA-SEC-003: Storlekskontroll (max 512 KB) tillagd vid JSON-uppladdning i admin",
       "TEMA-SEC-004: Rate-limiting på AJAX-kommentarer – max 10/timme per användare",
-      "TEMA-SEC-005: Rate-limiting på community-insändare – max 3/dygn per användare"
+      "TEMA-SEC-005: Rate-limiting på community-insändare – max 3/dygn per användare",
+      "TEMA-PRIV-001: blogtree_liked_by och blogtree_likes registrerade med show_in_rest:false",
+      "TEMA-PRIV-002: delete_user-hook rensar blogtree_followed_topics vid kontoborttagning",
+      "TEMA-PRIV-003: delete_user-hook tar bort user ID från alla blogtree_liked_by-listor"
     ]
   }
 }
