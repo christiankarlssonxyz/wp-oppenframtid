@@ -40,13 +40,30 @@
                         <?php echo get_avatar($user->ID, 32); ?>
                     </button>
                     <div class="nav-user__menu" role="menu">
-                        <a href="<?php echo $profile_url; ?>" class="nav-user__item" role="menuitem">Användarprofil</a>
+
+                        <div class="nav-user__greeting">Hej <?php echo esc_html($user->display_name); ?></div>
+
+                        <div class="nav-user__section">
+                            <a href="<?php echo $profile_url; ?>" class="nav-user__account-btn">Mitt konto</a>
+                        </div>
+
+                        <div class="nav-user__divider"></div>
+
+                        <div class="nav-user__heading">Mitt innehåll</div>
+                        <button class="nav-user__item nav-user__theme-toggle" id="theme-toggle" aria-label="Byt tema">
+                            <span class="theme-toggle__icon">☀️</span>
+                            <span class="theme-toggle__label">Ljust läge</span>
+                        </button>
+
                         <?php if ($is_admin): ?>
-                        <a href="<?php echo $admin_url; ?>" class="nav-user__item" role="menuitem">Admin</a>
-                        <?php endif; ?>
+                        <div class="nav-user__divider"></div>
+                        <div class="nav-user__heading">Admin</div>
                         <a href="<?php echo $new_post; ?>" class="nav-user__item" role="menuitem">Skriv nytt inlägg</a>
+                        <?php endif; ?>
+
                         <div class="nav-user__divider"></div>
                         <a href="<?php echo $logout_url; ?>" class="nav-user__item nav-user__item--logout" role="menuitem">Logga ut</a>
+
                     </div>
                 </div>
             <?php else: ?>

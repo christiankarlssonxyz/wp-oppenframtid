@@ -33,25 +33,48 @@ add_action('wp_enqueue_scripts', function () {
         'nonce' => wp_create_nonce('blogtree_follow'),
     ]);
 
-    // Användarmeny dropdown
+    // Användarmeny dropdown + mörkt/ljust läge
     wp_add_inline_script('blogtree-follow', "
 (function () {
+    // ── Dropdown ──────────────────────────────────────────────────────────────
     var btn  = document.querySelector('.nav-avatar');
     var menu = document.querySelector('.nav-user__menu');
-    if (!btn || !menu) return;
+    if (btn && menu) {
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = menu.classList.toggle('is-open');
+            btn.setAttribute('aria-expanded', open);
+        });
+        document.addEventListener('click', function () {
+            menu.classList.remove('is-open');
+            btn.setAttribute('aria-expanded', 'false');
+        });
+        menu.addEventListener('click', function (e) { e.stopPropagation(); });
+    }
 
-    btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var open = menu.classList.toggle('is-open');
-        btn.setAttribute('aria-expanded', open);
-    });
+    // ── Mörkt/Ljust läge ──────────────────────────────────────────────────────
+    var toggleBtn   = document.getElementById('theme-toggle');
+    var icon        = toggleBtn ? toggleBtn.querySelector('.theme-toggle__icon')  : null;
+    var label       = toggleBtn ? toggleBtn.querySelector('.theme-toggle__label') : null;
+    var stored      = localStorage.getItem('blogtree-theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark      = stored === 'dark' || (!stored && prefersDark);
 
-    document.addEventListener('click', function () {
-        menu.classList.remove('is-open');
-        btn.setAttribute('aria-expanded', 'false');
-    });
+    function applyTheme(dark) {
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        if (icon)  icon.textContent  = dark ? '🌙' : '☀️';
+        if (label) label.textContent = dark ? 'Mörkt läge' : 'Ljust läge';
+    }
 
-    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+    applyTheme(isDark);
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+            isDark = !isDark;
+            localStorage.setItem('blogtree-theme', isDark ? 'dark' : 'light');
+            applyTheme(isDark);
+        });
+    }
 })();
     ");
 

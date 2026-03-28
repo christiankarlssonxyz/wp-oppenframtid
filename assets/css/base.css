@@ -42,6 +42,17 @@
     --shadow-md: 0 4px 16px rgba(0,0,0,.1);
 }
 
+/* ── Mörkt läge ─────────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+    --color-bg:         #0f1117;
+    --color-surface:    #1a1d27;
+    --color-border:     #2a2d3a;
+    --color-text:       #e8eaf0;
+    --color-muted:      #9399a8;
+    --color-accent:     #a8b4c8;
+    --color-accent-alt: #5ba3e8;
+}
+
 /* ── Reset ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
     box-sizing: border-box;
