@@ -5,9 +5,20 @@
  * Visar alla inlägg inom ett ämne.
  * URL-format: /topic/amnesnamn/
  */
+$term = get_queried_object();
+
+if ( ! $term || ! isset( $term->term_id ) ) {
+    global $wp_query;
+    $wp_query->set_404();
+    status_header( 404 );
+    get_header();
+    get_template_part( '404' );
+    get_footer();
+    exit;
+}
+
 get_header();
 
-$term  = get_queried_object();
 $color = get_term_meta($term->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
 $paged = get_query_var('paged') ?: 1;
 ?>
