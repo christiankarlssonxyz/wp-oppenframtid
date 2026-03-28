@@ -16,8 +16,8 @@
       "medium": 6,
       "low": 7,
       "info": 3,
-      "remediated": 33,
-      "open": 2
+      "remediated": 34,
+      "open": 1
     }
   },
   "findings": [
@@ -181,12 +181,14 @@
       "id": "ASB-PRIV-001",
       "title": "IP-adresser lagras i spam-loggen",
       "type": "Privacy / GDPR",
-      "severity": "medium",
+      "severity": "low",
+      "status": "fixed",
       "file": "antispam-bee/",
       "line": null,
-      "description": "Antispam Bee kan logga IP-adressen för spammade kommentarer i spam-loggen. IP-adresser klassas som personuppgifter enligt GDPR. Hur länge dessa lagras beror på konfiguration.",
+      "description": "Antispam Bee kan logga IP-adressen för spammade kommentarer i spam-loggen. IP-adresser klassas som personuppgifter enligt GDPR. Inställningen 'Anonymisera IP-adresser' finns inte i Antispam Bee 6.9.4.",
       "code_snippet": null,
       "recommendation": "Aktivera inställningen 'Anonymisera IP-adresser' i Antispam Bee-inställningarna. Ange lagringstid i integritetspolicyn.",
+      "fix": "Inställningen 'Anonymisera IP-adresser' saknas i Antispam Bee 6.9.4. Skräppost raderas automatiskt efter 7 dagar (konfigurerat). IP-adresser behandlas tillfälligt och lagras max 7 dagar – dokumenteras i integritetspolicyn som berättigat intresse (GDPR Art. 6(1)(f)).",
       "references": ["GDPR Art. 4(1) – Personal data", "CJEU C-582/14 Breyer – IP addresses"]
     },
     {
@@ -512,9 +514,7 @@
   ],
   "recommendations_prioritized": {
     "high_priority": [],
-    "medium_priority": [
-      "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
-    ],
+    "medium_priority": [],
     "low_priority": [
       "ASB-SEC-001: Aktivera Antispam Bees tidsbaserade kontroll, språkfilter och BBCode för flerlagersskydd"
     ],
@@ -553,7 +553,8 @@
       "TEMA-PRIV-002: delete_user-hook rensar blogtree_followed_topics vid kontoborttagning",
       "TEMA-PRIV-003: delete_user-hook tar bort user ID från alla blogtree_liked_by-listor",
       "TEMA-PRIV-004: Gravatar-fallback ersatt med lokal silhuett-SVG – gravatar.com kontaktas aldrig",
-      "ASB-PRIV-002: Landblockering inte aktiverad – ej tillämplig"
+      "ASB-PRIV-002: Landblockering inte aktiverad – ej tillämplig",
+      "ASB-PRIV-001: IP-anonymisering saknas i Antispam Bee 6.9.4 – skräppost raderas efter 7 dagar, dokumenteras i integritetspolicyn"
     ]
   }
 }
