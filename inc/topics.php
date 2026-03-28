@@ -27,9 +27,47 @@ add_action('init', function () {
     ]);
 });
 
+// ── Ladda mediepicker på ämnes-admin-sidor ─────────────────────────────────────
+add_action('admin_enqueue_scripts', function ($hook) {
+    if (in_array($hook, ['edit-tags.php', 'term.php'], true)) {
+        wp_enqueue_media();
+        wp_add_inline_script('media-editor', "
+(function($){
+    var mediaUploader;
+    $(document).on('click', '#topic-banner-btn', function(e){
+        e.preventDefault();
+        if(mediaUploader){ mediaUploader.open(); return; }
+        mediaUploader = wp.media({
+            title: 'Välj bannerbild',
+            button: { text: 'Välj bild' },
+            multiple: false,
+            library: { type: 'image' }
+        });
+        mediaUploader.on('select', function(){
+            var att = mediaUploader.state().get('selection').first().toJSON();
+            $('#topic-banner-id').val(att.id);
+            var thumb = att.sizes && att.sizes.medium ? att.sizes.medium.url : att.url;
+            $('#topic-banner-preview').attr('src', thumb).show();
+            $('#topic-banner-remove').show();
+        });
+        mediaUploader.open();
+    });
+    $(document).on('click', '#topic-banner-remove', function(e){
+        e.preventDefault();
+        $('#topic-banner-id').val('');
+        $('#topic-banner-preview').hide().attr('src','');
+        $(this).hide();
+    });
+})(jQuery);
+        ");
+    }
+});
+
 // ── Färgval per ämne i admin ───────────────────────────────────────────────────
 add_action('topic_edit_form_fields', function ($term) {
-    $color = get_term_meta($term->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+    $color     = get_term_meta($term->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+    $banner_id = (int) get_term_meta($term->term_id, 'wpblogtree_topic_banner_id', true);
+    $preview   = $banner_id ? wp_get_attachment_image_src($banner_id, 'medium') : false;
     ?>
     <tr class="form-field">
         <th><label for="topic-color">Färg</label></th>
@@ -38,11 +76,38 @@ add_action('topic_edit_form_fields', function ($term) {
             <p class="description">Visas på ämnessidan och i ämneskorten på startsidan.</p>
         </td>
     </tr>
+    <tr class="form-field">
+        <th><label>Bannerbild</label></th>
+        <td>
+            <input type="hidden" id="topic-banner-id" name="topic_banner_id" value="<?php echo esc_attr($banner_id ?: ''); ?>">
+            <?php if ($preview): ?>
+            <img id="topic-banner-preview"
+                 src="<?php echo esc_url($preview[0]); ?>"
+                 style="max-width:300px;height:auto;display:block;margin-bottom:8px;border-radius:4px;">
+            <?php else: ?>
+            <img id="topic-banner-preview" src="" style="max-width:300px;height:auto;display:none;margin-bottom:8px;border-radius:4px;">
+            <?php endif; ?>
+            <button type="button" id="topic-banner-btn" class="button">Välj bild</button>
+            <button type="button" id="topic-banner-remove" class="button" style="<?php echo $banner_id ? '' : 'display:none;'; ?>margin-left:4px;">Ta bort bild</button>
+            <p class="description">
+                Rekommenderat format: <strong>1 200 × 400 px</strong> (3:1).<br>
+                Ladda upp minst 1 200 px bred för bäst kvalitet på alla skärmar.
+            </p>
+        </td>
+    </tr>
     <?php
 });
 
 add_action('edited_topic', function ($term_id) {
     if (isset($_POST['topic_color'])) {
         update_term_meta($term_id, 'wpblogtree_topic_color', sanitize_hex_color($_POST['topic_color']));
+    }
+    if (isset($_POST['topic_banner_id'])) {
+        $banner_id = absint($_POST['topic_banner_id']);
+        if ($banner_id) {
+            update_term_meta($term_id, 'wpblogtree_topic_banner_id', $banner_id);
+        } else {
+            delete_term_meta($term_id, 'wpblogtree_topic_banner_id');
+        }
     }
 });

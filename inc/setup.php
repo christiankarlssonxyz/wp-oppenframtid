@@ -37,6 +37,7 @@ add_action('after_setup_theme', function () {
     add_image_size('blogtree-card', 600, 400, true);
     add_image_size('blogtree-hero', 1200, 600, true);
     add_image_size('blogtree-frontpage-banner', 1200, 500, true);
+    add_image_size('blogtree-topic-banner', 1200, 400, true);
 
 });
 

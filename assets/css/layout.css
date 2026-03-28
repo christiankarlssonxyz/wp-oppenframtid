@@ -424,6 +424,20 @@
     padding: var(--space-xl) var(--space-md);
 }
 
+/* ── Ämnes-bannerbild ───────────────────────────────────────────────────────── */
+.topic-banner {
+    margin-bottom: var(--space-xl);
+}
+
+.topic-banner__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    aspect-ratio: 3 / 1;
+}
+
 /* ── Frontpage bannerbild ────────────────────────────────────────────────────── */
 .frontpage-banner {
     padding: var(--space-xl) var(--space-md) 0;
