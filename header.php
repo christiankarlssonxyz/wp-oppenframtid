@@ -4,6 +4,13 @@
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="profile" href="https://gmpg.org/xfn/11">
+    <script>
+    (function(){
+        var t = localStorage.getItem('blogtree-theme');
+        var d = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
+    })();
+    </script>
     <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -33,7 +40,7 @@
                 $is_admin    = current_user_can('manage_options');
                 $profile_url = esc_url(get_permalink(get_page_by_path('profil')));
                 $new_post    = esc_url(admin_url('post-new.php'));
-                $logout_url  = esc_url(wp_logout_url(home_url('/')));
+                $logout_url  = esc_url(wp_logout_url(home_url()));
                 $admin_url   = esc_url(admin_url()); ?>
                 <div class="nav-user" aria-haspopup="true">
                     <button class="nav-avatar" aria-expanded="false" aria-label="Användarmeny">
