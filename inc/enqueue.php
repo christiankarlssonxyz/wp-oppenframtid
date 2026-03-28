@@ -33,4 +33,26 @@ add_action('wp_enqueue_scripts', function () {
         'nonce' => wp_create_nonce('blogtree_follow'),
     ]);
 
+    // Användarmeny dropdown
+    wp_add_inline_script('blogtree-follow', "
+(function () {
+    var btn  = document.querySelector('.nav-avatar');
+    var menu = document.querySelector('.nav-user__menu');
+    if (!btn || !menu) return;
+
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = menu.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', open);
+    });
+
+    document.addEventListener('click', function () {
+        menu.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+    });
+
+    menu.addEventListener('click', function (e) { e.stopPropagation(); });
+})();
+    ");
+
 });

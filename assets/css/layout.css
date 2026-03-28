@@ -92,11 +92,68 @@
     display: block;
 }
 
+.nav-avatar {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
 .nav-avatar img {
     border-radius: 50%;
     width: 32px;
     height: 32px;
     object-fit: cover;
+    display: block;
+}
+
+/* ── Användarmeny (dropdown) ────────────────────────────────────────────────── */
+.nav-user {
+    position: relative;
+}
+
+.nav-user__menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(0,0,0,.1);
+    min-width: 180px;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.nav-user__menu.is-open {
+    display: block;
+}
+
+.nav-user__item {
+    display: block;
+    padding: .65rem 1rem;
+    color: var(--color-text);
+    font-size: .9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background .15s;
+}
+
+.nav-user__item:hover {
+    background: var(--color-border);
+}
+
+.nav-user__divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: .25rem 0;
+}
+
+.nav-user__item--logout {
+    color: #c0392b;
 }
 
 /* Desktop nav */
