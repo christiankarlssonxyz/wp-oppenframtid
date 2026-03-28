@@ -406,6 +406,15 @@
     margin-bottom: var(--space-md);
 }
 
+.sidebar-widget__text {
+    font-size: .9rem;
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+.sidebar-widget__text p { margin: 0 0 var(--space-sm); }
+.sidebar-widget__text p:last-child { margin-bottom: 0; }
+
 /* Om mig */
 .sidebar-about {
     display: flex;

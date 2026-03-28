@@ -42,6 +42,35 @@ add_action('after_setup_theme', function () {
 // ── Stäng av admin-toolbar för alla användare ──────────────────────────────────
 add_filter('show_admin_bar', '__return_false');
 
+// ── Sidebar-textbox i Customizer ───────────────────────────────────────────────
+add_action('customize_register', function ($wp_customize) {
+
+    $wp_customize->add_section('blogtree_sidebar_text', [
+        'title'    => 'Sidebar – textbox',
+        'priority' => 25,
+    ]);
+
+    $wp_customize->add_setting('blogtree_sidebar_text_title', [
+        'default'           => 'Integritet &amp; öppen källkod',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('blogtree_sidebar_text_title', [
+        'label'   => 'Rubrik',
+        'section' => 'blogtree_sidebar_text',
+        'type'    => 'text',
+    ]);
+
+    $wp_customize->add_setting('blogtree_sidebar_text_body', [
+        'default'           => '',
+        'sanitize_callback' => 'wp_kses_post',
+    ]);
+    $wp_customize->add_control('blogtree_sidebar_text_body', [
+        'label'   => 'Text',
+        'section' => 'blogtree_sidebar_text',
+        'type'    => 'textarea',
+    ]);
+});
+
 // ── Sociala länkar i Customizer ────────────────────────────────────────────────
 add_action('customize_register', function ($wp_customize) {
 

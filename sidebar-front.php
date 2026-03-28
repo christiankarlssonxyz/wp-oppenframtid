@@ -30,6 +30,21 @@
         </div>
     </div>
 
+    <!-- ── Anpassningsbar textbox ──────────────────────────────────────────────── -->
+    <?php
+    $box_title = get_theme_mod('blogtree_sidebar_text_title', 'Integritet &amp; öppen källkod');
+    $box_body  = get_theme_mod('blogtree_sidebar_text_body', '');
+    if ($box_title || $box_body): ?>
+    <div class="sidebar-widget">
+        <?php if ($box_title): ?>
+        <h3 class="sidebar-widget__title"><?php echo esc_html($box_title); ?></h3>
+        <?php endif; ?>
+        <?php if ($box_body): ?>
+        <div class="sidebar-widget__text"><?php echo wp_kses_post($box_body); ?></div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <!-- ── Fästa inlägg ──────────────────────────────────────────────────────── -->
     <?php
     $sticky_ids = get_option('sticky_posts', []);
