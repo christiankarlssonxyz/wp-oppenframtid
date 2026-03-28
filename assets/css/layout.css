@@ -115,6 +115,52 @@
     align-items: center;
 }
 
+.theme-mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 99px;
+    padding: 6px 14px 6px 10px;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+    white-space: nowrap;
+}
+
+.theme-mode-btn:hover {
+    border-color: var(--color-accent-alt);
+    color: var(--color-text);
+}
+
+.theme-mode-btn__light,
+.theme-mode-btn__dark {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Ljust läge: visa sol (ljust), dölj måne */
+:root[data-theme="light"] .theme-mode-btn__light,
+:root:not([data-theme]) .theme-mode-btn__light {
+    display: none;
+}
+:root[data-theme="light"] .theme-mode-btn__dark,
+:root:not([data-theme]) .theme-mode-btn__dark {
+    display: flex;
+}
+
+/* Mörkt läge: visa måne (mörkt), dölj sol */
+:root[data-theme="dark"] .theme-mode-btn__dark {
+    display: none;
+}
+:root[data-theme="dark"] .theme-mode-btn__light {
+    display: flex;
+}
+
 .nav-login-btn {
     display: inline-block;
     background: var(--color-accent-alt, #3498db);

@@ -59,28 +59,19 @@ add_action('wp_enqueue_scripts', function () {
     }
 
     // ── Mörkt/Ljust läge ──────────────────────────────────────────────────────
-    var toggleBtn   = document.getElementById('theme-toggle');
-    var icon        = toggleBtn ? toggleBtn.querySelector('.theme-toggle__icon')  : null;
-    var label       = toggleBtn ? toggleBtn.querySelector('.theme-toggle__label') : null;
     var stored      = localStorage.getItem('blogtree-theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     var isDark      = stored === 'dark' || (!stored && prefersDark);
 
-    function applyTheme(dark) {
-        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-        if (icon)  icon.textContent  = dark ? '🌙' : '☀️';
-        if (label) label.textContent = dark ? 'Mörkt läge' : 'Ljust läge';
-    }
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 
-    applyTheme(isDark);
-
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function () {
+    document.querySelectorAll('#theme-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
             isDark = !isDark;
             localStorage.setItem('blogtree-theme', isDark ? 'dark' : 'light');
-            applyTheme(isDark);
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
         });
-    }
+    });
 })();
     ");
 
