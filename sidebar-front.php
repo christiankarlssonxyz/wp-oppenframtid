@@ -21,7 +21,7 @@
                 <li>Inga tredjepartstjänster</li>
             </ul>
             <?php
-            $privacy_page = get_page_by_path('integritet') ?: get_page_by_path('privacy');
+            $privacy_page = get_page_by_path('integritetspolicy') ?: get_page_by_path('integritet') ?: get_page_by_path('privacy');
             if ($privacy_page): ?>
             <a href="<?php echo esc_url(get_permalink($privacy_page)); ?>" class="integrity-badge__link">
                 Läs integritetspolicyn
