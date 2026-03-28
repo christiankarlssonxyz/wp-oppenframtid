@@ -86,6 +86,7 @@
                         <?php if ($is_admin): ?>
                         <div class="nav-user__divider"></div>
                         <div class="nav-user__heading">Admin</div>
+                        <a href="<?php echo $admin_url; ?>" class="nav-user__item" role="menuitem">Dashboard</a>
                         <a href="<?php echo $new_post; ?>" class="nav-user__item" role="menuitem">Skriv nytt inlägg</a>
                         <?php endif; ?>
 
