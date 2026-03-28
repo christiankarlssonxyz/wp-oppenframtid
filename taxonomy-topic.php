@@ -46,8 +46,8 @@ $paged = get_query_var('paged') ?: 1;
     </div>
 </section>
 
-<!-- ── INLÄGG ─────────────────────────────────────────────────────────────────── -->
-<section class="container">
+<!-- ── INLÄGG + SIDEBAR ───────────────────────────────────────────────────────── -->
+<div class="content-with-sidebar container" style="padding-top: var(--space-xl)">
     <?php
     $loop = new WP_Query([
         'post_type'      => 'post',
@@ -95,6 +95,9 @@ $paged = get_query_var('paged') ?: 1;
     <?php else: ?>
     <p>Inga inlägg hittades.</p>
     <?php endif; ?>
-</section>
+</div>
+
+<?php get_sidebar(); ?>
+</div>
 
 <?php get_footer(); ?>
