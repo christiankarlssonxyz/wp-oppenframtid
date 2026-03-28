@@ -116,37 +116,22 @@
 }
 
 .nav-login-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: 1px solid var(--color-border);
+    display: inline-block;
+    background: var(--color-accent-alt, #3498db);
+    color: #fff;
+    border: none;
     border-radius: 99px;
-    padding: 5px 14px 5px 8px;
+    padding: 7px 20px;
     font-size: .875rem;
-    font-weight: 500;
-    color: var(--color-text);
+    font-weight: 600;
     text-decoration: none;
-    transition: border-color .15s, background .15s;
+    transition: opacity .15s;
 }
 
 .nav-login-btn:hover {
-    border-color: var(--color-accent-alt);
-    background: var(--color-surface);
+    opacity: .85;
     text-decoration: none;
-}
-
-.nav-login-btn__avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    color: var(--color-muted);
-    flex-shrink: 0;
+    color: #fff;
 }
 
 .nav-avatar img {
