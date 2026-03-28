@@ -37,6 +37,7 @@
                 <span>Sök</span>
             </a>
 
+            <?php if (!is_user_logged_in()): ?>
             <button class="theme-mode-btn" id="theme-toggle" aria-label="Byt färgläge">
                 <span class="theme-mode-btn__light" aria-hidden="true">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -55,6 +56,7 @@
                     <span>Mörkt läge</span>
                 </span>
             </button>
+            <?php endif; ?>
 
             <?php if (is_user_logged_in()):
                 $user        = wp_get_current_user();
