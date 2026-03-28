@@ -10,13 +10,13 @@
       "Plugin: Open Messages (security-audit.json)"
     ],
     "summary": {
-      "total_findings": 29,
+      "total_findings": 35,
       "critical": 0,
       "high": 0,
       "medium": 6,
       "low": 6,
       "info": 4,
-      "remediated": 16,
+      "remediated": 22,
       "open": 13
     }
   },
@@ -390,6 +390,90 @@
       "references": ["OWASP A07:2021 – Identification and Authentication Failures", "CWE-384 Session Fixation"]
     },
     {
+      "id": "OM-SEC-002",
+      "title": "HTTP_REFERER används utan validering för redirect",
+      "type": "Open Redirect / Header Injection",
+      "severity": "medium",
+      "status": "fixed",
+      "file": "includes/class-om-admin.php",
+      "line": 286,
+      "description": "$_SERVER['HTTP_REFERER'] används som redirect-destination utan whitelist-validering. wp_safe_redirect() stoppar externa domäner men skyddar inte mot intern URL-manipulation.",
+      "code_snippet": "$url = $_SERVER['HTTP_REFERER'] ?? admin_url( 'admin.php?page=open-messages' );",
+      "recommendation": "Ersätt med hårdkodad intern admin-URL eller validera att referrer-domänen matchar site_url().",
+      "fix": "Referrern saneras med sanitize_url() + wp_unslash(). Valideras mot admin_url() – endast URL:er som börjar med WordPress admin-bas accepteras. Annars används hårdkodad fallback. Query-parametrar saneras med sanitize_key() och sanitize_text_field().",
+      "references": ["OWASP A01:2021 – Broken Access Control"]
+    },
+    {
+      "id": "OM-SEC-005",
+      "title": "Race condition vid IMAP-import (icke-atomisk UID-kontroll)",
+      "type": "Race Condition",
+      "severity": "low",
+      "status": "fixed",
+      "file": "includes/class-om-imap.php",
+      "line": 58,
+      "description": "Kontrollen om ett imap_uid redan finns och efterföljande INSERT är inte atomisk. Två parallella WP-Cron-körningar kan importera samma e-post dubbelt.",
+      "code_snippet": "$exists = $wpdb->get_var(...);\nif ( $exists ) { continue; }\n// INSERT här – race window",
+      "recommendation": "Lägg ett UNIQUE-index på (imap_uid, imap_account) och använd INSERT IGNORE för atomisk operation.",
+      "fix": "UNIQUE KEY imap_uid_account (imap_uid, imap_account) tillagd i tabellschemat. SELECT+INSERT ersatt med atomisk INSERT IGNORE via $wpdb->prepare().",
+      "references": ["CWE-362 Race Condition"]
+    },
+    {
+      "id": "OM-SEC-008",
+      "title": "sanitize_text_field() saknas på compose-vy GET-parametrar",
+      "type": "Input Validation",
+      "severity": "low",
+      "status": "fixed",
+      "file": "admin/views/compose.php",
+      "line": 37,
+      "description": "reply_to och reply_subject från $_GET skyddas med esc_attr() i output men saniteras inte vid inläsning. Längdvalidering saknas.",
+      "code_snippet": "value=\"<?php echo esc_attr( $_GET['reply_to'] ?? '' ); ?>\"",
+      "recommendation": "Tillämpa sanitize_email() respektive sanitize_text_field() vid inläsning, inte bara vid output.",
+      "fix": "$prefill_to saneras med sanitize_email(). $prefill_subject saneras med sanitize_text_field() och begränsas till 255 tecken med substr(). Output använder sanerade variabler.",
+      "references": ["OWASP A03:2021 – Injection"]
+    },
+    {
+      "id": "OM-SEC-009",
+      "title": "Lösenord kan framgå av felloggar",
+      "type": "Sensitive Data Exposure",
+      "severity": "medium",
+      "status": "fixed",
+      "file": "includes/class-om-imap.php",
+      "line": 31,
+      "description": "error_log() anropas med kontonamn och ID vid misslyckad dekryptering. Risk att lösenord loggas av framtida ändringar.",
+      "code_snippet": "error_log( \"[Open Messages] Kunde inte dekryptera lösenord för IMAP-konto #{$account->id}\" );",
+      "recommendation": "Centralisera loggning med ett filter som blockerar känsliga nyckelord.",
+      "fix": "Ny OM_Logger-klass skapad. Alla error_log()-anrop ersatta med OM_Logger::error/info/warning(). Mönsterfilter blockerar meddelanden med nyckelord som 'password', 'secret', 'token'. imap_last_error() loggas inte längre.",
+      "references": ["OWASP A09:2021 – Security Logging and Monitoring Failures", "CWE-532 Insertion of Sensitive Information into Log File"]
+    },
+    {
+      "id": "OM-SEC-011",
+      "title": "Honeypot-fält avslöjas i HTML-källkod",
+      "type": "Spam Protection Weakness",
+      "severity": "info",
+      "status": "fixed",
+      "file": "includes/class-om-form.php",
+      "line": 89,
+      "description": "Honeypot-fältet döljs med CSS-klassen om-hp men är synligt i HTML-källkoden med klassnamnet 'om-hp'. Sofistikerade bots kan känna igen och hoppa över det.",
+      "code_snippet": "<div class=\"om-hp\" aria-hidden=\"true\">",
+      "recommendation": "Generera honeypot-fältets namn dynamiskt och undvik generiska klassnamn.",
+      "fix": "Fältnamnet genereras med wp_generate_uuid4() per sidladdning och lagras i ett transient (10 min). Döljs med inline-style utan CSS-klass. Single-use: transientet raderas efter verifiering.",
+      "references": []
+    },
+    {
+      "id": "OM-PRIV-007",
+      "title": "Svarets fulltext lagras permanent i databasen",
+      "type": "Data Minimization",
+      "severity": "low",
+      "status": "fixed",
+      "file": "includes/class-om-database.php",
+      "line": 59,
+      "description": "replied_body lagras permanent i om_messages-tabellen utan möjlighet att radera enbart ett svar. Strider mot GDPR-principen om datamiminering.",
+      "code_snippet": "replied_body  LONGTEXT,\nreplied_at    DATETIME,",
+      "recommendation": "Skapa en separat tabell om_replies för granulär radering.",
+      "fix": "Ny tabell om_replies (id, message_id, body, sent_by, created_at). replied_body/replied_at borttagna ur om_messages. insert_reply(), get_replies(), delete_reply() tillagda. delete_message() rensar även kopplade svar. Individuell raderingsknapp per svar i admin.",
+      "references": ["GDPR Art. 5(1)(c) – Data minimisation"]
+    },
+    {
       "id": "OM-PRIV-004",
       "title": "GDPR – Lagringstid kommuniceras inte till besökaren",
       "type": "Privacy / GDPR",
@@ -442,7 +526,13 @@
       "OM-SEC-004: AES-256-CBC ersatt med AES-256-GCM (AEAD)",
       "OM-SEC-006: Transient-baserad rate-limiting (max 5/10 min per IP) implementerat",
       "OM-SEC-007: wp_verify_nonce() tillagd på GET-parametrar i admin-vyer",
-      "OM-SEC-010: session_regenerate_id(true) + migrering till WordPress-transients"
+      "OM-SEC-010: session_regenerate_id(true) + migrering till WordPress-transients",
+      "OM-SEC-002: HTTP_REFERER valideras mot admin_url() – hårdkodad fallback vid ogiltig URL",
+      "OM-SEC-005: UNIQUE-index på (imap_uid, imap_account) + atomisk INSERT IGNORE",
+      "OM-SEC-008: sanitize_email() och sanitize_text_field() tillagda på compose-vy GET-parametrar",
+      "OM-SEC-009: OM_Logger-klass – filter blockerar lösenord/token i loggar",
+      "OM-SEC-011: Honeypot-fältnamn genereras med UUID per sidladdning, single-use transient",
+      "OM-PRIV-007: Ny om_replies-tabell – granulär radering av svar (dataminimering)"
     ]
   }
 }
