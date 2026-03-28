@@ -14,8 +14,8 @@
       "critical": 0,
       "high": 0,
       "medium": 6,
-      "low": 6,
-      "info": 4,
+      "low": 7,
+      "info": 3,
       "remediated": 22,
       "open": 13
     }
@@ -185,13 +185,13 @@
       "id": "ASB-SEC-001",
       "title": "Honeypot-fältets klassnamn förutsägbart",
       "type": "Spam Protection Weakness",
-      "severity": "info",
+      "severity": "low",
       "file": "antispam-bee/",
       "line": null,
-      "description": "Antispam Bees honeypot-fält har ett relativt statiskt klassnamn. Sofistikerade bots som analyserar källkoden kan identifiera och hoppa över fältet. Effektiviteten beror på att fältet är okänt.",
+      "description": "Antispam Bees honeypot-fält har ett relativt statiskt klassnamn. Sofistikerade bots som analyserar källkoden kan identifiera och hoppa över fältet. Effektiviteten beror på att fältet är okänt. Kan inte åtgärdas utan att patcha plugin-koden.",
       "code_snippet": null,
-      "recommendation": "Kombinera honeypot-skyddet med tid-baserad kontroll och Antispam Bees övriga metoder för flerlagersskydd.",
-      "references": []
+      "recommendation": "Aktivera samtliga relevanta Antispam Bee-metoder under Inställningar → Antispam Bee: (1) Tidsbaserad kontroll – blockerar formulär som skickas för snabbt. (2) Reguljärt uttryck – filtrera spamfraser. (3) Språkfilter – blockera kommentarer på ej använda språk. (4) BBCode-kontroll. Flerlagersskyddet kompenserar för honeypotens begränsning. Kontaktformuläret (Open Messages) använder sedan v1.1 dynamiska honeypot-UUID:n.",
+      "references": ["Antispam Bee Settings Documentation"]
     },
     {
       "id": "ASB-PASS-002",
@@ -505,12 +505,12 @@
       "TEMA-PRIV-001: Registrera delete_user-hook för att rensa followed_topics",
       "TEMA-PRIV-002: Registrera delete_user-hook för att rensa liked_by-data",
       "TEMA-PRIV-003: Skydda blogtree_liked_by från REST API",
-      "ASB-PRIV-002: Dokumentera landblockering i integritetspolicyn om den används"
+      "ASB-PRIV-002: Dokumentera landblockering i integritetspolicyn om den används",
+      "ASB-SEC-001: Aktivera Antispam Bees tidsbaserade kontroll, språkfilter och BBCode för flerlagersskydd"
     ],
     "info": [
       "ASB-PASS-001: Antispam Bee – inga externa API-anrop (godkänt)",
-      "ASB-PASS-002: Antispam Bee – öppen källkod (godkänt)",
-      "ASB-SEC-001: Antispam Bee honeypot-klassnamn – kombinera med fler skyddslager"
+      "ASB-PASS-002: Antispam Bee – öppen källkod (godkänt)"
     ],
     "remediated": [
       "OM-PRIV-001: GDPR-samtyckescheckbox tillagd med lagringstid och Privacy Policy-länk",
