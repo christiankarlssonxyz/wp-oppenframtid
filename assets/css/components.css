@@ -766,6 +766,35 @@
     flex-wrap: wrap;
 }
 
+/* ── Söksida ────────────────────────────────────────────────────────────────── */
+.search-page {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-2xl);
+}
+
+.search-page__heading {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    margin-bottom: var(--space-lg);
+}
+
+.search-page__input {
+    display: block;
+    width: 100%;
+    padding: .85rem 1.1rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1.05rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    outline: none;
+    margin-bottom: var(--space-lg);
+    transition: border-color .15s;
+}
+
+.search-page__input:focus {
+    border-color: var(--color-accent-alt);
+}
+
 /* ── Sök-trigger (header) ───────────────────────────────────────────────────── */
 .search-trigger {
     display: flex;
