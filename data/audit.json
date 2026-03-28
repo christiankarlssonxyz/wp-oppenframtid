@@ -1,0 +1,419 @@
+{
+  "audit": {
+    "plugin": "WP ÖppenFramtid – Fullständig revision",
+    "version": "1.2",
+    "date": "2026-03-28",
+    "auditor": "Claude Sonnet 4.6",
+    "scope": [
+      "Tema: WP ÖppenFramtid (wp-oppenframtid)",
+      "Plugin: Antispam Bee",
+      "Plugin: Open Messages (security-audit.json)"
+    ],
+    "summary": {
+      "total_findings": 30,
+      "critical": 4,
+      "high": 5,
+      "medium": 9,
+      "low": 8,
+      "info": 4
+    }
+  },
+  "findings": [
+
+
+    {
+      "id": "TEMA-SEC-001",
+      "title": "Kaka saknar HttpOnly, Secure och SameSite-flaggor",
+      "type": "Session Security",
+      "severity": "medium",
+      "file": "front-page.php",
+      "line": 24,
+      "description": "setcookie() för 'blogtree_visited' saknar säkerhetsflaggorna HttpOnly (hindrar JS-åtkomst), Secure (kräver HTTPS) och SameSite (skyddar mot CSRF). Kakan är visserligen funktionell och innehåller ingen känslig data, men mönstret bör följa best practice.",
+      "code_snippet": "setcookie('blogtree_visited', time(), time() + 365 * DAY_IN_SECONDS, '/');",
+      "recommendation": "Ersätt med options-array: setcookie('blogtree_visited', time(), ['expires' => time() + 365 * DAY_IN_SECONDS, 'path' => '/', 'secure' => true, 'httponly' => true, 'samesite' => 'Lax']);",
+      "references": ["OWASP A05:2021 – Security Misconfiguration", "RFC 6265bis SameSite"]
+    },
+    {
+      "id": "TEMA-SEC-002",
+      "title": "str_contains() kräver PHP 8.0+ – kompatibilitetsproblem",
+      "type": "Input Validation",
+      "severity": "low",
+      "file": "inc/maintenance.php",
+      "line": 107,
+      "description": "str_contains() introducerades i PHP 8.0. Om servern kör PHP 7.x kraschar underhållsfunktionen med ett fatalt fel, vilket kan blockera hela webbplatsen.",
+      "code_snippet": "if (str_contains($path, $slug)) return;",
+      "recommendation": "Ersätt med str_pos($path, $slug) !== false för bakåtkompatibilitet, eller specificera PHP >= 8.0 som systemkrav i README.",
+      "references": ["PHP Compatibility"]
+    },
+    {
+      "id": "TEMA-SEC-003",
+      "title": "Ingen filstorleksgräns vid JSON-uppladdning i admin",
+      "type": "Denial of Service",
+      "severity": "medium",
+      "file": "inc/integrity.php",
+      "line": 52,
+      "description": "file_get_contents() körs på den uppladdade temporära filen utan att kontrollera filstorleken. En administratör (eller komprometterat admin-konto) kan ladda upp en extremt stor JSON-fil som orsakar minnesproblem.",
+      "code_snippet": "$content = file_get_contents($tmp);",
+      "recommendation": "Kontrollera $files['size'][$i] < 512 * 1024 (max 512 KB) innan file_get_contents() anropas.",
+      "references": ["OWASP A05:2021 – Security Misconfiguration"]
+    },
+    {
+      "id": "TEMA-SEC-004",
+      "title": "Rate-limiting saknas på AJAX-kommentarer",
+      "type": "Denial of Service",
+      "severity": "medium",
+      "file": "inc/comments.php",
+      "line": 17,
+      "description": "wp_ajax_blogtree_post_comment saknar begränsning på antal kommentarer per användare eller tidsperiod. En inloggad användare kan spamma obegränsat antal kommentarer och fylla databasen.",
+      "code_snippet": "add_action('wp_ajax_blogtree_post_comment', 'blogtree_handle_comment');",
+      "recommendation": "Implementera transient-baserad rate-limiting: max t.ex. 10 kommentarer per användare per timme via get_transient('blogtree_comment_rate_' . $user_id).",
+      "references": ["OWASP A05:2021 – Security Misconfiguration"]
+    },
+    {
+      "id": "TEMA-SEC-005",
+      "title": "Rate-limiting saknas på community-insändare",
+      "type": "Denial of Service",
+      "severity": "medium",
+      "file": "inc/community.php",
+      "line": 12,
+      "description": "blogtree_handle_submission saknar begränsning på hur många inlägg en inloggad användare kan skicka in. En användare kan skicka in hundratals inlägg och belasta databasen.",
+      "code_snippet": "add_action('wp_ajax_blogtree_submit_post', 'blogtree_handle_submission');",
+      "recommendation": "Använd transient per user_id för att begränsa t.ex. 3 insändare per 24 timmar.",
+      "references": ["OWASP A05:2021 – Security Misconfiguration"]
+    },
+    {
+      "id": "TEMA-SEC-006",
+      "title": "Hårdkodat user ID 1 för admin-avatar",
+      "type": "Input Validation",
+      "severity": "low",
+      "file": "front-page.php",
+      "line": 152,
+      "description": "get_avatar_url(1) och get_avatar(1, ...) förutsätter att administratören alltid har user ID 1. Om webbplatsen migreras eller admin-kontot skapas om kan fel bild visas eller anrop misslyckas.",
+      "code_snippet": "echo esc_url(get_avatar_url(1, ['size' => 200]));",
+      "recommendation": "Ersätt med get_option('admin_email') och get_user_by('email', ...) eller via get_theme_mod() för konfigurerbar profil-bild.",
+      "references": []
+    },
+    {
+      "id": "TEMA-PRIV-001",
+      "title": "liked_by-lista lagrar alla användares ID:n i post meta",
+      "type": "Privacy / GDPR",
+      "severity": "low",
+      "file": "inc/likes.php",
+      "line": 22,
+      "description": "blogtree_liked_by sparar en array av alla user IDs som gillat ett inlägg. Om WordPress REST API är aktiverat kan denna meta vara tillgänglig publikt. User IDs kan i kombination med profil-URL kopplas till identifierbara personer.",
+      "code_snippet": "$liked_by = (array) get_post_meta($post_id, 'blogtree_liked_by', true);",
+      "recommendation": "Registrera meta-fältet med 'show_in_rest' => false och lägg till ett auth_callback för att säkra åtkomst via REST API.",
+      "references": ["GDPR Art. 4(1) – Definition of personal data", "WordPress REST API Handbook"]
+    },
+    {
+      "id": "TEMA-PRIV-002",
+      "title": "Följda ämnen raderas inte vid kontoborttagning",
+      "type": "Privacy / GDPR",
+      "severity": "low",
+      "file": "inc/follow.php",
+      "line": 1,
+      "description": "blogtree_followed_topics sparas i user meta men ingen hook på delete_user rensar datan. Vid kontoborttagning finns kvarliggande data i wp_usermeta-tabellen.",
+      "code_snippet": "update_user_meta($user_id, 'blogtree_followed_topics', $followed);",
+      "recommendation": "Lägg till add_action('delete_user', function($user_id) { delete_user_meta($user_id, 'blogtree_followed_topics'); });",
+      "references": ["GDPR Art. 17 – Right to erasure"]
+    },
+    {
+      "id": "TEMA-PRIV-003",
+      "title": "Gilla-data raderas inte vid kontoborttagning",
+      "type": "Privacy / GDPR",
+      "severity": "low",
+      "file": "inc/likes.php",
+      "line": 1,
+      "description": "User IDs i blogtree_liked_by rensas inte när ett konto raderas. En raderad användares ID kvarstår i post meta och kan kopplas till anonymiserat eller återanvänt konto.",
+      "code_snippet": "// Ingen delete_user-hook registrerad",
+      "recommendation": "Vid delete_user: iterera igenom alla posts och ta bort user_id från blogtree_liked_by-arrayen.",
+      "references": ["GDPR Art. 17 – Right to erasure"]
+    },
+    {
+      "id": "TEMA-PRIV-004",
+      "title": "Gravatar kontaktas om lokal avatar saknas",
+      "type": "Privacy / GDPR",
+      "severity": "medium",
+      "file": "inc/avatars.php",
+      "line": 12,
+      "description": "Om en användare inte laddat upp en lokal avatar skickas en MD5-hash av e-postadressen till gravatar.com. Gravatar kan använda detta för spårning. Temat har visserligen ett lokalt avatar-system men det är frivilligt.",
+      "code_snippet": "if (!$attachment_id) return $args; // Faller tillbaka till Gravatar",
+      "recommendation": "Sätt ett standardalternativ (silhuett-SVG) istället för Gravatar via add_filter('pre_option_show_avatars', '__return_false') om lokal avatar saknas. Alternativt informera användaren om Gravatar-kontakten vid registrering.",
+      "references": ["GDPR Art. 5(1)(c) – Data minimisation", "Gravatar Privacy Policy"]
+    },
+
+
+    {
+      "id": "ASB-PASS-001",
+      "title": "Inga externa API-anrop för spamfiltrering",
+      "type": "Privacy",
+      "severity": "info",
+      "file": "antispam-bee/",
+      "line": null,
+      "description": "Antispam Bee analyserar spam lokalt utan att skicka kommentarsdata till externa servrar (till skillnad från Akismet). Ingen persondata lämnar servern vid grundläggande spamkontroll. Godkänt.",
+      "code_snippet": null,
+      "recommendation": null,
+      "references": ["Antispam Bee GitHub – Privacy Statement"]
+    },
+    {
+      "id": "ASB-PRIV-001",
+      "title": "IP-adresser lagras i spam-loggen",
+      "type": "Privacy / GDPR",
+      "severity": "medium",
+      "file": "antispam-bee/",
+      "line": null,
+      "description": "Antispam Bee kan logga IP-adressen för spammade kommentarer i spam-loggen. IP-adresser klassas som personuppgifter enligt GDPR. Hur länge dessa lagras beror på konfiguration.",
+      "code_snippet": null,
+      "recommendation": "Aktivera inställningen 'Anonymisera IP-adresser' i Antispam Bee-inställningarna. Ange lagringstid i integritetspolicyn.",
+      "references": ["GDPR Art. 4(1) – Personal data", "CJEU C-582/14 Breyer – IP addresses"]
+    },
+    {
+      "id": "ASB-PRIV-002",
+      "title": "Landbaserad blockering innebär IP-behandling",
+      "type": "Privacy / GDPR",
+      "severity": "low",
+      "file": "antispam-bee/",
+      "line": null,
+      "description": "Om landbaserad blockering aktiveras i Antispam Bee behandlas besökarens IP-adress för att avgöra geografiskt ursprung. Detta är behandling av personuppgifter och kräver rättslig grund (t.ex. berättigat intresse).",
+      "code_snippet": null,
+      "recommendation": "Dokumentera i integritetspolicyn att IP-adresser behandlas för spamskydd via berättigat intresse (GDPR Art. 6(1)(f)). Avaktivera landblockering om det inte behövs.",
+      "references": ["GDPR Art. 6(1)(f) – Legitimate interest"]
+    },
+    {
+      "id": "ASB-SEC-001",
+      "title": "Honeypot-fältets klassnamn förutsägbart",
+      "type": "Spam Protection Weakness",
+      "severity": "info",
+      "file": "antispam-bee/",
+      "line": null,
+      "description": "Antispam Bees honeypot-fält har ett relativt statiskt klassnamn. Sofistikerade bots som analyserar källkoden kan identifiera och hoppa över fältet. Effektiviteten beror på att fältet är okänt.",
+      "code_snippet": null,
+      "recommendation": "Kombinera honeypot-skyddet med tid-baserad kontroll och Antispam Bees övriga metoder för flerlagersskydd.",
+      "references": []
+    },
+    {
+      "id": "ASB-PASS-002",
+      "title": "Öppen källkod – Granskningsbar kod",
+      "type": "Privacy",
+      "severity": "info",
+      "file": "antispam-bee/",
+      "line": null,
+      "description": "Antispam Bee är GPL-licensierat och underhålls av WordPress-communityt. Koden är publik på GitHub och kan granskas av vem som helst. Godkänt.",
+      "code_snippet": null,
+      "recommendation": null,
+      "references": ["github.com/pluginkollektiv/antispam-bee"]
+    },
+
+
+    {
+      "id": "OM-PRIV-001",
+      "title": "GDPR – Ingen samtyckesmekanism i kontaktformuläret",
+      "type": "Privacy / GDPR",
+      "severity": "critical",
+      "file": "includes/class-om-form.php",
+      "line": 57,
+      "description": "Kontaktformuläret samlar in namn, e-postadress och meddelande och sparar dem i databasen utan att informera besökaren eller begära uttryckligt samtycke. Strider mot GDPR Artikel 6 och 13.",
+      "code_snippet": "// Ingen samtyckescheckbox eller integritetspolicylänk i render_shortcode()",
+      "recommendation": "Lägg till en obligatorisk, avmarkerad samtyckescheckbox med länk till integritetspolicy. Lagra samtyckets tidsstämpel i databasen.",
+      "references": ["GDPR Art. 6 – Lawfulness of processing", "GDPR Art. 13 – Information to be provided"]
+    },
+    {
+      "id": "OM-PRIV-002",
+      "title": "GDPR – Saknad funktion för rätten att bli glömd (Art. 17)",
+      "type": "Privacy / GDPR",
+      "severity": "critical",
+      "file": "includes/class-om-cleanup.php",
+      "line": 1,
+      "description": "Pluginet erbjuder ingen mekanism för att på begäran radera en specifik persons data. Automatisk 30-dagarsrensning uppfyller inte kravet på manuell hantering av raderingsbegäran.",
+      "code_snippet": "// Ingen hook, admin-åtgärd eller sökning på e-postadress för manuell radering",
+      "recommendation": "Implementera en admin-funktion för att söka och radera alla meddelanden kopplade till en specifik e-postadress. Registrera register_personal_data_eraser() för WordPress inbyggda integritetsfunktion.",
+      "references": ["GDPR Art. 17 – Right to erasure"]
+    },
+    {
+      "id": "OM-PRIV-003",
+      "title": "GDPR – Saknad dataexportfunktion (Art. 20)",
+      "type": "Privacy / GDPR",
+      "severity": "high",
+      "file": "includes/",
+      "line": null,
+      "description": "Pluginet registrerar inte register_personal_data_exporter(). En registrerad person kan inte exportera sina uppgifter via WordPress inbyggda verktyg.",
+      "code_snippet": "// register_personal_data_exporter() saknas helt",
+      "recommendation": "Implementera register_personal_data_exporter() som returnerar alla meddelanden kopplade till en given e-postadress.",
+      "references": ["GDPR Art. 20 – Right to data portability", "WordPress Privacy API"]
+    },
+    {
+      "id": "OM-PRIV-009",
+      "title": "WordPress Privacy API inte integrerat",
+      "type": "Privacy / GDPR",
+      "severity": "critical",
+      "file": "wp-openmessages.php",
+      "line": 1,
+      "description": "Pluginet registrerar inte sig i WordPress inbyggda Privacy API. Webbplatsägare kan inte använda WordPress inbyggda GDPR-verktyg för att hantera förfrågningar.",
+      "code_snippet": "// register_personal_data_eraser() och register_personal_data_exporter() saknas",
+      "recommendation": "Implementera båda hooks under plugins_loaded. Se WordPress Privacy API Handbook.",
+      "references": ["GDPR Art. 17, Art. 20", "WordPress Privacy API Handbook"]
+    },
+    {
+      "id": "OM-SEC-001",
+      "title": "SQL-interpolation i bulk-uppdatering",
+      "type": "SQL Injection",
+      "severity": "high",
+      "file": "includes/class-om-cleanup.php",
+      "line": 89,
+      "description": "Meddelande-ID:n sammanfogas med implode() och interpoleras direkt i en SQL-sträng utan $wpdb->prepare(). Även om intval() används är mönstret riskabelt och flaggas av WordPress Coding Standards.",
+      "code_snippet": "$wpdb->query( \"UPDATE {$wpdb->prefix}om_messages SET warn_sent = 1 WHERE id IN ($ids)\" );",
+      "recommendation": "Använd $wpdb->update() i en loop per ID, eller bygg en korrekt prepare()-sats med placeholders.",
+      "references": ["OWASP A03:2021 – Injection", "WordPress Coding Standards – DB.PreparedSQL"]
+    },
+    {
+      "id": "OM-SEC-003",
+      "title": "Hårdkodad fallback-krypteringsnyckel",
+      "type": "Cryptographic Weakness",
+      "severity": "high",
+      "file": "includes/class-om-crypto.php",
+      "line": 10,
+      "description": "Om AUTH_KEY inte är definierat används strängen 'om-fallback-salt-change-me' som krypteringsnyckel. Denna kända sträng exponeras i källkoden och ger inget skydd.",
+      "code_snippet": "$salt = defined( 'AUTH_KEY' ) ? AUTH_KEY : 'om-fallback-salt-change-me';",
+      "recommendation": "Lägg till wp_die() eller throw Exception om AUTH_KEY saknas. Kräv korrekt konfigurerad wp-config.php i installationsdokumentationen.",
+      "references": ["OWASP A02:2021 – Cryptographic Failures"]
+    },
+    {
+      "id": "OM-SEC-004",
+      "title": "AES-CBC utan autentisering (ingen MAC/AEAD)",
+      "type": "Cryptographic Weakness",
+      "severity": "medium",
+      "file": "includes/class-om-crypto.php",
+      "line": 19,
+      "description": "AES-256-CBC utan HMAC eller GCM-läge ger inget integritetsskydd. En angripare med databasåtkomst kan modifiera chiffertexten utan att dekrypteringen misslyckas (padding oracle-risk).",
+      "code_snippet": "openssl_encrypt( $plaintext, 'aes-256-cbc', self::key(), OPENSSL_RAW_DATA, $iv );",
+      "recommendation": "Byt till AES-256-GCM (AEAD): openssl_encrypt(..., 'aes-256-gcm', ...) med tag-verifiering.",
+      "references": ["OWASP A02:2021 – Cryptographic Failures", "CWE-326 Inadequate Encryption Strength"]
+    },
+    {
+      "id": "OM-SEC-006",
+      "title": "Rate-limiting saknas på kontaktformuläret",
+      "type": "Denial of Service",
+      "severity": "medium",
+      "file": "includes/class-om-form.php",
+      "line": 106,
+      "description": "Inga begränsningar per IP eller session hindrar en angripare från att skicka tusentals formulärmeddelanden.",
+      "code_snippet": "// Ingen kontroll av antal inskickningar per IP/tidsenhet",
+      "recommendation": "Implementera transient-baserad rate-limiting per IP: max 5 inskickningar per 10 minuter.",
+      "references": ["OWASP A05:2021 – Security Misconfiguration"]
+    },
+    {
+      "id": "OM-PRIV-005",
+      "title": "GDPR – IP-adress används för transient-nyckel utan anonymisering",
+      "type": "Privacy / GDPR",
+      "severity": "medium",
+      "file": "includes/class-om-form.php",
+      "line": 175,
+      "description": "Besökarens IP-adress lagras som MD5-hash i transient-nyckeln. IP-adresser är personuppgifter enligt GDPR. MD5 av en känd IP är trivial att reversa.",
+      "code_snippet": "return substr( md5( $_SERVER['REMOTE_ADDR'] ?? 'x' ), 0, 12 );",
+      "recommendation": "Anonymisera IP-adressen (ta bort sista oktetten för IPv4) eller använd ett slumpmässigt token i en cookie istället.",
+      "references": ["GDPR Art. 4(1) – Definition of personal data", "CJEU C-582/14 Breyer"]
+    },
+    {
+      "id": "OM-PRIV-006",
+      "title": "Lösenord lagras krypterade i databasen med svag nyckelhärledning",
+      "type": "Sensitive Data Storage",
+      "severity": "high",
+      "file": "includes/class-om-database.php",
+      "line": 177,
+      "description": "IMAP/SMTP-lösenord lagras krypterade i WordPress-databasen. Vid en fullständig databaskompromettering kan lösenorden dekrypteras om angriparen också känner till AUTH_KEY från wp-config.php.",
+      "code_snippet": "$data['password_enc'] = OM_Crypto::encrypt( $data['password'] );",
+      "recommendation": "Dokumentera tydligt att wp-config.php med AUTH_KEY måste skyddas (600-rättigheter, utanför web root). Överväg server-side environment variables.",
+      "references": ["OWASP A02:2021 – Cryptographic Failures", "CWE-312 Cleartext Storage of Sensitive Information"]
+    },
+    {
+      "id": "OM-SEC-007",
+      "title": "Nonce-verifiering saknas på GET-parametrar i admin-vyer",
+      "type": "CSRF",
+      "severity": "low",
+      "file": "admin/views/settings.php",
+      "line": 8,
+      "description": "edit_imap och edit_smtp GET-parametrar saknar nonce-verifiering. En angripare kan lura en inloggad admin att öppna en redigerings-URL via länk.",
+      "code_snippet": "$edit_imap = isset( $_GET['edit_imap'] ) ? OM_Database::get_imap_account( (int) $_GET['edit_imap'] ) : null;",
+      "recommendation": "Lägg till wp_verify_nonce() för GET-åtgärder som laddar känsliga formulär, eller begränsa till POST.",
+      "references": ["OWASP A01:2021 – Broken Access Control", "CWE-352 CSRF"]
+    },
+    {
+      "id": "OM-PRIV-008",
+      "title": "Ingen loggning av admin-åtgärder på meddelanden",
+      "type": "Audit Trail",
+      "severity": "low",
+      "file": "includes/class-om-admin.php",
+      "line": 60,
+      "description": "Det finns ingen audit-logg över vilken admin-användare som läste, svarade på, raderade eller stjärnmärkte ett meddelande. Försvårar incidenthantering.",
+      "code_snippet": "// Ingen loggning av get_current_user_id() vid känsliga åtgärder",
+      "recommendation": "Logga minst raderingshändelser med tidsstämpel och användar-ID i en om_audit_log-tabell.",
+      "references": ["OWASP A09:2021 – Security Logging and Monitoring Failures"]
+    },
+    {
+      "id": "OM-SEC-010",
+      "title": "PHP-session utan session_regenerate_id()",
+      "type": "Session Security",
+      "severity": "low",
+      "file": "includes/class-om-captcha.php",
+      "line": 12,
+      "description": "session_start() anropas utan session_regenerate_id() efter CAPTCHA-validering. Risk för session fixation.",
+      "code_snippet": "if ( ! session_id() ) { session_start(); }",
+      "recommendation": "Anropa session_regenerate_id(true) efter lyckad CAPTCHA-verifiering. Överväg WordPress-transients istället för PHP-sessioner.",
+      "references": ["OWASP A07:2021 – Identification and Authentication Failures", "CWE-384 Session Fixation"]
+    },
+    {
+      "id": "OM-PRIV-004",
+      "title": "GDPR – Lagringstid kommuniceras inte till besökaren",
+      "type": "Privacy / GDPR",
+      "severity": "medium",
+      "file": "includes/class-om-form.php",
+      "line": 57,
+      "description": "Besökaren informeras inte om att deras meddelande lagras i 30 dagar. Lagringstiden framgår inte i formuläret.",
+      "code_snippet": "// Ingen information om lagringstid i formulärets HTML",
+      "recommendation": "Visa lagringstid i formuläret: 'Ditt meddelande lagras i 30 dagar.' med länk till integritetspolicyn.",
+      "references": ["GDPR Art. 13(2)(a) – Storage period"]
+    }
+  ],
+  "recommendations_prioritized": {
+    "immediate_critical": [
+      "OM-PRIV-001: Lägg till GDPR-samtyckescheckbox i Open Messages kontaktformulär",
+      "OM-PRIV-002: Implementera manuell raderingsfunktion per e-postadress i Open Messages",
+      "OM-PRIV-009: Integrera Open Messages med WordPress Privacy API",
+      "OM-SEC-003: Kasta exception om AUTH_KEY saknas i Open Messages"
+    ],
+    "high_priority": [
+      "OM-SEC-001: Åtgärda SQL-interpolation i cleanup med prepare()",
+      "OM-PRIV-003: Registrera register_personal_data_exporter() i Open Messages",
+      "OM-PRIV-006: Dokumentera och förstärk skyddet kring wp-config.php",
+      "TEMA-PRIV-004: Inaktivera Gravatar som fallback eller informera vid registrering"
+    ],
+    "medium_priority": [
+      "TEMA-SEC-001: Lägg till HttpOnly, Secure och SameSite på blogtree_visited-kakan",
+      "TEMA-SEC-003: Lägg till filstorleksgräns (512 KB) vid JSON-uppladdning",
+      "TEMA-SEC-004: Implementera rate-limiting på AJAX-kommentarer",
+      "TEMA-SEC-005: Implementera rate-limiting på community-insändare",
+      "OM-SEC-004: Byt AES-CBC till AES-GCM i Open Messages",
+      "OM-SEC-006: Implementera IP-baserad rate-limiting på Open Messages kontaktformulär",
+      "OM-PRIV-005: Anonymisera IP-adress i transient-nyckel i Open Messages",
+      "OM-PRIV-004: Kommunicera lagringstid i Open Messages formulär",
+      "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
+    ],
+    "low_priority": [
+      "TEMA-SEC-002: Ersätt str_contains() med PHP 7.x-kompatibelt alternativ",
+      "TEMA-SEC-006: Ersätt hårdkodat user ID 1 med konfigurerbar inställning",
+      "TEMA-PRIV-001: Registrera delete_user-hook för att rensa followed_topics",
+      "TEMA-PRIV-002: Registrera delete_user-hook för att rensa liked_by-data",
+      "TEMA-PRIV-003: Skydda blogtree_liked_by från REST API",
+      "OM-SEC-007: Lägg till nonce-verifiering på GET-parametrar i Open Messages admin",
+      "OM-SEC-010: Lägg till session_regenerate_id() i Open Messages CAPTCHA",
+      "OM-PRIV-008: Implementera audit-logg för admin-åtgärder i Open Messages",
+      "ASB-PRIV-002: Dokumentera landblockering i integritetspolicyn om den används"
+    ],
+    "info": [
+      "ASB-PASS-001: Antispam Bee – inga externa API-anrop (godkänt)",
+      "ASB-PASS-002: Antispam Bee – öppen källkod (godkänt)",
+      "ASB-SEC-001: Antispam Bee honeypot-klassnamn – kombinera med fler skyddslager",
+      "OM-PRIV-007: Open Messages – överväg separat tabell för svar för granulär radering"
+    ]
+  }
+}

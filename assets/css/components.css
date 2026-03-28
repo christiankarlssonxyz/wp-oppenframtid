@@ -514,6 +514,213 @@
     text-decoration: none;
 }
 
+/* ── Integritetsbadge (front-page sidebar) ───────────────────────────────────── */
+.integrity-badge {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+}
+
+.integrity-badge__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.integrity-badge__shield {
+    color: #27ae60;
+    flex-shrink: 0;
+}
+
+.integrity-badge__title {
+    display: block;
+    font-size: .9rem;
+}
+
+.integrity-badge__domain {
+    font-size: .75rem;
+    color: var(--color-muted);
+}
+
+.integrity-badge__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: var(--space-md);
+}
+
+.integrity-badge__list li {
+    font-size: .85rem;
+    color: var(--color-muted);
+    padding-left: 1.2em;
+    position: relative;
+}
+
+.integrity-badge__list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #27ae60;
+    font-weight: 700;
+}
+
+.integrity-badge__link {
+    font-size: .8rem;
+    color: var(--color-accent-alt);
+}
+
+/* ── Integritetsrapport ──────────────────────────────────────────────────────── */
+.audit-report { max-width: 800px; }
+
+.audit-meta {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-xl);
+    font-size: .9rem;
+    color: var(--color-muted);
+}
+
+.audit-score {
+    text-align: center;
+    padding: var(--space-xl) 0;
+    margin-bottom: var(--space-xl);
+}
+
+.audit-score__number {
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 700;
+    line-height: 1;
+    color: #27ae60;
+}
+
+.audit-score__label {
+    font-size: 1rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-md);
+}
+
+.audit-score__breakdown {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: .9rem;
+}
+
+.audit-category {
+    margin-bottom: var(--space-2xl);
+}
+
+.audit-category h2 {
+    font-size: 1.2rem;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.audit-checks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.audit-check {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-md);
+    border-left-width: 4px;
+}
+
+.audit-pass { border-left-color: #27ae60; }
+.audit-warn { border-left-color: #e67e22; }
+.audit-fail { border-left-color: #e74c3c; }
+.audit-info { border-left-color: var(--color-accent-alt); }
+
+.audit-check__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xs);
+    gap: var(--space-md);
+}
+
+.audit-check__name { font-weight: 600; }
+
+.audit-check__status {
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    white-space: nowrap;
+}
+
+.audit-pass .audit-check__status { color: #27ae60; }
+.audit-warn .audit-check__status { color: #e67e22; }
+.audit-fail .audit-check__status { color: #e74c3c; }
+.audit-info .audit-check__status { color: var(--color-accent-alt); }
+
+.audit-check__desc {
+    font-size: .9rem;
+    color: var(--color-muted);
+    margin-bottom: var(--space-xs);
+}
+
+.audit-check__details {
+    font-size: .85rem;
+    margin-bottom: var(--space-xs);
+}
+
+.audit-check__file {
+    font-size: .8rem;
+    margin: 2px 0 var(--space-xs);
+    color: var(--color-muted);
+}
+
+.audit-check__code {
+    background: #f6f8fa;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: .8rem;
+    overflow-x: auto;
+    white-space: pre;
+    margin: var(--space-sm) 0;
+}
+
+.audit-check__refs {
+    font-size: .75rem;
+    color: var(--color-muted);
+    margin-top: var(--space-xs);
+}
+
+.audit-check__severity {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding: 2px 7px;
+    border-radius: 99px;
+}
+
+.audit-sev-critical { background: #fde8e8; color: #c0392b; }
+.audit-sev-high     { background: #fef0e0; color: #d35400; }
+.audit-sev-medium   { background: #fef9e0; color: #b7770d; }
+.audit-sev-low      { background: #e8f4fd; color: #1a6ea8; }
+.audit-sev-info     { background: #eef2ff; color: #3b4eb8; }
+
+.audit-check__alternative {
+    font-size: .85rem;
+    background: #fff8e1;
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    margin-top: var(--space-sm);
+}
+
 /* ── Felsidor (404) ─────────────────────────────────────────────────────────── */
 .error-page {
     text-align: center;

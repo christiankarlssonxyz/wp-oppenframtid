@@ -33,3 +33,6 @@ require_once get_template_directory() . '/inc/avatars.php';
 
 // ── Underhållsläge ─────────────────────────────────────────────────────────────
 require_once get_template_directory() . '/inc/maintenance.php';
+
+// ── Integritetsgranskning ───────────────────────────────────────────────────────
+require_once get_template_directory() . '/inc/integrity.php';

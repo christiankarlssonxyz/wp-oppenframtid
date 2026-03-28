@@ -48,6 +48,9 @@ get_header();
         </div>
     </section>
 
+    <div class="content-with-sidebar container">
+    <div>
+
     <?php
     // ── Nytt sedan senaste besök ───────────────────────────────────────────
     $new_posts = new WP_Query([
@@ -58,81 +61,81 @@ get_header();
 
     if ($new_posts->have_posts()): ?>
     <section class="posts-section">
-        <div class="container">
-            <h2 class="section-title">Nytt sedan ditt senaste besök</h2>
-            <div class="post-grid">
-                <?php while ($new_posts->have_posts()): $new_posts->the_post();
-                    $topics      = get_the_terms(get_the_ID(), 'topic');
-                    $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
-                ?>
-                <article class="post-card">
-                    <?php if (has_post_thumbnail()): ?>
-                    <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                        <?php the_post_thumbnail('blogtree-card'); ?>
+        <h2 class="section-title">Nytt sedan ditt senaste besök</h2>
+        <div class="post-grid">
+            <?php while ($new_posts->have_posts()): $new_posts->the_post();
+                $topics      = get_the_terms(get_the_ID(), 'topic');
+                $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
+            ?>
+            <article class="post-card">
+                <?php if (has_post_thumbnail()): ?>
+                <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
+                    <?php the_post_thumbnail('blogtree-card'); ?>
+                </a>
+                <?php endif; ?>
+                <div class="post-card__body">
+                    <?php if ($first_topic): ?>
+                    <a href="<?php echo esc_url(get_term_link($first_topic)); ?>" class="post-card__topic">
+                        <?php echo esc_html($first_topic->name); ?>
                     </a>
                     <?php endif; ?>
-                    <div class="post-card__body">
-                        <?php if ($first_topic): ?>
-                        <a href="<?php echo esc_url(get_term_link($first_topic)); ?>" class="post-card__topic">
-                            <?php echo esc_html($first_topic->name); ?>
-                        </a>
-                        <?php endif; ?>
-                        <h3 class="post-card__title">
-                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                        </h3>
-                        <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
-                        <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
-                            <?php echo get_the_date(); ?>
-                        </time>
-                    </div>
-                </article>
-                <?php endwhile; wp_reset_postdata(); ?>
-            </div>
+                    <h3 class="post-card__title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h3>
+                    <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
+                    <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
+                        <?php echo get_the_date(); ?>
+                    </time>
+                </div>
+            </article>
+            <?php endwhile; wp_reset_postdata(); ?>
         </div>
     </section>
     <?php endif; ?>
 
     <!-- Alla senaste inlägg -->
     <section class="posts-section">
-        <div class="container">
-            <h2 class="section-title">Senaste</h2>
-            <?php
-            $all_posts = new WP_Query([
-                'posts_per_page'      => 9,
-                'ignore_sticky_posts' => true,
-            ]);
-            if ($all_posts->have_posts()): ?>
-            <div class="post-grid">
-                <?php while ($all_posts->have_posts()): $all_posts->the_post();
-                    $topics      = get_the_terms(get_the_ID(), 'topic');
-                    $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
-                ?>
-                <article class="post-card">
-                    <?php if (has_post_thumbnail()): ?>
-                    <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                        <?php the_post_thumbnail('blogtree-card'); ?>
+        <h2 class="section-title">Senaste</h2>
+        <?php
+        $all_posts = new WP_Query([
+            'posts_per_page'      => 9,
+            'ignore_sticky_posts' => true,
+        ]);
+        if ($all_posts->have_posts()): ?>
+        <div class="post-grid">
+            <?php while ($all_posts->have_posts()): $all_posts->the_post();
+                $topics      = get_the_terms(get_the_ID(), 'topic');
+                $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
+            ?>
+            <article class="post-card">
+                <?php if (has_post_thumbnail()): ?>
+                <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
+                    <?php the_post_thumbnail('blogtree-card'); ?>
+                </a>
+                <?php endif; ?>
+                <div class="post-card__body">
+                    <?php if ($first_topic): ?>
+                    <a href="<?php echo esc_url(get_term_link($first_topic)); ?>" class="post-card__topic">
+                        <?php echo esc_html($first_topic->name); ?>
                     </a>
                     <?php endif; ?>
-                    <div class="post-card__body">
-                        <?php if ($first_topic): ?>
-                        <a href="<?php echo esc_url(get_term_link($first_topic)); ?>" class="post-card__topic">
-                            <?php echo esc_html($first_topic->name); ?>
-                        </a>
-                        <?php endif; ?>
-                        <h3 class="post-card__title">
-                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                        </h3>
-                        <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
-                        <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
-                            <?php echo get_the_date(); ?>
-                        </time>
-                    </div>
-                </article>
-                <?php endwhile; wp_reset_postdata(); ?>
-            </div>
-            <?php endif; ?>
+                    <h3 class="post-card__title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h3>
+                    <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
+                    <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
+                        <?php echo get_the_date(); ?>
+                    </time>
+                </div>
+            </article>
+            <?php endwhile; wp_reset_postdata(); ?>
         </div>
+        <?php endif; ?>
     </section>
+
+    </div>
+    <?php get_sidebar('front'); ?>
+    </div>
 
 <?php else: ?>
 
@@ -229,6 +232,9 @@ get_header();
         </div>
     </section>
 
+    <div class="content-with-sidebar container">
+    <div>
+
     <!-- ── Fokusområden ───────────────────────────────────────────────────── -->
     <?php
     $topics = get_terms([
@@ -239,66 +245,66 @@ get_header();
     ]);
     if ($topics && !is_wp_error($topics)): ?>
     <section class="topics-section" id="amnen">
-        <div class="container">
-            <h2 class="section-title">Fokusområden</h2>
-            <p class="section-sub">Det här skriver jag om</p>
-            <div class="topics-grid">
-                <?php foreach ($topics as $topic):
-                    $color = get_term_meta($topic->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
-                ?>
-                <a href="<?php echo esc_url(get_term_link($topic)); ?>"
-                   class="topic-card"
-                   style="--topic-color: <?php echo esc_attr($color); ?>">
-                    <span class="topic-card__name"><?php echo esc_html($topic->name); ?></span>
-                    <span class="topic-card__count"><?php echo $topic->count; ?> inlägg</span>
-                </a>
-                <?php endforeach; ?>
-            </div>
+        <h2 class="section-title">Fokusområden</h2>
+        <p class="section-sub">Det här skriver jag om</p>
+        <div class="topics-grid">
+            <?php foreach ($topics as $topic):
+                $color = get_term_meta($topic->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+            ?>
+            <a href="<?php echo esc_url(get_term_link($topic)); ?>"
+               class="topic-card"
+               style="--topic-color: <?php echo esc_attr($color); ?>">
+                <span class="topic-card__name"><?php echo esc_html($topic->name); ?></span>
+                <span class="topic-card__count"><?php echo $topic->count; ?> inlägg</span>
+            </a>
+            <?php endforeach; ?>
         </div>
     </section>
     <?php endif; ?>
 
     <!-- ── Senaste inlägg ─────────────────────────────────────────────────── -->
     <section class="posts-section" id="senaste">
-        <div class="container">
-            <h2 class="section-title">Senaste inlägg</h2>
-            <?php
-            $posts_query = new WP_Query([
-                'posts_per_page'      => 6,
-                'ignore_sticky_posts' => true,
-            ]);
-            if ($posts_query->have_posts()): ?>
-            <div class="post-grid">
-                <?php while ($posts_query->have_posts()): $posts_query->the_post();
-                    $topics      = get_the_terms(get_the_ID(), 'topic');
-                    $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
-                ?>
-                <article class="post-card">
-                    <?php if (has_post_thumbnail()): ?>
-                    <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                        <?php the_post_thumbnail('blogtree-card'); ?>
+        <h2 class="section-title">Senaste inlägg</h2>
+        <?php
+        $posts_query = new WP_Query([
+            'posts_per_page'      => 6,
+            'ignore_sticky_posts' => true,
+        ]);
+        if ($posts_query->have_posts()): ?>
+        <div class="post-grid">
+            <?php while ($posts_query->have_posts()): $posts_query->the_post();
+                $topics      = get_the_terms(get_the_ID(), 'topic');
+                $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
+            ?>
+            <article class="post-card">
+                <?php if (has_post_thumbnail()): ?>
+                <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
+                    <?php the_post_thumbnail('blogtree-card'); ?>
+                </a>
+                <?php endif; ?>
+                <div class="post-card__body">
+                    <?php if ($first_topic): ?>
+                    <a href="<?php echo esc_url(get_term_link($first_topic)); ?>" class="post-card__topic">
+                        <?php echo esc_html($first_topic->name); ?>
                     </a>
                     <?php endif; ?>
-                    <div class="post-card__body">
-                        <?php if ($first_topic): ?>
-                        <a href="<?php echo esc_url(get_term_link($first_topic)); ?>" class="post-card__topic">
-                            <?php echo esc_html($first_topic->name); ?>
-                        </a>
-                        <?php endif; ?>
-                        <h3 class="post-card__title">
-                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                        </h3>
-                        <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
-                        <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
-                            <?php echo get_the_date(); ?>
-                        </time>
-                    </div>
-                </article>
-                <?php endwhile; wp_reset_postdata(); ?>
-            </div>
-            <?php endif; ?>
+                    <h3 class="post-card__title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h3>
+                    <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
+                    <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
+                        <?php echo get_the_date(); ?>
+                    </time>
+                </div>
+            </article>
+            <?php endwhile; wp_reset_postdata(); ?>
         </div>
+        <?php endif; ?>
     </section>
+
+    </div>
+    <?php get_sidebar('front'); ?>
+    </div>
 
 <?php endif; ?>
 
