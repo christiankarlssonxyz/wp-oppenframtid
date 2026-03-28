@@ -16,8 +16,8 @@
       "medium": 6,
       "low": 7,
       "info": 3,
-      "remediated": 22,
-      "open": 13
+      "remediated": 23,
+      "open": 12
     }
   },
   "findings": [
@@ -28,11 +28,13 @@
       "title": "Kaka saknar HttpOnly, Secure och SameSite-flaggor",
       "type": "Session Security",
       "severity": "medium",
+      "status": "fixed",
       "file": "front-page.php",
       "line": 24,
       "description": "setcookie() för 'blogtree_visited' saknar säkerhetsflaggorna HttpOnly (hindrar JS-åtkomst), Secure (kräver HTTPS) och SameSite (skyddar mot CSRF). Kakan är visserligen funktionell och innehåller ingen känslig data, men mönstret bör följa best practice.",
       "code_snippet": "setcookie('blogtree_visited', time(), time() + 365 * DAY_IN_SECONDS, '/');",
       "recommendation": "Ersätt med options-array: setcookie('blogtree_visited', time(), ['expires' => time() + 365 * DAY_IN_SECONDS, 'path' => '/', 'secure' => true, 'httponly' => true, 'samesite' => 'Lax']);",
+      "fix": "setcookie() ersatt med options-array med secure: true, httponly: true, samesite: Lax. Kräver PHP 7.3+.",
       "references": ["OWASP A05:2021 – Security Misconfiguration", "RFC 6265bis SameSite"]
     },
     {
@@ -493,7 +495,6 @@
       "TEMA-PRIV-004: Inaktivera Gravatar som fallback eller informera vid registrering"
     ],
     "medium_priority": [
-      "TEMA-SEC-001: Lägg till HttpOnly, Secure och SameSite på blogtree_visited-kakan",
       "TEMA-SEC-003: Lägg till filstorleksgräns (512 KB) vid JSON-uppladdning",
       "TEMA-SEC-004: Implementera rate-limiting på AJAX-kommentarer",
       "TEMA-SEC-005: Implementera rate-limiting på community-insändare",
@@ -532,7 +533,8 @@
       "OM-SEC-008: sanitize_email() och sanitize_text_field() tillagda på compose-vy GET-parametrar",
       "OM-SEC-009: OM_Logger-klass – filter blockerar lösenord/token i loggar",
       "OM-SEC-011: Honeypot-fältnamn genereras med UUID per sidladdning, single-use transient",
-      "OM-PRIV-007: Ny om_replies-tabell – granulär radering av svar (dataminimering)"
+      "OM-PRIV-007: Ny om_replies-tabell – granulär radering av svar (dataminimering)",
+      "TEMA-SEC-001: setcookie() för blogtree_visited uppdaterad med HttpOnly, Secure och SameSite=Lax"
     ]
   }
 }

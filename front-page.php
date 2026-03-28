@@ -21,7 +21,13 @@ $last_visit   = isset($_COOKIE['blogtree_visited']) ? (int) $_COOKIE['blogtree_v
 $is_returning = $last_visit > 0;
 
 // Spara senaste besök (1 år)
-setcookie('blogtree_visited', time(), time() + 365 * DAY_IN_SECONDS, '/');
+setcookie('blogtree_visited', time(), [
+    'expires'  => time() + 365 * DAY_IN_SECONDS,
+    'path'     => '/',
+    'secure'   => true,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
 
 get_header();
 ?>
