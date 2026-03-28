@@ -39,6 +39,9 @@ add_action('after_setup_theme', function () {
 
 });
 
+// ── Stäng av admin-toolbar för alla användare ──────────────────────────────────
+add_filter('show_admin_bar', '__return_false');
+
 // ── Sociala länkar i Customizer ────────────────────────────────────────────────
 add_action('customize_register', function ($wp_customize) {
 
