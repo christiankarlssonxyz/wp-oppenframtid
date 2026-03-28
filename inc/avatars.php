@@ -8,9 +8,12 @@
  * Avataren sparas i user meta som en WordPress attachment-ID.
  */
 
-// ── Visa lokal avatar om den finns, annars Gravatar ───────────────────────────
+// ── Visa lokal avatar, annars silhuett (aldrig Gravatar) ──────────────────────
+// Gravatar kontaktar gravatar.com med en MD5-hash av e-postadressen (GDPR-risk).
+// Vi sätter alltid found_avatar=true så WordPress aldrig faller tillbaka till Gravatar.
 add_filter('pre_get_avatar_data', function ($args, $id_or_email) {
-    $user_id = 0;
+    $default_url = get_template_directory_uri() . '/assets/img/avatar-default.svg';
+    $user_id     = 0;
 
     if (is_numeric($id_or_email)) {
         $user_id = (int) $id_or_email;
@@ -20,15 +23,17 @@ add_filter('pre_get_avatar_data', function ($args, $id_or_email) {
         $user_id = (int) $id_or_email->user_id;
     }
 
-    if (!$user_id) return $args;
+    // Ingen inloggad användare – använd silhuett direkt
+    if (!$user_id) {
+        $args['url']          = $default_url;
+        $args['found_avatar'] = true;
+        return $args;
+    }
 
     $attachment_id = (int) get_user_meta($user_id, 'blogtree_avatar', true);
-    if (!$attachment_id) return $args;
+    $url           = $attachment_id ? wp_get_attachment_image_url($attachment_id, 'thumbnail') : '';
 
-    $url = wp_get_attachment_image_url($attachment_id, 'thumbnail');
-    if (!$url) return $args;
-
-    $args['url']          = $url;
+    $args['url']          = $url ?: $default_url;
     $args['found_avatar'] = true;
 
     return $args;

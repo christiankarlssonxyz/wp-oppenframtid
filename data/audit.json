@@ -16,8 +16,8 @@
       "medium": 6,
       "low": 7,
       "info": 3,
-      "remediated": 31,
-      "open": 4
+      "remediated": 32,
+      "open": 3
     }
   },
   "findings": [
@@ -154,11 +154,13 @@
       "title": "Gravatar kontaktas om lokal avatar saknas",
       "type": "Privacy / GDPR",
       "severity": "medium",
+      "status": "fixed",
       "file": "inc/avatars.php",
       "line": 12,
       "description": "Om en användare inte laddat upp en lokal avatar skickas en MD5-hash av e-postadressen till gravatar.com. Gravatar kan använda detta för spårning. Temat har visserligen ett lokalt avatar-system men det är frivilligt.",
       "code_snippet": "if (!$attachment_id) return $args; // Faller tillbaka till Gravatar",
       "recommendation": "Sätt ett standardalternativ (silhuett-SVG) istället för Gravatar via add_filter('pre_option_show_avatars', '__return_false') om lokal avatar saknas. Alternativt informera användaren om Gravatar-kontakten vid registrering.",
+      "fix": "pre_get_avatar_data-filtret sätter alltid found_avatar=true. Saknas lokal avatar används assets/img/avatar-default.svg (lokal silhuett). Gravatar kontaktas aldrig.",
       "references": ["GDPR Art. 5(1)(c) – Data minimisation", "Gravatar Privacy Policy"]
     },
 
@@ -507,9 +509,7 @@
     }
   ],
   "recommendations_prioritized": {
-    "high_priority": [
-      "TEMA-PRIV-004: Inaktivera Gravatar som fallback eller informera vid registrering"
-    ],
+    "high_priority": [],
     "medium_priority": [
       "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
     ],
@@ -550,7 +550,8 @@
       "TEMA-SEC-005: Rate-limiting på community-insändare – max 3/dygn per användare",
       "TEMA-PRIV-001: blogtree_liked_by och blogtree_likes registrerade med show_in_rest:false",
       "TEMA-PRIV-002: delete_user-hook rensar blogtree_followed_topics vid kontoborttagning",
-      "TEMA-PRIV-003: delete_user-hook tar bort user ID från alla blogtree_liked_by-listor"
+      "TEMA-PRIV-003: delete_user-hook tar bort user ID från alla blogtree_liked_by-listor",
+      "TEMA-PRIV-004: Gravatar-fallback ersatt med lokal silhuett-SVG – gravatar.com kontaktas aldrig"
     ]
   }
 }
