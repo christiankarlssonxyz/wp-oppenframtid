@@ -16,8 +16,8 @@
       "medium": 6,
       "low": 7,
       "info": 3,
-      "remediated": 32,
-      "open": 3
+      "remediated": 33,
+      "open": 2
     }
   },
   "findings": [
@@ -194,11 +194,13 @@
       "title": "Landbaserad blockering innebär IP-behandling",
       "type": "Privacy / GDPR",
       "severity": "low",
+      "status": "fixed",
       "file": "antispam-bee/",
       "line": null,
       "description": "Om landbaserad blockering aktiveras i Antispam Bee behandlas besökarens IP-adress för att avgöra geografiskt ursprung. Detta är behandling av personuppgifter och kräver rättslig grund (t.ex. berättigat intresse).",
       "code_snippet": null,
       "recommendation": "Dokumentera i integritetspolicyn att IP-adresser behandlas för spamskydd via berättigat intresse (GDPR Art. 6(1)(f)). Avaktivera landblockering om det inte behövs.",
+      "fix": "Landbaserad blockering är inte aktiverad — ingen IP-behandling för geolokalisering sker. Ej tillämplig.",
       "references": ["GDPR Art. 6(1)(f) – Legitimate interest"]
     },
     {
@@ -514,7 +516,6 @@
       "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
     ],
     "low_priority": [
-      "ASB-PRIV-002: Dokumentera landblockering i integritetspolicyn om den används",
       "ASB-SEC-001: Aktivera Antispam Bees tidsbaserade kontroll, språkfilter och BBCode för flerlagersskydd"
     ],
     "info": [
@@ -551,7 +552,8 @@
       "TEMA-PRIV-001: blogtree_liked_by och blogtree_likes registrerade med show_in_rest:false",
       "TEMA-PRIV-002: delete_user-hook rensar blogtree_followed_topics vid kontoborttagning",
       "TEMA-PRIV-003: delete_user-hook tar bort user ID från alla blogtree_liked_by-listor",
-      "TEMA-PRIV-004: Gravatar-fallback ersatt med lokal silhuett-SVG – gravatar.com kontaktas aldrig"
+      "TEMA-PRIV-004: Gravatar-fallback ersatt med lokal silhuett-SVG – gravatar.com kontaktas aldrig",
+      "ASB-PRIV-002: Landblockering inte aktiverad – ej tillämplig"
     ]
   }
 }
