@@ -712,6 +712,21 @@
 .audit-sev-medium   { background: #fef9e0; color: #b7770d; }
 .audit-sev-low      { background: #e8f4fd; color: #1a6ea8; }
 .audit-sev-info     { background: #eef2ff; color: #3b4eb8; }
+.audit-sev-fixed    { background: #e8f5e9; color: #2e7d32; }
+
+.audit-fixed {
+    border-left-color: #4caf50;
+    opacity: .92;
+}
+
+.audit-check__fix {
+    margin-top: .5rem;
+    font-size: .85rem;
+    color: #2e7d32;
+    background: #f1f8f1;
+    border-radius: 4px;
+    padding: .4rem .6rem;
+}
 
 .audit-check__alternative {
     font-size: .85rem;

@@ -74,15 +74,19 @@ function blogtree_convert_findings_to_checklist(array $data): array {
                 'checks' => [],
             ];
         }
-        $severity = strtolower($finding['severity'] ?? 'info');
-        $file_ref = trim(($finding['file'] ?? '') . ($finding['line'] ? ':' . $finding['line'] : ''));
+        $severity    = strtolower($finding['severity'] ?? 'info');
+        $is_fixed    = ($finding['status'] ?? '') === 'fixed';
+        $file_ref    = trim(($finding['file'] ?? '') . ($finding['line'] ? ':' . $finding['line'] : ''));
+        $base_status = $severity_to_status[$severity] ?? 'info';
 
         $categories_map[$key]['checks'][] = [
             'id'           => strtolower($finding['id'] ?? uniqid('f-')),
             'name'         => $finding['title'] ?? ($finding['id'] ?? ''),
             'description'  => $finding['description'] ?? '',
-            'status'       => $severity_to_status[$severity] ?? 'info',
+            'status'       => $is_fixed ? 'pass' : $base_status,
             'severity'     => $severity,
+            'fixed'        => $is_fixed,
+            'fix'          => $finding['fix'] ?? null,
             'details'      => $file_ref,
             'alternative'  => $finding['recommendation'] ?? null,
             'code_snippet' => $finding['code_snippet'] ?? null,
@@ -487,18 +491,25 @@ function blogtree_render_integrity_content(array $data): string {
         <h2><?php echo esc_html(($cat['icon'] ?? '') . ' ' . $cat['name']); ?></h2>
         <div class="audit-checks">
         <?php foreach (($cat['checks'] ?? []) as $check):
+            $is_fixed = !empty($check['fixed']);
             $s = $status_map[$check['status']] ?? ['label' => $check['status'], 'class' => 'audit-info'];
+            $status_label = $is_fixed ? 'Åtgärdad' : $s['label'];
+            $status_class = $is_fixed ? 'audit-pass audit-fixed' : $s['class'];
         ?>
-        <div class="audit-check <?php echo esc_attr($s['class']); ?>">
+        <div class="audit-check <?php echo esc_attr($status_class); ?>">
             <div class="audit-check__header">
                 <span class="audit-check__name"><?php echo esc_html($check['name']); ?></span>
                 <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
-                    <?php if (!empty($check['severity'])): ?>
+                    <?php if (!empty($check['severity']) && !$is_fixed): ?>
                     <span class="audit-check__severity audit-sev-<?php echo esc_attr($check['severity']); ?>">
                         <?php echo esc_html($sev_labels[$check['severity']] ?? $check['severity']); ?>
                     </span>
+                    <?php elseif (!empty($check['severity']) && $is_fixed): ?>
+                    <span class="audit-check__severity audit-sev-fixed">
+                        <?php echo esc_html(ucfirst($sev_labels[$check['severity']] ?? $check['severity'])); ?> – åtgärdad
+                    </span>
                     <?php endif; ?>
-                    <span class="audit-check__status"><?php echo esc_html($s['label']); ?></span>
+                    <span class="audit-check__status"><?php echo esc_html($status_label); ?></span>
                 </div>
             </div>
             <?php if (!empty($check['details'])): ?>
@@ -508,7 +519,11 @@ function blogtree_render_integrity_content(array $data): string {
             <?php if (!empty($check['code_snippet'])): ?>
             <pre class="audit-check__code"><?php echo esc_html($check['code_snippet']); ?></pre>
             <?php endif; ?>
-            <?php if (!empty($check['alternative'])): ?>
+            <?php if (!empty($check['fix'])): ?>
+            <div class="audit-check__fix">
+                <strong>✅ Fix:</strong> <?php echo esc_html($check['fix']); ?>
+            </div>
+            <?php elseif (!empty($check['alternative'])): ?>
             <div class="audit-check__alternative">
                 <strong>Åtgärd:</strong> <?php echo esc_html($check['alternative']); ?>
             </div>

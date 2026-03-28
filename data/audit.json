@@ -10,12 +10,14 @@
       "Plugin: Open Messages (security-audit.json)"
     ],
     "summary": {
-      "total_findings": 30,
-      "critical": 4,
-      "high": 5,
-      "medium": 9,
-      "low": 8,
-      "info": 4
+      "total_findings": 29,
+      "critical": 0,
+      "high": 0,
+      "medium": 6,
+      "low": 6,
+      "info": 4,
+      "remediated": 16,
+      "open": 13
     }
   },
   "findings": [
@@ -210,11 +212,13 @@
       "title": "GDPR – Ingen samtyckesmekanism i kontaktformuläret",
       "type": "Privacy / GDPR",
       "severity": "critical",
+      "status": "fixed",
       "file": "includes/class-om-form.php",
       "line": 57,
       "description": "Kontaktformuläret samlar in namn, e-postadress och meddelande och sparar dem i databasen utan att informera besökaren eller begära uttryckligt samtycke. Strider mot GDPR Artikel 6 och 13.",
       "code_snippet": "// Ingen samtyckescheckbox eller integritetspolicylänk i render_shortcode()",
       "recommendation": "Lägg till en obligatorisk, avmarkerad samtyckescheckbox med länk till integritetspolicy. Lagra samtyckets tidsstämpel i databasen.",
+      "fix": "Obligatorisk samtyckescheckbox tillagd med lagringstid och länk till integritetspolicy (hämtas från WordPress wp_page_for_privacy_policy). Servervalidering av om_consent i handle_submission(). Kolumn consent_at DATETIME tillagd i om_messages.",
       "references": ["GDPR Art. 6 – Lawfulness of processing", "GDPR Art. 13 – Information to be provided"]
     },
     {
@@ -222,11 +226,13 @@
       "title": "GDPR – Saknad funktion för rätten att bli glömd (Art. 17)",
       "type": "Privacy / GDPR",
       "severity": "critical",
+      "status": "fixed",
       "file": "includes/class-om-cleanup.php",
       "line": 1,
       "description": "Pluginet erbjuder ingen mekanism för att på begäran radera en specifik persons data. Automatisk 30-dagarsrensning uppfyller inte kravet på manuell hantering av raderingsbegäran.",
       "code_snippet": "// Ingen hook, admin-åtgärd eller sökning på e-postadress för manuell radering",
       "recommendation": "Implementera en admin-funktion för att söka och radera alla meddelanden kopplade till en specifik e-postadress. Registrera register_personal_data_eraser() för WordPress inbyggda integritetsfunktion.",
+      "fix": "OM_Privacy::erase_user_data() implementerad och kopplad till register_personal_data_eraser(). Admin-sökformulär i Inställningar med sök- och raderingsfunktion per e-postadress. Radering loggas i audit-loggen med hashad e-post.",
       "references": ["GDPR Art. 17 – Right to erasure"]
     },
     {
@@ -234,11 +240,13 @@
       "title": "GDPR – Saknad dataexportfunktion (Art. 20)",
       "type": "Privacy / GDPR",
       "severity": "high",
+      "status": "fixed",
       "file": "includes/",
       "line": null,
       "description": "Pluginet registrerar inte register_personal_data_exporter(). En registrerad person kan inte exportera sina uppgifter via WordPress inbyggda verktyg.",
       "code_snippet": "// register_personal_data_exporter() saknas helt",
       "recommendation": "Implementera register_personal_data_exporter() som returnerar alla meddelanden kopplade till en given e-postadress.",
+      "fix": "OM_Privacy::export_user_data() implementerad med paginering. Exporterar från_namn, e-post, ämne, meddelande, datum och consent_at. Tillgänglig under Verktyg → Integritet.",
       "references": ["GDPR Art. 20 – Right to data portability", "WordPress Privacy API"]
     },
     {
@@ -246,11 +254,13 @@
       "title": "WordPress Privacy API inte integrerat",
       "type": "Privacy / GDPR",
       "severity": "critical",
+      "status": "fixed",
       "file": "wp-openmessages.php",
       "line": 1,
       "description": "Pluginet registrerar inte sig i WordPress inbyggda Privacy API. Webbplatsägare kan inte använda WordPress inbyggda GDPR-verktyg för att hantera förfrågningar.",
       "code_snippet": "// register_personal_data_eraser() och register_personal_data_exporter() saknas",
       "recommendation": "Implementera båda hooks under plugins_loaded. Se WordPress Privacy API Handbook.",
+      "fix": "Ny OM_Privacy-klass registrerar båda hooks via wp_privacy_personal_data_exporters och wp_privacy_personal_data_erasers. Tillgängligt under Verktyg → Integritet i WordPress admin.",
       "references": ["GDPR Art. 17, Art. 20", "WordPress Privacy API Handbook"]
     },
     {
@@ -258,11 +268,13 @@
       "title": "SQL-interpolation i bulk-uppdatering",
       "type": "SQL Injection",
       "severity": "high",
+      "status": "fixed",
       "file": "includes/class-om-cleanup.php",
       "line": 89,
       "description": "Meddelande-ID:n sammanfogas med implode() och interpoleras direkt i en SQL-sträng utan $wpdb->prepare(). Även om intval() används är mönstret riskabelt och flaggas av WordPress Coding Standards.",
       "code_snippet": "$wpdb->query( \"UPDATE {$wpdb->prefix}om_messages SET warn_sent = 1 WHERE id IN ($ids)\" );",
       "recommendation": "Använd $wpdb->update() i en loop per ID, eller bygg en korrekt prepare()-sats med placeholders.",
+      "fix": "Ersatt med foreach-loop som anropar $wpdb->update() per ID med typade format-specifiers (%d). phpcs:ignore-kommentaren borttagen.",
       "references": ["OWASP A03:2021 – Injection", "WordPress Coding Standards – DB.PreparedSQL"]
     },
     {
@@ -270,11 +282,13 @@
       "title": "Hårdkodad fallback-krypteringsnyckel",
       "type": "Cryptographic Weakness",
       "severity": "high",
+      "status": "fixed",
       "file": "includes/class-om-crypto.php",
       "line": 10,
       "description": "Om AUTH_KEY inte är definierat används strängen 'om-fallback-salt-change-me' som krypteringsnyckel. Denna kända sträng exponeras i källkoden och ger inget skydd.",
       "code_snippet": "$salt = defined( 'AUTH_KEY' ) ? AUTH_KEY : 'om-fallback-salt-change-me';",
       "recommendation": "Lägg till wp_die() eller throw Exception om AUTH_KEY saknas. Kräv korrekt konfigurerad wp-config.php i installationsdokumentationen.",
+      "fix": "Fallback-strängen borttagen. Kastar \\RuntimeException om AUTH_KEY saknas eller är kortare än 32 tecken. README uppdaterat med instruktioner för att skydda wp-config.php.",
       "references": ["OWASP A02:2021 – Cryptographic Failures"]
     },
     {
@@ -282,11 +296,13 @@
       "title": "AES-CBC utan autentisering (ingen MAC/AEAD)",
       "type": "Cryptographic Weakness",
       "severity": "medium",
+      "status": "fixed",
       "file": "includes/class-om-crypto.php",
       "line": 19,
       "description": "AES-256-CBC utan HMAC eller GCM-läge ger inget integritetsskydd. En angripare med databasåtkomst kan modifiera chiffertexten utan att dekrypteringen misslyckas (padding oracle-risk).",
       "code_snippet": "openssl_encrypt( $plaintext, 'aes-256-cbc', self::key(), OPENSSL_RAW_DATA, $iv );",
       "recommendation": "Byt till AES-256-GCM (AEAD): openssl_encrypt(..., 'aes-256-gcm', ...) med tag-verifiering.",
+      "fix": "Bytt till AES-256-GCM med 12-byte IV och 16-byte GCM-tag. Lagringsformat: base64(IV[12] + TAG[16] + ciphertext). OBS: befintliga CBC-krypterade lösenord måste sparas om i admin-inställningarna.",
       "references": ["OWASP A02:2021 – Cryptographic Failures", "CWE-326 Inadequate Encryption Strength"]
     },
     {
@@ -294,11 +310,13 @@
       "title": "Rate-limiting saknas på kontaktformuläret",
       "type": "Denial of Service",
       "severity": "medium",
+      "status": "fixed",
       "file": "includes/class-om-form.php",
       "line": 106,
       "description": "Inga begränsningar per IP eller session hindrar en angripare från att skicka tusentals formulärmeddelanden.",
       "code_snippet": "// Ingen kontroll av antal inskickningar per IP/tidsenhet",
       "recommendation": "Implementera transient-baserad rate-limiting per IP: max 5 inskickningar per 10 minuter.",
+      "fix": "check_rate_limit() implementerad med transient-baserad räknare per anonymiserad IP. Max 5 inskickningar per 10 minuter.",
       "references": ["OWASP A05:2021 – Security Misconfiguration"]
     },
     {
@@ -306,11 +324,13 @@
       "title": "GDPR – IP-adress används för transient-nyckel utan anonymisering",
       "type": "Privacy / GDPR",
       "severity": "medium",
+      "status": "fixed",
       "file": "includes/class-om-form.php",
       "line": 175,
       "description": "Besökarens IP-adress lagras som MD5-hash i transient-nyckeln. IP-adresser är personuppgifter enligt GDPR. MD5 av en känd IP är trivial att reversa.",
       "code_snippet": "return substr( md5( $_SERVER['REMOTE_ADDR'] ?? 'x' ), 0, 12 );",
       "recommendation": "Anonymisera IP-adressen (ta bort sista oktetten för IPv4) eller använd ett slumpmässigt token i en cookie istället.",
+      "fix": "IPv4: sista oktetten nollställs. IPv6: de sista 64 bitarna nollställs. Hash saltas med wp_salt(). MD5 ersatt med SHA-256.",
       "references": ["GDPR Art. 4(1) – Definition of personal data", "CJEU C-582/14 Breyer"]
     },
     {
@@ -318,11 +338,13 @@
       "title": "Lösenord lagras krypterade i databasen med svag nyckelhärledning",
       "type": "Sensitive Data Storage",
       "severity": "high",
+      "status": "fixed",
       "file": "includes/class-om-database.php",
       "line": 177,
       "description": "IMAP/SMTP-lösenord lagras krypterade i WordPress-databasen. Vid en fullständig databaskompromettering kan lösenorden dekrypteras om angriparen också känner till AUTH_KEY från wp-config.php.",
       "code_snippet": "$data['password_enc'] = OM_Crypto::encrypt( $data['password'] );",
       "recommendation": "Dokumentera tydligt att wp-config.php med AUTH_KEY måste skyddas (600-rättigheter, utanför web root). Överväg server-side environment variables.",
+      "fix": "README uppdaterat med sektion 'Skydda wp-config.php': flytta filen ovanför web root, filrättigheter (640), Apache-blockering, starka salts och krav på AUTH_KEY ≥ 32 tecken.",
       "references": ["OWASP A02:2021 – Cryptographic Failures", "CWE-312 Cleartext Storage of Sensitive Information"]
     },
     {
@@ -330,11 +352,13 @@
       "title": "Nonce-verifiering saknas på GET-parametrar i admin-vyer",
       "type": "CSRF",
       "severity": "low",
+      "status": "fixed",
       "file": "admin/views/settings.php",
       "line": 8,
       "description": "edit_imap och edit_smtp GET-parametrar saknar nonce-verifiering. En angripare kan lura en inloggad admin att öppna en redigerings-URL via länk.",
       "code_snippet": "$edit_imap = isset( $_GET['edit_imap'] ) ? OM_Database::get_imap_account( (int) $_GET['edit_imap'] ) : null;",
       "recommendation": "Lägg till wp_verify_nonce() för GET-åtgärder som laddar känsliga formulär, eller begränsa till POST.",
+      "fix": "wp_verify_nonce() tillagd med konto-specifik action. Redigera-länkarna genereras med wp_nonce_url(). Utan giltig nonce förblir variablerna null.",
       "references": ["OWASP A01:2021 – Broken Access Control", "CWE-352 CSRF"]
     },
     {
@@ -342,11 +366,13 @@
       "title": "Ingen loggning av admin-åtgärder på meddelanden",
       "type": "Audit Trail",
       "severity": "low",
+      "status": "fixed",
       "file": "includes/class-om-admin.php",
       "line": 60,
       "description": "Det finns ingen audit-logg över vilken admin-användare som läste, svarade på, raderade eller stjärnmärkte ett meddelande. Försvårar incidenthantering.",
       "code_snippet": "// Ingen loggning av get_current_user_id() vid känsliga åtgärder",
       "recommendation": "Logga minst raderingshändelser med tidsstämpel och användar-ID i en om_audit_log-tabell.",
+      "fix": "om_audit_log-tabell skapad med kolumner: action, message_id, user_id, ip_hash, created_at. Åtgärder loggas: read, reply, delete, star. Raderingsbegäran loggar hashad e-post istället för message_id. Logg visas i admin under fliken Granskningslogg.",
       "references": ["OWASP A09:2021 – Security Logging and Monitoring Failures"]
     },
     {
@@ -354,11 +380,13 @@
       "title": "PHP-session utan session_regenerate_id()",
       "type": "Session Security",
       "severity": "low",
+      "status": "fixed",
       "file": "includes/class-om-captcha.php",
       "line": 12,
       "description": "session_start() anropas utan session_regenerate_id() efter CAPTCHA-validering. Risk för session fixation.",
       "code_snippet": "if ( ! session_id() ) { session_start(); }",
       "recommendation": "Anropa session_regenerate_id(true) efter lyckad CAPTCHA-verifiering. Överväg WordPress-transients istället för PHP-sessioner.",
+      "fix": "session_regenerate_id(true) anropas direkt efter lyckad CAPTCHA-validering för att förhindra session fixation. CAPTCHA-token migrerat till WordPress-transient (set_transient) för att undvika PHP-sessioner helt – session_start() borttaget.",
       "references": ["OWASP A07:2021 – Identification and Authentication Failures", "CWE-384 Session Fixation"]
     },
     {
@@ -366,11 +394,13 @@
       "title": "GDPR – Lagringstid kommuniceras inte till besökaren",
       "type": "Privacy / GDPR",
       "severity": "medium",
+      "status": "fixed",
       "file": "includes/class-om-form.php",
       "line": 57,
       "description": "Besökaren informeras inte om att deras meddelande lagras i 30 dagar. Lagringstiden framgår inte i formuläret.",
       "code_snippet": "// Ingen information om lagringstid i formulärets HTML",
       "recommendation": "Visa lagringstid i formuläret: 'Ditt meddelande lagras i 30 dagar.' med länk till integritetspolicyn.",
+      "fix": "Lagringstid visas dynamiskt under samtyckescheckboxen: 'Ditt meddelande lagras i X dagar.' baserat på konstanten OM_RETENTION_DAYS (standardvärde 30). Länk till integritetspolicyn hämtas automatiskt via get_privacy_policy_url().",
       "references": ["GDPR Art. 13(2)(a) – Storage period"]
     }
   ],
