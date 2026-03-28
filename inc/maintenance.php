@@ -104,7 +104,7 @@ add_action('template_redirect', function () {
     // Inloggningssidan är alltid tillgänglig
     $path = trim(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
     foreach (['logga-in', 'registrera', 'wp-login.php'] as $slug) {
-        if (str_contains($path, $slug)) return;
+        if (strpos($path, $slug) !== false) return;
     }
 
     $mode     = $opts['mode']      ?? 'maintenance';

@@ -16,8 +16,8 @@
       "medium": 6,
       "low": 7,
       "info": 3,
-      "remediated": 23,
-      "open": 12
+      "remediated": 25,
+      "open": 10
     }
   },
   "findings": [
@@ -42,11 +42,13 @@
       "title": "str_contains() kräver PHP 8.0+ – kompatibilitetsproblem",
       "type": "Input Validation",
       "severity": "low",
+      "status": "fixed",
       "file": "inc/maintenance.php",
       "line": 107,
       "description": "str_contains() introducerades i PHP 8.0. Om servern kör PHP 7.x kraschar underhållsfunktionen med ett fatalt fel, vilket kan blockera hela webbplatsen.",
       "code_snippet": "if (str_contains($path, $slug)) return;",
       "recommendation": "Ersätt med str_pos($path, $slug) !== false för bakåtkompatibilitet, eller specificera PHP >= 8.0 som systemkrav i README.",
+      "fix": "str_contains() ersatt med strpos() !== false – kompatibelt med PHP 7.x och uppåt.",
       "references": ["PHP Compatibility"]
     },
     {
@@ -90,11 +92,13 @@
       "title": "Hårdkodat user ID 1 för admin-avatar",
       "type": "Input Validation",
       "severity": "low",
+      "status": "fixed",
       "file": "front-page.php",
       "line": 152,
       "description": "get_avatar_url(1) och get_avatar(1, ...) förutsätter att administratören alltid har user ID 1. Om webbplatsen migreras eller admin-kontot skapas om kan fel bild visas eller anrop misslyckas.",
       "code_snippet": "echo esc_url(get_avatar_url(1, ['size' => 200]));",
       "recommendation": "Ersätt med get_option('admin_email') och get_user_by('email', ...) eller via get_theme_mod() för konfigurerbar profil-bild.",
+      "fix": "Admin-ID hämtas dynamiskt via get_user_by('email', get_option('admin_email')). Fallback till ID 1 om ingen träff. Båda get_avatar() och get_avatar_url() använder $_admin_id.",
       "references": []
     },
     {
@@ -501,8 +505,6 @@
       "ASB-PRIV-001: Aktivera IP-anonymisering i Antispam Bee-inställningarna"
     ],
     "low_priority": [
-      "TEMA-SEC-002: Ersätt str_contains() med PHP 7.x-kompatibelt alternativ",
-      "TEMA-SEC-006: Ersätt hårdkodat user ID 1 med konfigurerbar inställning",
       "TEMA-PRIV-001: Registrera delete_user-hook för att rensa followed_topics",
       "TEMA-PRIV-002: Registrera delete_user-hook för att rensa liked_by-data",
       "TEMA-PRIV-003: Skydda blogtree_liked_by från REST API",
@@ -534,7 +536,9 @@
       "OM-SEC-009: OM_Logger-klass – filter blockerar lösenord/token i loggar",
       "OM-SEC-011: Honeypot-fältnamn genereras med UUID per sidladdning, single-use transient",
       "OM-PRIV-007: Ny om_replies-tabell – granulär radering av svar (dataminimering)",
-      "TEMA-SEC-001: setcookie() för blogtree_visited uppdaterad med HttpOnly, Secure och SameSite=Lax"
+      "TEMA-SEC-001: setcookie() för blogtree_visited uppdaterad med HttpOnly, Secure och SameSite=Lax",
+      "TEMA-SEC-002: str_contains() ersatt med strpos() !== false – PHP 7.x-kompatibelt",
+      "TEMA-SEC-006: Admin-avatar hämtar ID dynamiskt via admin_email istället för hårdkodat ID 1"
     ]
   }
 }

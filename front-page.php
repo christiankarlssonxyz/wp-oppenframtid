@@ -20,6 +20,10 @@
 $last_visit   = isset($_COOKIE['blogtree_visited']) ? (int) $_COOKIE['blogtree_visited'] : 0;
 $is_returning = $last_visit > 0;
 
+// ── Admin-användare (undviker hårdkodat user ID 1) ─────────────────────────────
+$_admin_user = get_user_by('email', get_option('admin_email'));
+$_admin_id   = $_admin_user ? $_admin_user->ID : 1;
+
 // Spara senaste besök (1 år)
 setcookie('blogtree_visited', time(), [
     'expires'  => time() + 365 * DAY_IN_SECONDS,
@@ -41,7 +45,7 @@ get_header();
     <section class="returning-hero">
         <div class="container">
             <div class="returning-hero__inner">
-                <?php echo get_avatar(1, 48, '', '', ['class' => 'returning-hero__avatar']); ?>
+                <?php echo get_avatar($_admin_id, 48, '', '', ['class' => 'returning-hero__avatar']); ?>
                 <div>
                     <p class="returning-hero__welcome">Välkommen tillbaka</p>
                     <p class="returning-hero__since">
@@ -157,7 +161,7 @@ get_header();
                 <?php if (has_custom_logo()):
                     the_custom_logo();
                 else: ?>
-                    <img src="<?php echo esc_url(get_avatar_url(1, ['size' => 200])); ?>"
+                    <img src="<?php echo esc_url(get_avatar_url($_admin_id, ['size' => 200])); ?>"
                          alt="<?php bloginfo('name'); ?>"
                          class="hero__avatar">
                 <?php endif; ?>
