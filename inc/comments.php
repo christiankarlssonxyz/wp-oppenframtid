@@ -37,23 +37,42 @@ function blogtree_handle_comment(): void {
 
     $user = wp_get_current_user();
 
+    $has_link = blogtree_comment_has_link($content);
+
     $comment_id = wp_insert_comment([
         'comment_post_ID'  => $post_id,
         'comment_content'  => $content,
         'comment_parent'   => $parent_id,
         'user_id'          => $user_id,
         'comment_author'   => $user->display_name,
-        'comment_approved' => 1,
+        'comment_approved' => $has_link ? 0 : 1,
     ]);
 
     if (!$comment_id) {
         wp_send_json_error('Kunde inte spara kommentaren.');
     }
 
+    if ($has_link) {
+        wp_send_json_success([
+            'comment_id' => $comment_id,
+            'content'    => $content,
+            'pending'    => true,
+            'message'    => 'Din kommentar innehåller en länk och väntar på godkännande.',
+        ]);
+    }
+
     wp_send_json_success([
         'comment_id' => $comment_id,
         'content'    => $content,
+        'pending'    => false,
     ]);
+}
+
+// ── Hjälp: detektera länkar i kommentarsinnehåll ──────────────────────────────
+
+function blogtree_comment_has_link(string $content): bool {
+    return (bool) preg_match('#https?://|www\\.#i', strip_tags($content))
+        || (bool) preg_match('#<a[\s>]#i', $content);
 }
 
 // ── AJAX: gästkommentar ────────────────────────────────────────────────────────

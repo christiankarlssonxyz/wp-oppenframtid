@@ -1,5 +1,5 @@
 /**
- * comments.js – Skicka kommentar och svar via AJAX
+ * comments.js – Kommentarer: toolbar, emoji, toggle, AJAX
  */
 (function () {
     'use strict';
@@ -10,7 +10,86 @@
     var ajaxurl = cfg.ajaxurl;
     var nonce   = cfg.nonce;
 
-    // ── Skicka formulär ───────────────────────────────────────────────────────────
+    // ── Toggle kommentarssektion ──────────────────────────────────────────────
+    var toggleBtn    = document.getElementById('toggle-comments-btn');
+    var commentsWrap = document.getElementById('comments-wrapper');
+
+    if (toggleBtn && commentsWrap) {
+        toggleBtn.addEventListener('click', function () {
+            var isOpen = !commentsWrap.hidden;
+            commentsWrap.hidden = isOpen;
+            toggleBtn.setAttribute('aria-expanded', String(!isOpen));
+            if (!isOpen) {
+                commentsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                var editor = commentsWrap.querySelector('.comment-editor');
+                if (editor) setTimeout(function () { editor.focus(); }, 400);
+            }
+        });
+    }
+
+    // ── Toolbar: kommandon ────────────────────────────────────────────────────
+    document.addEventListener('mousedown', function (e) {
+        var btn = e.target.closest('.comment-toolbar__btn[data-cmd]');
+        if (!btn) return;
+        e.preventDefault();
+
+        var form   = btn.closest('.comment-form');
+        var editor = form ? form.querySelector('.comment-editor') : null;
+        if (!editor) return;
+
+        editor.focus();
+        var cmd = btn.dataset.cmd;
+
+        if (cmd === 'createLink') {
+            var url = prompt('Ange URL:');
+            if (url) document.execCommand('createLink', false, url);
+        } else {
+            document.execCommand(cmd, false, null);
+        }
+    });
+
+    // ── Toolbar: emoji ────────────────────────────────────────────────────────
+    var activeEditorForEmoji = null;
+
+    document.addEventListener('click', function (e) {
+        // Öppna/stäng picker
+        var toggleEmoji = e.target.closest('.comment-emoji-toggle');
+        if (toggleEmoji) {
+            e.stopPropagation();
+            var form   = toggleEmoji.closest('.comment-form');
+            var picker = form ? form.querySelector('.comment-emoji-picker') : null;
+            if (!picker) return;
+            var isHidden = picker.hidden;
+            document.querySelectorAll('.comment-emoji-picker').forEach(function (p) { p.hidden = true; });
+            picker.hidden = !isHidden;
+            activeEditorForEmoji = form ? form.querySelector('.comment-editor') : null;
+            return;
+        }
+
+        // Infoga emoji
+        var emojiBtn = e.target.closest('.comment-emoji-insert');
+        if (emojiBtn) {
+            e.stopPropagation();
+            var picker = emojiBtn.closest('.comment-emoji-picker');
+            if (picker) picker.hidden = true;
+            if (activeEditorForEmoji) {
+                activeEditorForEmoji.focus();
+                document.execCommand('insertText', false, emojiBtn.dataset.emoji);
+            }
+            return;
+        }
+
+        // Stäng picker vid klick utanför
+        document.querySelectorAll('.comment-emoji-picker').forEach(function (p) { p.hidden = true; });
+    });
+
+    // ── Placeholder på contenteditable ───────────────────────────────────────
+    document.addEventListener('focusin', function (e) {
+        var ed = e.target.closest('.comment-editor');
+        if (ed && ed.textContent.trim() === '') ed.innerHTML = '';
+    });
+
+    // ── Skicka formulär ───────────────────────────────────────────────────────
     document.addEventListener('submit', function (e) {
         var form = e.target.closest('.comment-form');
         if (!form) return;
@@ -18,12 +97,16 @@
 
         var postId   = form.dataset.postId;
         var parentId = form.dataset.parentId || '0';
-        var textarea = form.querySelector('textarea[name="content"]');
-        var content  = textarea ? textarea.value.trim() : '';
+        var editor   = form.querySelector('.comment-editor');
+        var hidden   = form.querySelector('.comment-content-input');
         var btn      = form.querySelector('button[type="submit"]');
 
-        if (!content) return;
+        var content = editor ? editor.innerHTML.trim() : '';
+        var text    = editor ? editor.textContent.trim() : '';
 
+        if (!text) return;
+
+        if (hidden) hidden.value = content;
         if (btn) btn.disabled = true;
 
         var body = new URLSearchParams({
@@ -43,38 +126,40 @@
                     return;
                 }
 
+                // Väntar på godkännande (länk i kommentar)
+                if (data.data.pending) {
+                    showFormMessage(form, data.data.message, 'info');
+                    if (editor) editor.innerHTML = '';
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
                 var commentId = data.data.comment_id;
-                var listId    = 'comment-list-' + postId;
 
                 if (parentId !== '0') {
-                    // Svar: lägg till i rätt nästlad lista
-                    var parentItem  = document.getElementById('comment-' + parentId);
-                    var replyList   = parentItem ? parentItem.querySelector('.comment-list--replies') : null;
+                    var parentItem = document.getElementById('comment-' + parentId);
+                    var replyList  = parentItem ? parentItem.querySelector('.comment-list--replies') : null;
                     if (!replyList) {
                         replyList = document.createElement('ol');
                         replyList.className = 'comment-list comment-list--replies';
                         if (parentItem) parentItem.appendChild(replyList);
                     }
-
                     replyList.insertAdjacentHTML('beforeend', buildCommentHTML(data.data, cfg.displayName, commentId));
-
-                    // Stäng svar-formulär
                     var replyFormWrap = document.getElementById('reply-form-' + parentId);
                     if (replyFormWrap) replyFormWrap.hidden = true;
                 } else {
-                    // Toppnivå: lägg till i huvudlistan (skapa om den saknas)
-                    var list = document.getElementById(listId);
+                    var listId = 'comment-list-' + postId;
+                    var list   = document.getElementById(listId);
                     if (!list) {
                         list = document.createElement('ol');
                         list.className = 'comment-list';
                         list.id = listId;
-                        var section = document.getElementById('comments');
+                        var section  = document.getElementById('comments');
                         var formWrap = document.getElementById('comment-form-wrap');
-                        if (formWrap) section.insertBefore(list, formWrap);
+                        if (formWrap && section) section.insertBefore(list, formWrap);
                     }
                     list.insertAdjacentHTML('beforeend', buildCommentHTML(data.data, cfg.displayName, commentId));
 
-                    // Uppdatera räknaren
                     var heading = document.querySelector('.comments-section__title');
                     if (heading) {
                         var count = document.querySelectorAll('.comment-item').length;
@@ -82,7 +167,7 @@
                     }
                 }
 
-                textarea.value = '';
+                if (editor) editor.innerHTML = '';
                 if (btn) btn.disabled = false;
             })
             .catch(function () {
@@ -91,24 +176,32 @@
             });
     });
 
-    // ── Svar-knapp: visa/dölj formulär ───────────────────────────────────────────
+    function showFormMessage(form, msg, type) {
+        var existing = form.querySelector('.comment-form-msg');
+        if (existing) existing.remove();
+        var el = document.createElement('p');
+        el.className = 'comment-form-msg comment-form-msg--' + type;
+        el.textContent = msg;
+        var footer = form.querySelector('.comment-form__footer');
+        if (footer) form.insertBefore(el, footer);
+    }
+
+    // ── Svar-knapp ────────────────────────────────────────────────────────────
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('.comment-reply-btn');
         if (!btn) return;
-
         var commentId = btn.dataset.commentId;
         var wrap      = document.getElementById('reply-form-' + commentId);
         if (!wrap) return;
-
         var isOpen = !wrap.hidden;
         wrap.hidden = isOpen;
         if (!isOpen) {
-            var input = wrap.querySelector('textarea');
-            if (input) input.focus();
+            var editor = wrap.querySelector('.comment-editor');
+            if (editor) editor.focus();
         }
     });
 
-    // ── Avbryt svar ───────────────────────────────────────────────────────────────
+    // ── Avbryt svar ───────────────────────────────────────────────────────────
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('.reply-cancel-btn');
         if (!btn) return;
@@ -116,7 +209,7 @@
         if (wrap) wrap.hidden = true;
     });
 
-    // ── Bygg HTML för ny kommentar ────────────────────────────────────────────────
+    // ── Bygg HTML för ny kommentar ────────────────────────────────────────────
     function buildCommentHTML(data, displayName, commentId) {
         var now = new Date();
         var dateStr = now.toLocaleDateString('sv-SE', {
@@ -132,7 +225,7 @@
             '<div class="comment-meta">' + avatar +
             '<div><strong class="comment-author">' + escHtml(displayName) + '</strong>' +
             '<time class="comment-date">' + dateStr + '</time></div></div>' +
-            '<div class="comment-content"><p>' + escHtml(data.content || '') + '</p></div>' +
+            '<div class="comment-content">' + (data.content || '') + '</div>' +
             '<div class="comment-actions">' +
             '<button class="report-comment-btn" data-comment-id="' + commentId + '" aria-label="Rapportera kommentar">' +
             '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>' +
@@ -140,7 +233,7 @@
             '</div></li>';
     }
 
-    // ── Gästkommentarsmodal ───────────────────────────────────────────────────────
+    // ── Gästkommentarsmodal ───────────────────────────────────────────────────
     var guestOverlay = document.getElementById('guest-comment-overlay');
     var guestStatus  = document.getElementById('guest-comment-status');
     var guestSubmit  = document.getElementById('guest-comment-submit');
@@ -148,7 +241,6 @@
     var guestPostId  = null;
 
     if (guestOverlay) {
-        // Öppna
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('.comments-section__guest-btn');
             if (!btn) return;
@@ -156,27 +248,22 @@
             document.getElementById('guest-name').value    = '';
             document.getElementById('guest-email').value   = '';
             document.getElementById('guest-content').value = '';
-            guestStatus.hidden = true;
+            guestStatus.hidden   = true;
             guestSubmit.disabled = false;
-            guestOverlay.hidden = false;
+            guestOverlay.hidden  = false;
         });
 
-        // Stäng
         guestCancel.addEventListener('click', function () { guestOverlay.hidden = true; });
         guestOverlay.addEventListener('click', function (e) {
             if (e.target === guestOverlay) guestOverlay.hidden = true;
         });
 
-        // Skicka
         guestSubmit.addEventListener('click', function () {
             var name    = document.getElementById('guest-name').value.trim();
             var email   = document.getElementById('guest-email').value.trim();
             var content = document.getElementById('guest-content').value.trim();
 
-            if (!name || !email || !content) {
-                showGuestStatus('Fyll i alla fält.', 'error');
-                return;
-            }
+            if (!name || !email || !content) { showGuestStatus('Fyll i alla fält.', 'error'); return; }
 
             guestSubmit.disabled = true;
 
@@ -208,17 +295,15 @@
 
         function showGuestStatus(msg, type) {
             guestStatus.textContent = msg;
-            guestStatus.className = 'report-modal__status report-modal__status--' + type;
-            guestStatus.hidden = false;
+            guestStatus.className   = 'report-modal__status report-modal__status--' + type;
+            guestStatus.hidden      = false;
         }
     }
 
     function escHtml(str) {
         return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
 }());

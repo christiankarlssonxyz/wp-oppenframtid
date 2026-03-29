@@ -33,52 +33,6 @@ get_header();
             <span>~<?php echo $minutes; ?> min läsning</span>
         </div>
 
-        <!-- ── Åtgärdsrad ─────────────────────────────────────────────── -->
-        <div class="post-actions">
-
-            <?php
-            // Gilla
-            $likes    = (int) get_post_meta(get_the_ID(), 'blogtree_likes', true);
-            $liked_by = (array) get_post_meta(get_the_ID(), 'blogtree_liked_by', true);
-            $is_liked = is_user_logged_in() && in_array(get_current_user_id(), $liked_by);
-            ?>
-            <button class="post-action-btn like-btn <?php echo $is_liked ? 'is-liked' : ''; ?>"
-                    data-post-id="<?php echo get_the_ID(); ?>"
-                    <?php echo !is_user_logged_in() ? 'data-require-login="true"' : ''; ?>
-                    aria-label="Gilla inlägget">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                <span class="post-action-btn__label">Gilla<?php if ($likes > 0): ?> <span class="like-btn__count"><?php echo $likes; ?></span><?php endif; ?></span>
-            </button>
-
-            <?php if (is_user_logged_in()):
-                $saved_posts = (array) get_user_meta(get_current_user_id(), 'blogtree_saved_posts', true);
-                $is_saved    = in_array(get_the_ID(), array_map('intval', $saved_posts), true);
-            ?>
-            <!-- Spara -->
-            <button class="post-action-btn save-btn <?php echo $is_saved ? 'is-saved' : ''; ?>"
-                    data-post-id="<?php echo get_the_ID(); ?>"
-                    aria-label="<?php echo $is_saved ? 'Ta bort från sparade' : 'Spara inlägg'; ?>">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span class="post-action-btn__label save-btn__label"><?php echo $is_saved ? 'Sparad' : 'Spara'; ?></span>
-            </button>
-            <?php endif; ?>
-
-            <!-- Kopiera länk -->
-            <button class="post-action-btn copy-btn"
-                    data-url="<?php echo esc_attr(get_permalink()); ?>"
-                    aria-label="Kopiera länk till inlägget">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-                <span class="post-action-btn__label copy-btn__label">Kopiera länk</span>
-            </button>
-
-        </div>
     </header>
 
     <?php if (has_post_thumbnail()): ?>
@@ -91,7 +45,50 @@ get_header();
         <?php the_content(); ?>
     </div>
 
-    <?php comments_template(); ?>
+    <!-- ── Åtgärdsrad ─────────────────────────────────────────────────── -->
+    <?php
+    $likes    = (int) get_post_meta(get_the_ID(), 'blogtree_likes', true);
+    $liked_by = (array) get_post_meta(get_the_ID(), 'blogtree_liked_by', true);
+    $is_liked = is_user_logged_in() && in_array(get_current_user_id(), $liked_by);
+    $comments_count = (int) get_comments_number();
+    ?>
+    <div class="post-actions-bar">
+        <button class="post-actions-bar__btn like-btn <?php echo $is_liked ? 'is-liked' : ''; ?>"
+                data-post-id="<?php echo get_the_ID(); ?>"
+                <?php echo !is_user_logged_in() ? 'data-require-login="true"' : ''; ?>
+                aria-label="Gilla inlägget">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="<?php echo $is_liked ? 'currentColor' : 'none'; ?>" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            Gilla<?php if ($likes > 0): ?> <span class="like-btn__count"><?php echo $likes; ?></span><?php endif; ?>
+        </button>
+
+        <button class="post-actions-bar__btn" id="toggle-comments-btn" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Kommentera<?php if ($comments_count > 0): ?> <span><?php echo $comments_count; ?></span><?php endif; ?>
+        </button>
+
+        <button class="post-actions-bar__btn copy-btn"
+                data-url="<?php echo esc_attr(get_permalink()); ?>"
+                aria-label="Dela inlägget">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+            <span class="copy-btn__label">Dela</span>
+        </button>
+    </div>
+
+    <!-- ── Läs mer ────────────────────────────────────────────────────── -->
+    <?php blogtree_render_read_more(get_the_ID()); ?>
+
+    <!-- ── Kommentarer (dolda från start) ────────────────────────────── -->
+    <div id="comments-wrapper" class="comments-wrapper" hidden>
+        <?php comments_template(); ?>
+    </div>
 
 </article>
 

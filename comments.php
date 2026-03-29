@@ -1,9 +1,6 @@
 <?php
 /**
  * comments.php – Kommentarsmall
- *
- * Anropas via comments_template() i single.php.
- * Visar kommentarer med svar-knapp och rapportera-knapp.
  */
 
 if (post_password_required()) {
@@ -14,6 +11,11 @@ if (post_password_required()) {
 $comments     = get_comments(['post_id' => get_the_ID(), 'status' => 'approve', 'parent' => 0]);
 $current_user = wp_get_current_user();
 $is_logged_in = is_user_logged_in();
+
+$emojis = ['😀','😂','😍','🤔','😎','🥳','😢','😡','🙏','👍',
+           '👎','❤️','🔥','✅','⚡','🎉','💡','📢','🚀','🌍',
+           '📰','🗳️','⚖️','🏛️','📊','💬','🤝','✊','👏','🌱',
+           '⚠️','❌','💰','🏆','📝','🔍','📌','🕐','💪','🧵'];
 ?>
 
 <section class="comments-section" id="comments">
@@ -35,8 +37,44 @@ $is_logged_in = is_user_logged_in();
         <form class="comment-form" id="main-comment-form"
               data-post-id="<?php echo get_the_ID(); ?>"
               data-parent-id="0">
-            <textarea class="comment-form__input" name="content"
-                      placeholder="Din kommentar…" rows="4" required></textarea>
+            <input type="hidden" name="content" class="comment-content-input">
+
+            <!-- Toolbar -->
+            <div class="comment-toolbar">
+                <button type="button" class="comment-toolbar__btn" data-cmd="bold" title="Fetstil"><b>B</b></button>
+                <button type="button" class="comment-toolbar__btn" data-cmd="italic" title="Kursiv"><i>I</i></button>
+                <button type="button" class="comment-toolbar__btn" data-cmd="underline" title="Understrykning"><u>U</u></button>
+                <div class="comment-toolbar__sep"></div>
+                <button type="button" class="comment-toolbar__btn" data-cmd="insertUnorderedList" title="Punktlista">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+                </button>
+                <button type="button" class="comment-toolbar__btn" data-cmd="insertOrderedList" title="Numrerad lista">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
+                </button>
+                <button type="button" class="comment-toolbar__btn" data-cmd="createLink" title="Lägg till länk">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </button>
+                <div class="comment-toolbar__sep"></div>
+                <button type="button" class="comment-toolbar__btn comment-emoji-toggle" title="Emoji">😊</button>
+            </div>
+
+            <!-- Emoji-picker -->
+            <div class="comment-emoji-picker" hidden>
+                <div class="mikro-emoji-picker__grid">
+                    <?php foreach ($emojis as $e): ?>
+                    <button type="button" class="mikro-emoji-btn comment-emoji-insert" data-emoji="<?php echo $e; ?>"><?php echo $e; ?></button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Editor -->
+            <div class="comment-editor comment-form__input"
+                 contenteditable="true"
+                 data-placeholder="Din kommentar…"
+                 role="textbox"
+                 aria-multiline="true"
+                 aria-label="Kommentar"></div>
+
             <div class="comment-form__footer">
                 <button type="submit" class="btn btn--primary">Skicka</button>
             </div>
@@ -94,7 +132,7 @@ function blogtree_render_comments(array $comments, int $post_id, int $depth = 0)
                 </div>
             </div>
             <div class="comment-content">
-                <?php echo wpautop(esc_html($comment->comment_content)); ?>
+                <?php echo wp_kses_post($comment->comment_content); ?>
             </div>
             <?php if (get_comment_meta($comment->comment_ID, 'blogtree_admin_liked', true)): ?>
             <div class="comment-admin-like">❤ Admin gillar den här kommentaren</div>
@@ -120,8 +158,12 @@ function blogtree_render_comments(array $comments, int $post_id, int $depth = 0)
                 <form class="comment-form comment-form--reply"
                       data-post-id="<?php echo esc_attr($post_id); ?>"
                       data-parent-id="<?php echo esc_attr($comment->comment_ID); ?>">
-                    <textarea class="comment-form__input" name="content"
-                              placeholder="Ditt svar…" rows="3" required></textarea>
+                    <input type="hidden" name="content" class="comment-content-input">
+                    <div class="comment-editor comment-form__input"
+                         contenteditable="true"
+                         data-placeholder="Ditt svar…"
+                         role="textbox"
+                         aria-multiline="true"></div>
                     <div class="comment-form__footer">
                         <button type="submit" class="btn btn--primary btn--sm">Skicka svar</button>
                         <button type="button" class="btn btn--ghost btn--sm reply-cancel-btn"
