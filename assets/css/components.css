@@ -29,6 +29,10 @@
     color: #fff;
 }
 
+[data-theme="dark"] .btn--primary {
+    color: #4a4f5a;
+}
+
 .btn--primary:hover {
     opacity: .85;
     text-decoration: none;
@@ -2708,6 +2712,7 @@
 .mikro-chip:hover { opacity: .75; text-decoration: none; }
 .mikro-chip--topic { background: #4a4f5a; color: #fff; }
 .mikro-chip--cat   { background: var(--color-surface-alt, #eee); color: var(--color-text); }
+[data-theme="dark"] .mikro-chip--cat { color: #4a4f5a; }
 .mikro-chip--tag   { background: transparent; border: 1px solid var(--color-border); color: var(--color-text-muted); }
 
 /* Footer */
