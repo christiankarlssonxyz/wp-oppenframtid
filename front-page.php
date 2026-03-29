@@ -192,15 +192,15 @@ $_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_c
             </div>
 
             <div class="hero__text">
-                <p class="hero__label">Personlig blogg & community</p>
+                <p class="hero__label"><?php echo esc_html(get_theme_mod('blogtree_hero_label', 'Personlig blogg & community')); ?></p>
                 <h1 class="hero__name"><?php bloginfo('name'); ?></h1>
                 <?php if (get_bloginfo('description')): ?>
                     <p class="hero__bio"><?php bloginfo('description'); ?></p>
                 <?php endif; ?>
 
                 <div class="hero__actions">
-                    <a href="#amnen" class="btn btn--primary">Utforska ämnen</a>
-                    <a href="#senaste" class="btn btn--ghost">Senaste inlägg</a>
+                    <a href="#amnen" class="btn btn--primary"><?php echo esc_html(get_theme_mod('blogtree_hero_btn_primary', 'Utforska ämnen')); ?></a>
+                    <a href="#senaste" class="btn btn--ghost"><?php echo esc_html(get_theme_mod('blogtree_hero_btn_secondary', 'Senaste inlägg')); ?></a>
                 </div>
 
                 <?php
@@ -247,21 +247,23 @@ $_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_c
     <section class="about-strip">
         <div class="container">
             <div class="about-strip__grid">
+                <?php
+                $feature_defaults = [
+                    1 => ['icon' => '✍️',  'title' => 'Personlig blogg',  'desc' => 'Jag skriver om saker jag bryr mig om – fackligt, teknik och politik.'],
+                    2 => ['icon' => '🤝',  'title' => 'Community',        'desc' => 'Du kan kommentera, gilla och följa ämnen. Inloggade kan skicka in egna inlägg.'],
+                    3 => ['icon' => '🔒',  'title' => 'Öppen & ärlig',    'desc' => 'Inga spårare. Ingen reklam. Bara innehåll.'],
+                ];
+                foreach ($feature_defaults as $n => $d):
+                    $icon  = get_theme_mod("blogtree_feature_{$n}_icon",  $d['icon']);
+                    $title = get_theme_mod("blogtree_feature_{$n}_title", $d['title']);
+                    $desc  = get_theme_mod("blogtree_feature_{$n}_desc",  $d['desc']);
+                ?>
                 <div class="about-strip__item">
-                    <span class="about-strip__icon">✍️</span>
-                    <h3>Personlig blogg</h3>
-                    <p>Jag skriver om saker jag bryr mig om – fackligt, teknik och politik.</p>
+                    <span class="about-strip__icon"><?php echo esc_html($icon); ?></span>
+                    <h3><?php echo esc_html($title); ?></h3>
+                    <p><?php echo esc_html($desc); ?></p>
                 </div>
-                <div class="about-strip__item">
-                    <span class="about-strip__icon">🤝</span>
-                    <h3>Community</h3>
-                    <p>Du kan kommentera, gilla och följa ämnen. Inloggade kan skicka in egna inlägg.</p>
-                </div>
-                <div class="about-strip__item">
-                    <span class="about-strip__icon">🔒</span>
-                    <h3>Öppen & ärlig</h3>
-                    <p>Inga spårare. Ingen reklam. Bara innehåll.</p>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
@@ -279,8 +281,8 @@ $_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_c
     ]);
     if ($topics && !is_wp_error($topics)): ?>
     <section class="topics-section" id="amnen">
-        <h2 class="section-title">Fokusområden</h2>
-        <p class="section-sub">Det här skriver jag om</p>
+        <h2 class="section-title"><?php echo esc_html(get_theme_mod('blogtree_topics_title', 'Fokusområden')); ?></h2>
+        <p class="section-sub"><?php echo esc_html(get_theme_mod('blogtree_topics_sub', 'Det här skriver jag om')); ?></p>
         <div class="topics-grid">
             <?php foreach ($topics as $topic):
                 $color = get_term_meta($topic->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';

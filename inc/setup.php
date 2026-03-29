@@ -132,6 +132,121 @@ add_action('customize_register', function ($wp_customize) {
     ]);
 });
 
+// ── Startsida – hero-text i Customizer ────────────────────────────────────────
+add_action('customize_register', function ($wp_customize) {
+
+    $wp_customize->add_section('blogtree_frontpage_hero', [
+        'title'    => 'Startsida – hero',
+        'priority' => 18,
+    ]);
+
+    $wp_customize->add_setting('blogtree_hero_label', [
+        'default'           => 'Personlig blogg & community',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('blogtree_hero_label', [
+        'label'   => 'Etikett (liten text ovanför namnet)',
+        'section' => 'blogtree_frontpage_hero',
+        'type'    => 'text',
+    ]);
+
+    $wp_customize->add_setting('blogtree_hero_btn_primary', [
+        'default'           => 'Utforska ämnen',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('blogtree_hero_btn_primary', [
+        'label'   => 'Knapp 1 – text (primär)',
+        'section' => 'blogtree_frontpage_hero',
+        'type'    => 'text',
+    ]);
+
+    $wp_customize->add_setting('blogtree_hero_btn_secondary', [
+        'default'           => 'Senaste inlägg',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('blogtree_hero_btn_secondary', [
+        'label'   => 'Knapp 2 – text (ghost)',
+        'section' => 'blogtree_frontpage_hero',
+        'type'    => 'text',
+    ]);
+});
+
+// ── Startsida – fokusområden i Customizer ─────────────────────────────────────
+add_action('customize_register', function ($wp_customize) {
+
+    $wp_customize->add_section('blogtree_frontpage_topics', [
+        'title'    => 'Startsida – fokusområden',
+        'priority' => 21,
+    ]);
+
+    $wp_customize->add_setting('blogtree_topics_title', [
+        'default'           => 'Fokusområden',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('blogtree_topics_title', [
+        'label'   => 'Rubrik',
+        'section' => 'blogtree_frontpage_topics',
+        'type'    => 'text',
+    ]);
+
+    $wp_customize->add_setting('blogtree_topics_sub', [
+        'default'           => 'Det här skriver jag om',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('blogtree_topics_sub', [
+        'label'   => 'Undertext',
+        'section' => 'blogtree_frontpage_topics',
+        'type'    => 'text',
+    ]);
+});
+
+// ── Startsida – feature-kolumner i Customizer ─────────────────────────────────
+add_action('customize_register', function ($wp_customize) {
+
+    $wp_customize->add_section('blogtree_frontpage_features', [
+        'title'    => 'Startsida – feature-kolumner',
+        'priority' => 22,
+    ]);
+
+    $defaults = [
+        1 => ['icon' => '✍️',  'title' => 'Personlig blogg',  'desc' => 'Jag skriver om saker jag bryr mig om – fackligt, teknik och politik.'],
+        2 => ['icon' => '🤝',  'title' => 'Community',        'desc' => 'Du kan kommentera, gilla och följa ämnen. Inloggade kan skicka in egna inlägg.'],
+        3 => ['icon' => '🔒',  'title' => 'Öppen & ärlig',    'desc' => 'Inga spårare. Ingen reklam. Bara innehåll.'],
+    ];
+
+    foreach ($defaults as $n => $d) {
+        $wp_customize->add_setting("blogtree_feature_{$n}_icon", [
+            'default'           => $d['icon'],
+            'sanitize_callback' => 'sanitize_text_field',
+        ]);
+        $wp_customize->add_control("blogtree_feature_{$n}_icon", [
+            'label'   => "Kolumn {$n} – ikon (emoji)",
+            'section' => 'blogtree_frontpage_features',
+            'type'    => 'text',
+        ]);
+
+        $wp_customize->add_setting("blogtree_feature_{$n}_title", [
+            'default'           => $d['title'],
+            'sanitize_callback' => 'sanitize_text_field',
+        ]);
+        $wp_customize->add_control("blogtree_feature_{$n}_title", [
+            'label'   => "Kolumn {$n} – rubrik",
+            'section' => 'blogtree_frontpage_features',
+            'type'    => 'text',
+        ]);
+
+        $wp_customize->add_setting("blogtree_feature_{$n}_desc", [
+            'default'           => $d['desc'],
+            'sanitize_callback' => 'sanitize_textarea_field',
+        ]);
+        $wp_customize->add_control("blogtree_feature_{$n}_desc", [
+            'label'   => "Kolumn {$n} – beskrivning",
+            'section' => 'blogtree_frontpage_features',
+            'type'    => 'textarea',
+        ]);
+    }
+});
+
 // ── Sociala länkar i Customizer ────────────────────────────────────────────────
 add_action('customize_register', function ($wp_customize) {
 
