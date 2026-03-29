@@ -3307,3 +3307,162 @@
 
 /* Kommentarssektion wrapper */
 .comments-wrapper { margin-top: var(--space-xl); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KOMMENTARSVISNING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.comments-section { margin-top: var(--space-lg); }
+
+.comments-section__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Lista */
+.comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Enskilt kort */
+.comment-item {
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+.comment-item:last-child { border-bottom: none; }
+
+/* Svar-lista indragna */
+.comment-list--replies {
+    margin-left: 44px;
+    margin-top: 0;
+    border-left: 2px solid var(--color-border);
+    padding-left: var(--space-md);
+}
+.comment-list--replies .comment-item {
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+.comment-list--replies .comment-item:last-child { border-bottom: none; }
+
+/* Body */
+.comment-body { display: flex; flex-direction: column; gap: 8px; }
+
+/* Meta: avatar + namn + datum */
+.comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.comment-meta img,
+.comment-meta .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.comment-meta > div {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.comment-author {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+.comment-date {
+    font-size: .75rem;
+    color: var(--color-muted);
+}
+
+/* Innehåll */
+.comment-content {
+    font-size: .9rem;
+    line-height: 1.65;
+    color: var(--color-text);
+    padding-left: 46px;
+}
+
+/* Admin gillar */
+.comment-admin-like {
+    font-size: .78rem;
+    color: #e74c3c;
+    padding-left: 46px;
+}
+
+/* Åtgärder: Svara + Rapportera */
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-left: 46px;
+}
+.comment-reply-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    cursor: pointer;
+    font-family: inherit;
+}
+.comment-reply-btn:hover { text-decoration: underline; }
+
+.report-comment-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .78rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    font-family: inherit;
+    transition: color .15s;
+}
+.report-comment-btn:hover { color: var(--color-danger, #e74c3c); }
+
+/* Svar-formulär */
+.comment-reply-form {
+    padding-left: 46px;
+    padding-top: var(--space-sm);
+}
+
+/* Inloggnings-länk */
+.comments-section__login {
+    font-size: .9rem;
+    color: var(--color-muted);
+    margin-top: var(--space-md);
+}
+.comments-section__login a { color: var(--color-accent); }
+.comments-section__guest-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-accent);
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+/* Kommentarsrubrik */
+.comment-form__title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+    color: var(--color-text);
+}
+
+/* Skicka-knapp margin */
+.comment-form__footer { margin-top: var(--space-sm); }
