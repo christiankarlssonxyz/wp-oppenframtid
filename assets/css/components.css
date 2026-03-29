@@ -2770,6 +2770,123 @@
     padding: var(--space-md) 0;
 }
 
+/* ── Editor + toolbar ───────────────────────────────────────────────────── */
+.mikro-editor {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: visible;
+    transition: border-color .15s;
+    position: relative;
+}
+.mikro-editor:focus-within { border-color: var(--color-accent); }
+
+.mikro-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: 8px 8px 0 0;
+}
+.mikro-toolbar__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: background .12s;
+    padding: 0;
+}
+.mikro-toolbar__btn:hover { background: var(--color-border); }
+.mikro-toolbar__img-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    color: var(--color-text);
+    transition: background .12s;
+}
+.mikro-toolbar__img-label:hover { background: var(--color-border); }
+.mikro-toolbar__sep {
+    width: 1px;
+    height: 18px;
+    background: var(--color-border);
+    margin: 0 4px;
+}
+
+.mikro-write-form__editor {
+    min-height: 100px;
+    padding: 12px;
+    font-size: .95rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    background: var(--color-bg);
+    outline: none;
+    border-radius: 0 0 8px 8px;
+    word-break: break-word;
+}
+.mikro-write-form__editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--color-muted);
+    pointer-events: none;
+}
+.mikro-write-form__editor p      { margin: 0 0 .4em; }
+.mikro-write-form__editor p:last-child { margin-bottom: 0; }
+.mikro-write-form__editor ul,
+.mikro-write-form__editor ol     { margin: .3em 0 .4em 1.4em; padding: 0; }
+.mikro-write-form__editor li     { margin-bottom: .15em; }
+.mikro-write-form__editor img    { max-width: 100%; border-radius: 8px; display: block; margin-top: 8px; }
+
+/* Emoji-picker */
+.mikro-emoji-picker {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 200;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: var(--shadow-md);
+    width: 280px;
+}
+.mikro-emoji-picker__grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+}
+.mikro-emoji-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 5px;
+    line-height: 1;
+    transition: background .1s;
+}
+.mikro-emoji-btn:hover { background: var(--color-border); }
+
+/* Bildstatus */
+.mikro-img-status {
+    font-size: .8rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin: 4px 0 0;
+}
+.mikro-img-status--ok  { color: #155724; background: #d4edda; }
+.mikro-img-status--err { color: #721c24; background: #f8d7da; }
+
 /* ── Skriv-formulär ─────────────────────────────────────────────────────── */
 .mikro-write-card {
     background: var(--color-surface);
@@ -2787,24 +2904,6 @@
 .mikro-write-form { display: flex; flex-direction: column; gap: 14px; }
 
 .mikro-write-form__field { position: relative; }
-.mikro-write-form__textarea {
-    width: 100%;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 1rem;
-    line-height: 1.6;
-    resize: vertical;
-    background: var(--color-bg);
-    color: var(--color-text);
-    font-family: inherit;
-    transition: border-color .15s;
-    box-sizing: border-box;
-}
-.mikro-write-form__textarea:focus {
-    outline: none;
-    border-color: var(--color-accent);
-}
 .mikro-write-form__counter {
     text-align: right;
     font-size: .8rem;

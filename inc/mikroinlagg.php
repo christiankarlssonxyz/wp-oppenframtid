@@ -145,13 +145,26 @@ function blogtree_ajax_save_mikro() {
         wp_send_json_error(['message' => 'Behörighet saknas.'], 403);
     }
 
-    $content = wp_strip_all_tags(wp_unslash($_POST['content'] ?? ''));
+    $allowed_html = [
+        'p'      => [],
+        'br'     => [],
+        'strong' => [],
+        'b'      => [],
+        'em'     => [],
+        'i'      => [],
+        'ul'     => [],
+        'ol'     => [],
+        'li'     => [],
+        'img'    => ['src' => [], 'alt' => [], 'width' => [], 'height' => [], 'class' => []],
+    ];
+    $content = wp_kses(wp_unslash($_POST['content'] ?? ''), $allowed_html);
     $content = trim($content);
+    $text_only = trim(wp_strip_all_tags($content));
 
-    if (empty($content)) {
+    if (empty($text_only)) {
         wp_send_json_error(['message' => 'Innehållet får inte vara tomt.']);
     }
-    if (mb_strlen($content) > 500) {
+    if (mb_strlen($text_only) > 500) {
         wp_send_json_error(['message' => 'Max 500 tecken.']);
     }
 
@@ -309,6 +322,33 @@ function blogtree_mikro_card($post_id) {
         </div>
     </article>
     <?php
+}
+
+// ── AJAX: bilduppladdning från frontend ───────────────────────────────────────
+
+add_action('wp_ajax_blogtree_mikro_upload_image', 'blogtree_ajax_mikro_upload_image');
+function blogtree_ajax_mikro_upload_image() {
+    check_ajax_referer('blogtree_mikro_save', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Behörighet saknas.'], 403);
+    }
+
+    if (empty($_FILES['image'])) {
+        wp_send_json_error(['message' => 'Ingen fil skickad.']);
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+
+    $attachment_id = media_handle_upload('image', 0);
+    if (is_wp_error($attachment_id)) {
+        wp_send_json_error(['message' => $attachment_id->get_error_message()]);
+    }
+
+    $url = wp_get_attachment_url($attachment_id);
+    wp_send_json_success(['url' => $url, 'id' => $attachment_id]);
 }
 
 // ── Hjälpfunktion: relativ tid ────────────────────────────────────────────────
