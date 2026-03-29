@@ -3466,3 +3466,22 @@
 
 /* Skicka-knapp margin */
 .comment-form__footer { margin-top: var(--space-sm); }
+
+/* Gilla-knapp på kommentar */
+.comment-like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: .8rem;
+    color: var(--color-muted);
+    cursor: pointer;
+    font-family: inherit;
+    transition: color .15s;
+}
+.comment-like-btn:hover { color: #e74c3c; }
+.comment-like-btn.is-liked { color: #e74c3c; }
+.comment-like-btn:disabled { opacity: .5; cursor: default; }
+.comment-like-btn__count { font-size: .78rem; font-weight: 600; min-width: 10px; }

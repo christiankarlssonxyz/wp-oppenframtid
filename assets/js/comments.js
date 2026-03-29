@@ -186,6 +186,37 @@
         if (footer) form.insertBefore(el, footer);
     }
 
+    // ── Gilla kommentar ───────────────────────────────────────────────────────
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.comment-like-btn');
+        if (!btn || btn.disabled) return;
+
+        var commentId = btn.dataset.commentId;
+        var countEl   = btn.querySelector('.comment-like-btn__count');
+
+        btn.disabled = true;
+
+        var body = new URLSearchParams({
+            action:     'blogtree_like_comment',
+            comment_id: commentId,
+            nonce:      cfg.commentLikeNonce,
+        });
+
+        fetch(ajaxurl, { method: 'POST', body: body })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    var liked = data.data.liked;
+                    var count = data.data.count;
+                    btn.classList.toggle('is-liked', liked);
+                    var svg = btn.querySelector('svg');
+                    if (svg) svg.setAttribute('fill', liked ? 'currentColor' : 'none');
+                    if (countEl) countEl.textContent = count > 0 ? count : '';
+                }
+            })
+            .finally(function () { btn.disabled = false; });
+    });
+
     // ── Svar-knapp ────────────────────────────────────────────────────────────
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('.comment-reply-btn');

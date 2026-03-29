@@ -68,6 +68,32 @@ function blogtree_handle_comment(): void {
     ]);
 }
 
+// ── AJAX: gilla kommentar (toggle) ────────────────────────────────────────────
+
+add_action('wp_ajax_blogtree_like_comment', 'blogtree_ajax_like_comment');
+function blogtree_ajax_like_comment(): void {
+    check_ajax_referer('blogtree_comment_like', 'nonce');
+
+    $comment_id = (int) ($_POST['comment_id'] ?? 0);
+    if (!$comment_id) wp_send_json_error('Ogiltig förfrågan.');
+
+    $user_id  = get_current_user_id();
+    $liked_by = (array) get_comment_meta($comment_id, 'blogtree_liked_by', true);
+
+    if (in_array($user_id, $liked_by, true)) {
+        $liked_by = array_values(array_diff($liked_by, [$user_id]));
+        $liked    = false;
+    } else {
+        $liked_by[] = $user_id;
+        $liked      = true;
+    }
+
+    update_comment_meta($comment_id, 'blogtree_liked_by', $liked_by);
+    $count = count($liked_by);
+
+    wp_send_json_success(['liked' => $liked, 'count' => $count]);
+}
+
 // ── Hjälp: detektera länkar i kommentarsinnehåll ──────────────────────────────
 
 function blogtree_comment_has_link(string $content): bool {

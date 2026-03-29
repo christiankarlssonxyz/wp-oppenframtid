@@ -49,11 +49,12 @@ add_action('wp_enqueue_scripts', function () {
         wp_enqueue_script('blogtree-comments', $uri . '/assets/js/comments.js', [], $version, true);
         $current_user = wp_get_current_user();
         wp_localize_script('blogtree-comments', 'blogtreeComments', [
-            'ajaxurl'     => admin_url('admin-ajax.php'),
-            'nonce'       => wp_create_nonce('blogtree_comment'),
-            'loggedIn'    => is_user_logged_in(),
-            'displayName' => $current_user->display_name ?? '',
-            'avatarUrl'   => get_avatar_url($current_user->ID, ['size' => 36]),
+            'ajaxurl'          => admin_url('admin-ajax.php'),
+            'nonce'            => wp_create_nonce('blogtree_comment'),
+            'commentLikeNonce' => wp_create_nonce('blogtree_comment_like'),
+            'loggedIn'         => is_user_logged_in(),
+            'displayName'      => $current_user->display_name ?? '',
+            'avatarUrl'        => get_avatar_url($current_user->ID, ['size' => 36]),
         ]);
 
         wp_enqueue_script('blogtree-reports', $uri . '/assets/js/reports.js', [], $version, true);

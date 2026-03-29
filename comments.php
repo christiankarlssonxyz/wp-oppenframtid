@@ -138,6 +138,23 @@ function blogtree_render_comments(array $comments, int $post_id, int $depth = 0)
             <div class="comment-admin-like">❤ Admin gillar den här kommentaren</div>
             <?php endif; ?>
             <div class="comment-actions">
+                <?php
+                $liked_by     = (array) get_comment_meta($comment->comment_ID, 'blogtree_liked_by', true);
+                $like_count   = count($liked_by);
+                $user_liked   = is_user_logged_in() && in_array(get_current_user_id(), $liked_by, true);
+                ?>
+                <button class="comment-like-btn <?php echo $user_liked ? 'is-liked' : ''; ?>"
+                        data-comment-id="<?php echo esc_attr($comment->comment_ID); ?>"
+                        <?php echo !is_user_logged_in() ? 'disabled title="Logga in för att gilla"' : ''; ?>"
+                        aria-label="Gilla kommentar">
+                    <svg viewBox="0 0 24 24" width="13" height="13"
+                         fill="<?php echo $user_liked ? 'currentColor' : 'none'; ?>"
+                         stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span class="comment-like-btn__count"><?php echo $like_count > 0 ? $like_count : ''; ?></span>
+                </button>
+
                 <?php if (is_user_logged_in() && $depth < 3): ?>
                 <button class="comment-reply-btn" data-comment-id="<?php echo esc_attr($comment->comment_ID); ?>">
                     Svara
