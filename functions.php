@@ -36,3 +36,6 @@ require_once get_template_directory() . '/inc/maintenance.php';
 
 // ── Integritetsgranskning ───────────────────────────────────────────────────────
 require_once get_template_directory() . '/inc/integrity.php';
+
+// ── CSV-import av inlägg ────────────────────────────────────────────────────────
+require_once get_template_directory() . '/inc/import.php';
