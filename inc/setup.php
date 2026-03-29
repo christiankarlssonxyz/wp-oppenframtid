@@ -62,6 +62,16 @@ add_action('customize_register', function ($wp_customize) {
         'section'   => 'blogtree_frontpage_banner',
         'mime_type' => 'image',
     ]));
+
+    $wp_customize->add_setting('blogtree_frontpage_banner_caption', [
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+    $wp_customize->add_control('blogtree_frontpage_banner_caption', [
+        'label'   => 'Bildtext',
+        'section' => 'blogtree_frontpage_banner',
+        'type'    => 'text',
+    ]);
 });
 
 // ── Sidebar-textbox i Customizer ───────────────────────────────────────────────

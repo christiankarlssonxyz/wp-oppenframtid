@@ -438,6 +438,13 @@
     aspect-ratio: 3 / 1;
 }
 
+.banner-caption {
+    margin-top: var(--space-sm);
+    font-size: .8rem;
+    color: var(--color-muted);
+    text-align: center;
+}
+
 /* ── Frontpage bannerbild ────────────────────────────────────────────────────── */
 .frontpage-banner {
     padding: var(--space-xl) var(--space-md) 0;

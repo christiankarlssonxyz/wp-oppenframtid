@@ -63,17 +63,21 @@ $paged = get_query_var('paged') ?: 1;
     <div>
 
         <?php
-        $banner_id  = (int) get_term_meta($term->term_id, 'wpblogtree_topic_banner_id', true);
-        $banner_src = $banner_id ? wp_get_attachment_image_src($banner_id, 'blogtree-topic-banner') : false;
+        $banner_id      = (int) get_term_meta($term->term_id, 'wpblogtree_topic_banner_id', true);
+        $banner_src     = $banner_id ? wp_get_attachment_image_src($banner_id, 'blogtree-topic-banner') : false;
+        $banner_caption = get_term_meta($term->term_id, 'wpblogtree_topic_banner_caption', true);
         if ($banner_src): ?>
-        <div class="topic-banner">
+        <figure class="topic-banner">
             <img src="<?php echo esc_url($banner_src[0]); ?>"
                  width="<?php echo (int) $banner_src[1]; ?>"
                  height="<?php echo (int) $banner_src[2]; ?>"
-                 alt=""
+                 alt="<?php echo esc_attr($banner_caption); ?>"
                  class="topic-banner__img"
                  loading="lazy">
-        </div>
+            <?php if ($banner_caption): ?>
+            <figcaption class="banner-caption"><?php echo esc_html($banner_caption); ?></figcaption>
+            <?php endif; ?>
+        </figure>
         <?php endif; ?>
 
         <?php

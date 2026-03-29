@@ -95,6 +95,15 @@ add_action('topic_edit_form_fields', function ($term) {
             </p>
         </td>
     </tr>
+    <tr class="form-field">
+        <th><label for="topic-banner-caption">Bildtext</label></th>
+        <td>
+            <?php $caption = get_term_meta($term->term_id, 'wpblogtree_topic_banner_caption', true); ?>
+            <input type="text" id="topic-banner-caption" name="topic_banner_caption"
+                   value="<?php echo esc_attr($caption); ?>" class="regular-text">
+            <p class="description">Visas under bannerbilden på ämnessidan.</p>
+        </td>
+    </tr>
     <?php
 });
 
@@ -108,6 +117,14 @@ add_action('edited_topic', function ($term_id) {
             update_term_meta($term_id, 'wpblogtree_topic_banner_id', $banner_id);
         } else {
             delete_term_meta($term_id, 'wpblogtree_topic_banner_id');
+        }
+    }
+    if (isset($_POST['topic_banner_caption'])) {
+        $caption = sanitize_text_field($_POST['topic_banner_caption']);
+        if ($caption) {
+            update_term_meta($term_id, 'wpblogtree_topic_banner_caption', $caption);
+        } else {
+            delete_term_meta($term_id, 'wpblogtree_topic_banner_caption');
         }
     }
 });

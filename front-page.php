@@ -107,15 +107,20 @@ get_header();
     <?php
     $_banner_id  = (int) get_theme_mod('blogtree_frontpage_banner_id', 0);
     $_banner_src = $_banner_id ? wp_get_attachment_image_src($_banner_id, 'blogtree-frontpage-banner') : false;
-    if ($_banner_src): ?>
-    <div class="frontpage-banner">
+    if ($_banner_src):
+        $_banner_caption = get_theme_mod('blogtree_frontpage_banner_caption', '');
+    ?>
+    <figure class="frontpage-banner">
         <img src="<?php echo esc_url($_banner_src[0]); ?>"
              width="<?php echo (int) $_banner_src[1]; ?>"
              height="<?php echo (int) $_banner_src[2]; ?>"
-             alt=""
+             alt="<?php echo esc_attr($_banner_caption); ?>"
              class="frontpage-banner__img"
              loading="lazy">
-    </div>
+        <?php if ($_banner_caption): ?>
+        <figcaption class="banner-caption"><?php echo esc_html($_banner_caption); ?></figcaption>
+        <?php endif; ?>
+    </figure>
     <?php endif; ?>
 
     <!-- Alla senaste inlägg -->
@@ -291,15 +296,20 @@ get_header();
     <?php
     $_banner_id  = (int) get_theme_mod('blogtree_frontpage_banner_id', 0);
     $_banner_src = $_banner_id ? wp_get_attachment_image_src($_banner_id, 'blogtree-frontpage-banner') : false;
-    if ($_banner_src): ?>
-    <div class="frontpage-banner">
+    if ($_banner_src):
+        $_banner_caption = get_theme_mod('blogtree_frontpage_banner_caption', '');
+    ?>
+    <figure class="frontpage-banner">
         <img src="<?php echo esc_url($_banner_src[0]); ?>"
              width="<?php echo (int) $_banner_src[1]; ?>"
              height="<?php echo (int) $_banner_src[2]; ?>"
-             alt=""
+             alt="<?php echo esc_attr($_banner_caption); ?>"
              class="frontpage-banner__img"
              loading="lazy">
-    </div>
+        <?php if ($_banner_caption): ?>
+        <figcaption class="banner-caption"><?php echo esc_html($_banner_caption); ?></figcaption>
+        <?php endif; ?>
+    </figure>
     <?php endif; ?>
 
     <!-- ── Senaste inlägg ─────────────────────────────────────────────────── -->
