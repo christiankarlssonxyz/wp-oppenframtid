@@ -2705,7 +2705,7 @@
     transition: opacity .15s;
 }
 .mikro-chip:hover { opacity: .75; text-decoration: none; }
-.mikro-chip--topic { background: var(--color-accent); color: #fff; }
+.mikro-chip--topic { background: #4a4f5a; color: #fff; }
 .mikro-chip--cat   { background: var(--color-surface-alt, #eee); color: var(--color-text); }
 .mikro-chip--tag   { background: transparent; border: 1px solid var(--color-border); color: var(--color-text-muted); }
 

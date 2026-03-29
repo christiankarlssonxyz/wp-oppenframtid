@@ -278,7 +278,7 @@ function blogtree_mikro_card($post_id) {
                     <a href="<?php echo esc_url(get_term_link($c)); ?>" class="mikro-chip mikro-chip--cat"><?php echo esc_html($c->name); ?></a>
                 <?php endforeach; ?>
                 <?php foreach ($tags as $tag): ?>
-                    <a href="<?php echo esc_url(get_term_link($tag)); ?>" class="mikro-chip mikro-chip--tag">#<?php echo esc_html($tag->name); ?></a>
+                    <a href="<?php echo esc_url(get_term_link($tag)); ?>" class="mikro-chip mikro-chip--tag">#<?php echo esc_html(ltrim($tag->name, '#')); ?></a>
                 <?php endforeach; ?>
             </div>
             <?php endif; ?>
