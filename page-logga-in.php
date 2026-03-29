@@ -52,6 +52,10 @@ $fel         = $_GET['fel'] ?? '';
         </form>
 
         <p class="auth-card__footer">
+            <a href="<?php echo esc_url(wp_lostpassword_url()); ?>">Glömt lösenordet?</a>
+        </p>
+
+        <p class="auth-card__footer">
             Inget konto? <a href="<?php echo esc_url(home_url('/registrera/')); ?>">Registrera dig</a>
         </p>
 

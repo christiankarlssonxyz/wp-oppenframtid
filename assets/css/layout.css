@@ -161,6 +161,24 @@
     display: flex;
 }
 
+.nav-register-btn {
+    display: inline-block;
+    background: transparent;
+    color: var(--color-accent-alt, #3498db);
+    border: 2px solid var(--color-accent-alt, #3498db);
+    border-radius: 99px;
+    padding: 5px 18px;
+    font-size: .875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity .15s;
+}
+
+.nav-register-btn:hover {
+    opacity: .75;
+    text-decoration: none;
+}
+
 .nav-login-btn {
     display: inline-block;
     background: var(--color-accent-alt, #3498db);

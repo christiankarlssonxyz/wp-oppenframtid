@@ -128,6 +128,7 @@
                     </div>
                 </div>
             <?php else: ?>
+                <a href="<?php echo esc_url(home_url('/registrera/')); ?>" class="nav-register-btn">Skapa konto</a>
                 <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>" class="nav-login-btn">Logga in</a>
             <?php endif; ?>
         </div>
