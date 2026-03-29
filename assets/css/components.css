@@ -2607,34 +2607,40 @@
     font-size: .875rem;
 }
 
-/* Filterrad */
+/* Filterdropdowns */
 .mikro-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: var(--space-md);
 }
-.mikro-filter-btn {
-    padding: 4px 14px;
+.mikro-filter-dropdown { position: relative; }
+.mikro-filter-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 6px 32px 6px 14px;
     border-radius: 99px;
-    font-size: .8rem;
+    font-size: .85rem;
     font-weight: 500;
     border: 1px solid var(--color-border);
-    color: var(--color-muted);
-    text-decoration: none;
-    transition: background .15s, color .15s, border-color .15s;
+    background-color: var(--color-surface);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color .15s;
+    font-family: inherit;
 }
-[data-theme="dark"] .mikro-filter-btn {
-    background: #4a4f5a;
+.mikro-filter-select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+[data-theme="dark"] .mikro-filter-select {
+    background-color: #4a4f5a;
     border-color: #4a4f5a;
     color: #fff;
-}
-.mikro-filter-btn:hover,
-.mikro-filter-btn.is-active {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: #fff;
-    text-decoration: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
 /* Flöde */

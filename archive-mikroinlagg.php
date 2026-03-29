@@ -47,23 +47,40 @@ $loop = new WP_Query($query_args);
                 <?php endif; ?>
             </div>
 
-            <!-- Filterrad -->
+            <!-- Filterdropdowns -->
             <?php if ($topics || $cats): ?>
             <div class="mikro-filters">
-                <a href="<?php echo esc_url(home_url('/mikroinlagg/')); ?>"
-                   class="mikro-filter-btn <?php echo (!$filter_tax) ? 'is-active' : ''; ?>">Alla</a>
-                <?php foreach ($topics as $t): ?>
-                <a href="<?php echo esc_url(add_query_arg(['filter' => 'topic', 'term' => $t->slug], home_url('/mikroinlagg/'))); ?>"
-                   class="mikro-filter-btn <?php echo ($filter_tax === 'topic' && $filter_val === $t->slug) ? 'is-active' : ''; ?>">
-                    <?php echo esc_html($t->name); ?>
-                </a>
-                <?php endforeach; ?>
-                <?php foreach ($cats as $c): ?>
-                <a href="<?php echo esc_url(add_query_arg(['filter' => 'category', 'term' => $c->slug], home_url('/mikroinlagg/'))); ?>"
-                   class="mikro-filter-btn <?php echo ($filter_tax === 'category' && $filter_val === $c->slug) ? 'is-active' : ''; ?>">
-                    <?php echo esc_html($c->name); ?>
-                </a>
-                <?php endforeach; ?>
+                <?php if ($topics): ?>
+                <div class="mikro-filter-dropdown">
+                    <select class="mikro-filter-select" onchange="if(this.value) window.location=this.value">
+                        <option value="<?php echo esc_url(home_url('/mikroinlagg/')); ?>">
+                            <?php echo ($filter_tax === 'topic') ? esc_html(get_term_by('slug', $filter_val, 'topic')->name ?? 'Ämne') : 'Ämne'; ?>
+                        </option>
+                        <?php foreach ($topics as $t):
+                            $url = esc_url(add_query_arg(['filter' => 'topic', 'term' => $t->slug], home_url('/mikroinlagg/')));
+                            $sel = ($filter_tax === 'topic' && $filter_val === $t->slug) ? 'selected' : '';
+                        ?>
+                        <option value="<?php echo $url; ?>" <?php echo $sel; ?>><?php echo esc_html($t->name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+
+                <?php if ($cats): ?>
+                <div class="mikro-filter-dropdown">
+                    <select class="mikro-filter-select" onchange="if(this.value) window.location=this.value">
+                        <option value="<?php echo esc_url(home_url('/mikroinlagg/')); ?>">
+                            <?php echo ($filter_tax === 'category') ? esc_html(get_term_by('slug', $filter_val, 'category')->name ?? 'Kategori') : 'Kategori'; ?>
+                        </option>
+                        <?php foreach ($cats as $c):
+                            $url = esc_url(add_query_arg(['filter' => 'category', 'term' => $c->slug], home_url('/mikroinlagg/')));
+                            $sel = ($filter_tax === 'category' && $filter_val === $c->slug) ? 'selected' : '';
+                        ?>
+                        <option value="<?php echo $url; ?>" <?php echo $sel; ?>><?php echo esc_html($c->name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
 
