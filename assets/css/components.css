@@ -2698,8 +2698,10 @@
     word-break: break-word;
     margin-bottom: 10px;
 }
-.mikro-card__content p      { margin: 0 0 .6em; }
+.mikro-card__content p           { margin: 0 0 .5em; }
 .mikro-card__content p:last-child { margin-bottom: 0; }
+.mikro-card__content p:empty,
+.mikro-card__content p > br:only-child { display: none; }
 .mikro-card__content ul,
 .mikro-card__content ol     { margin: .4em 0 .6em 1.4em; padding: 0; }
 .mikro-card__content li     { margin-bottom: .2em; }
