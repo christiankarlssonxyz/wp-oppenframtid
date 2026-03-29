@@ -265,7 +265,7 @@ function blogtree_mikro_card($post_id) {
             </div>
 
             <div class="mikro-card__content">
-                <?php echo nl2br(esc_html($post->post_content)); ?>
+                <?php echo apply_filters('the_content', $post->post_content); ?>
             </div>
 
             <?php if ($topics || $cats || $tags): ?>

@@ -2616,9 +2616,13 @@
     font-size: .8rem;
     font-weight: 500;
     border: 1px solid var(--color-border);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
     text-decoration: none;
     transition: background .15s, color .15s, border-color .15s;
+}
+[data-theme="dark"] .mikro-filter-btn {
+    border-color: #4a4d5a;
+    color: #c8cad4;
 }
 .mikro-filter-btn:hover,
 .mikro-filter-btn.is-active {
