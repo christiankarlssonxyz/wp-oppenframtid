@@ -2565,6 +2565,363 @@
     white-space: nowrap;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MIKROINLÄGG
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Layout */
+.mikro-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-xl);
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    align-items: start;
+}
+@media (max-width: 900px) {
+    .mikro-layout { grid-template-columns: 1fr; }
+}
+
+.mikro-main { min-width: 0; }
+
+/* Header-rad på arkivsidan */
+.mikro-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}
+.mikro-header__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+.mikro-header__write-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .875rem;
+}
+
+/* Filterrad */
+.mikro-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: var(--space-md);
+}
+.mikro-filter-btn {
+    padding: 4px 14px;
+    border-radius: 99px;
+    font-size: .8rem;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.mikro-filter-btn:hover,
+.mikro-filter-btn.is-active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Flöde */
+.mikro-feed { display: flex; flex-direction: column; }
+
+.mikro-empty {
+    color: var(--color-text-muted);
+    padding: var(--space-lg) 0;
+    text-align: center;
+}
+
+/* ── Mikroinlägg-kort ────────────────────────────────────────────────────── */
+.mikro-card {
+    display: flex;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+.mikro-card:last-child { border-bottom: none; }
+
+.mikro-card__avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.mikro-card__body { flex: 1; min-width: 0; }
+
+.mikro-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: .8rem;
+    color: var(--color-text-muted);
+}
+.mikro-card__author {
+    font-weight: 600;
+    color: var(--color-text);
+}
+.mikro-card__time {
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+.mikro-card__time:hover { text-decoration: underline; }
+
+.mikro-card__visibility { display: inline-flex; align-items: center; }
+
+.mikro-card__content {
+    font-size: .95rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-bottom: 10px;
+}
+
+/* Chips */
+.mikro-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.mikro-chip {
+    font-size: .75rem;
+    padding: 2px 10px;
+    border-radius: 99px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity .15s;
+}
+.mikro-chip:hover { opacity: .75; text-decoration: none; }
+.mikro-chip--topic { background: var(--color-accent); color: #fff; }
+.mikro-chip--cat   { background: var(--color-surface-alt, #eee); color: var(--color-text); }
+.mikro-chip--tag   { background: transparent; border: 1px solid var(--color-border); color: var(--color-text-muted); }
+
+/* Footer */
+.mikro-card__footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: .8rem;
+    color: var(--color-text-muted);
+}
+.mikro-card__comments {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+.mikro-card__comments:hover { color: var(--color-accent); }
+
+.mikro-card__crosspost { display: flex; gap: 10px; margin-left: auto; }
+.mikro-crosspost-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .75rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    border-radius: 99px;
+    padding: 2px 10px;
+    transition: border-color .15s, color .15s;
+}
+.mikro-crosspost-link:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+/* Enskilt inlägg */
+.mikro-single .mikro-card {
+    padding: var(--space-md) 0;
+}
+
+/* ── Skriv-formulär ─────────────────────────────────────────────────────── */
+.mikro-write-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+.mikro-write-card__title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 var(--space-md);
+}
+
+.mikro-write-form { display: flex; flex-direction: column; gap: 14px; }
+
+.mikro-write-form__field { position: relative; }
+.mikro-write-form__textarea {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: vertical;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: inherit;
+    transition: border-color .15s;
+    box-sizing: border-box;
+}
+.mikro-write-form__textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+.mikro-write-form__counter {
+    text-align: right;
+    font-size: .8rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+    transition: color .15s;
+}
+.mikro-write-form__counter.is-over { color: #c0392b; font-weight: 600; }
+
+.mikro-write-form__row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.mikro-write-form__label {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+.mikro-write-form__input,
+.mikro-write-form__select {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: .9rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: inherit;
+    transition: border-color .15s;
+}
+.mikro-write-form__input:focus,
+.mikro-write-form__select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.mikro-write-form__options {
+    display: flex;
+    gap: 16px;
+}
+.mikro-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .9rem;
+    cursor: pointer;
+}
+
+.mikro-write-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.mikro-write-feedback {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: .9rem;
+    margin-bottom: 10px;
+}
+.mikro-write-feedback--success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.mikro-write-feedback--error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* ── Utkast-lista ────────────────────────────────────────────────────────── */
+.mikro-drafts {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: var(--space-md);
+}
+.mikro-drafts__title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+.mikro-draft-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: .85rem;
+}
+.mikro-draft-item:last-child { border-bottom: none; }
+.mikro-draft-item__status {
+    font-size: .7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+.mikro-draft-item__status--draft   { background: #ffeeba; color: #856404; }
+.mikro-draft-item__status--future  { background: #cce5ff; color: #004085; }
+.mikro-draft-item__content { flex: 1; color: var(--color-text-muted); }
+.mikro-draft-item__edit { color: var(--color-accent); font-weight: 600; white-space: nowrap; }
+
+/* ── Ämnessida – flikar ─────────────────────────────────────────────────── */
+.topic-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--color-border);
+    margin-bottom: var(--space-lg);
+}
+.topic-tab {
+    padding: 8px 20px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color .15s, border-color .15s;
+}
+.topic-tab:hover { color: var(--color-text); text-decoration: none; }
+.topic-tab.is-active {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+}
+
+/* Header-nav mikrolänk */
+.nav-list__mikro-link {
+    font-size: .9rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color .15s;
+}
+.nav-list__mikro-link:hover {
+    color: var(--color-text);
+    text-decoration: none;
+}
+
 /* Expandera kommentartext */
 .comment-expand-btn {
     background: none;

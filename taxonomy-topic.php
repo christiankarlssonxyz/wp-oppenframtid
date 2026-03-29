@@ -86,55 +86,113 @@ $paged          = get_query_var('paged') ?: 1;
         </figure>
         <?php endif; ?>
 
-        <h2 class="section-title"><?php esc_html_e('Senaste inlägg', 'blogtree'); ?></h2>
-
         <?php
-        $loop = new WP_Query([
-            'post_type'      => 'post',
+        $tab = sanitize_key($_GET['tab'] ?? 'inlagg');
+        if (!in_array($tab, ['inlagg', 'mikroinlagg', 'alla'])) $tab = 'inlagg';
+
+        $mikro_count = (new WP_Query([
+            'post_type'      => 'mikroinlagg',
+            'post_status'    => 'publish',
+            'posts_per_page' => 1,
+            'fields'         => 'ids',
             'tax_query'      => [[
                 'taxonomy'         => 'topic',
                 'field'            => 'term_id',
                 'terms'            => [$term->term_id],
                 'include_children' => false,
             ]],
-            'paged'          => $paged,
-            'posts_per_page' => (int) get_option('posts_per_page', 10),
-        ]);
+        ]))->found_posts;
+        ?>
 
-        if ($loop->have_posts()): ?>
-        <div class="post-grid">
-            <?php while ($loop->have_posts()): $loop->the_post(); ?>
-            <article class="post-card">
-                <?php if (has_post_thumbnail()): ?>
-                <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                    <?php the_post_thumbnail('medium'); ?>
-                </a>
-                <?php endif; ?>
-                <div class="post-card__body">
-                    <h3 class="post-card__title">
-                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                    </h3>
-                    <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
-                    <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
-                        <?php echo get_the_date(); ?>
-                    </time>
-                </div>
-            </article>
-            <?php endwhile; wp_reset_postdata(); ?>
+        <?php if ($mikro_count > 0): ?>
+        <div class="topic-tabs">
+            <a href="<?php echo esc_url(add_query_arg('tab', 'inlagg',      get_term_link($term))); ?>"
+               class="topic-tab <?php echo $tab === 'inlagg'      ? 'is-active' : ''; ?>">Inlägg</a>
+            <a href="<?php echo esc_url(add_query_arg('tab', 'mikroinlagg', get_term_link($term))); ?>"
+               class="topic-tab <?php echo $tab === 'mikroinlagg' ? 'is-active' : ''; ?>">Mikroinlägg</a>
+            <a href="<?php echo esc_url(add_query_arg('tab', 'alla',        get_term_link($term))); ?>"
+               class="topic-tab <?php echo $tab === 'alla'        ? 'is-active' : ''; ?>">Alla</a>
         </div>
-
-        <div class="pagination">
-            <?php echo paginate_links([
-                'total'     => $loop->max_num_pages,
-                'current'   => $paged,
-                'prev_text' => '&larr;',
-                'next_text' => '&rarr;',
-            ]); ?>
-        </div>
-
         <?php else: ?>
-        <p>Inga inlägg hittades.</p>
+        <h2 class="section-title"><?php esc_html_e('Senaste inlägg', 'blogtree'); ?></h2>
         <?php endif; ?>
+
+        <?php
+        $tax_query_base = [[
+            'taxonomy'         => 'topic',
+            'field'            => 'term_id',
+            'terms'            => [$term->term_id],
+            'include_children' => false,
+        ]];
+
+        // ── Blogginlägg ───────────────────────────────────────────────────────
+        if ($tab === 'inlagg' || $tab === 'alla'):
+            $loop = new WP_Query([
+                'post_type'      => 'post',
+                'tax_query'      => $tax_query_base,
+                'paged'          => $paged,
+                'posts_per_page' => (int) get_option('posts_per_page', 10),
+            ]);
+
+            if ($loop->have_posts()): ?>
+            <div class="post-grid">
+                <?php while ($loop->have_posts()): $loop->the_post(); ?>
+                <article class="post-card">
+                    <?php if (has_post_thumbnail()): ?>
+                    <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
+                        <?php the_post_thumbnail('medium'); ?>
+                    </a>
+                    <?php endif; ?>
+                    <div class="post-card__body">
+                        <h3 class="post-card__title">
+                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                        </h3>
+                        <p class="post-card__excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15, ''); ?></p>
+                        <time class="post-card__date" datetime="<?php echo get_the_date('c'); ?>">
+                            <?php echo get_the_date(); ?>
+                        </time>
+                    </div>
+                </article>
+                <?php endwhile; wp_reset_postdata(); ?>
+            </div>
+
+            <div class="pagination">
+                <?php echo paginate_links([
+                    'total'     => $loop->max_num_pages,
+                    'current'   => $paged,
+                    'prev_text' => '&larr;',
+                    'next_text' => '&rarr;',
+                ]); ?>
+            </div>
+            <?php else: ?>
+            <p>Inga inlägg hittades.</p>
+            <?php endif;
+        endif;
+
+        // ── Mikroinlägg ───────────────────────────────────────────────────────
+        if ($tab === 'mikroinlagg' || $tab === 'alla'):
+            if ($tab === 'alla'): ?>
+                <h2 class="section-title" style="margin-top:var(--space-xl)">Mikroinlägg</h2>
+            <?php endif;
+
+            $mikro_loop = new WP_Query([
+                'post_type'      => 'mikroinlagg',
+                'post_status'    => 'publish',
+                'tax_query'      => $tax_query_base,
+                'paged'          => $paged,
+                'posts_per_page' => 20,
+            ]);
+
+            if ($mikro_loop->have_posts()): ?>
+            <div class="mikro-feed">
+                <?php while ($mikro_loop->have_posts()): $mikro_loop->the_post();
+                    blogtree_mikro_card(get_the_ID());
+                endwhile; wp_reset_postdata(); ?>
+            </div>
+            <?php else: ?>
+            <p>Inga mikroinlägg hittades.</p>
+            <?php endif;
+        endif; ?>
     </div>
 
     <!-- Sidebar -->

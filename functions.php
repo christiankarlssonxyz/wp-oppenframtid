@@ -57,3 +57,6 @@ require_once get_template_directory() . '/inc/saved.php';
 
 // ── Kommentarsrapportering ──────────────────────────────────────────────────────
 require_once get_template_directory() . '/inc/reports.php';
+
+// ── Mikroinlägg (social media-inspirerade korta meddelanden) ───────────────────
+require_once get_template_directory() . '/inc/mikroinlagg.php';

@@ -85,6 +85,15 @@ add_action('wp_enqueue_scripts', function () {
         ]);
     }
 
+    // Mikroinlägg – skriva-sida
+    if (is_page('skriva') || is_singular('mikroinlagg') || is_post_type_archive('mikroinlagg')) {
+        wp_enqueue_script('blogtree-mikro', $uri . '/assets/js/mikroinlagg.js', [], $version, true);
+        wp_localize_script('blogtree-mikro', 'blogtreeMikro', [
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce'   => wp_create_nonce('blogtree_mikro_save'),
+        ]);
+    }
+
     // Sökning
     wp_enqueue_script('blogtree-search', $uri . '/assets/js/search.js', [], $version, true);
     wp_localize_script('blogtree-search', 'blogtreeSearch', [

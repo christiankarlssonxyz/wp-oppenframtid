@@ -77,6 +77,14 @@
                             <a href="<?php echo esc_url(home_url('/konto/')); ?>" class="nav-user__account-btn">Mitt konto</a>
                         </div>
 
+                        <?php if (current_user_can('manage_options')): ?>
+                        <div class="nav-user__divider"></div>
+                        <a href="<?php echo esc_url(home_url('/skriva/')); ?>" class="nav-user__item" role="menuitem">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            Skriv mikroinlägg
+                        </a>
+                        <?php endif; ?>
+
                         <div class="nav-user__divider"></div>
 
                         <div class="nav-user__heading">Mitt innehåll</div>
@@ -144,6 +152,7 @@
                 'menu_class'     => 'nav-list',
                 'fallback_cb'    => false,
             ]); ?>
+            <a href="<?php echo esc_url(home_url('/mikroinlagg/')); ?>" class="nav-list__mikro-link">Mikroinlägg</a>
         </nav>
     </div>
 
