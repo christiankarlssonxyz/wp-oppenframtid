@@ -98,10 +98,21 @@ add_action('topic_edit_form_fields', function ($term) {
     <tr class="form-field">
         <th><label for="topic-banner-caption">Bildtext</label></th>
         <td>
-            <?php $caption = get_term_meta($term->term_id, 'wpblogtree_topic_banner_caption', true); ?>
-            <input type="text" id="topic-banner-caption" name="topic_banner_caption"
-                   value="<?php echo esc_attr($caption); ?>" class="regular-text">
-            <p class="description">Visas under bannerbilden på ämnessidan.</p>
+            <?php
+            $caption = get_term_meta($term->term_id, 'wpblogtree_topic_banner_caption', true);
+            wp_editor($caption, 'topic-banner-caption', [
+                'textarea_name' => 'topic_banner_caption',
+                'textarea_rows' => 4,
+                'media_buttons' => false,
+                'teeny'         => true,
+                'tinymce'       => [
+                    'toolbar1' => 'bold,italic,link,removeformat',
+                    'toolbar2' => '',
+                ],
+                'quicktags'     => ['buttons' => 'strong,em,link,br'],
+            ]);
+            ?>
+            <p class="description">Visas under bannerbilden. Stödjer fetstil, kursiv, länkar och radbrytning.</p>
         </td>
     </tr>
     <?php
@@ -120,7 +131,7 @@ add_action('edited_topic', function ($term_id) {
         }
     }
     if (isset($_POST['topic_banner_caption'])) {
-        $caption = sanitize_text_field($_POST['topic_banner_caption']);
+        $caption = wp_kses_post($_POST['topic_banner_caption']);
         if ($caption) {
             update_term_meta($term_id, 'wpblogtree_topic_banner_caption', $caption);
         } else {

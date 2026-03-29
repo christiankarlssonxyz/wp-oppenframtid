@@ -65,12 +65,13 @@ add_action('customize_register', function ($wp_customize) {
 
     $wp_customize->add_setting('blogtree_frontpage_banner_caption', [
         'default'           => '',
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'wp_kses_post',
     ]);
     $wp_customize->add_control('blogtree_frontpage_banner_caption', [
-        'label'   => 'Bildtext',
-        'section' => 'blogtree_frontpage_banner',
-        'type'    => 'text',
+        'label'       => 'Bildtext',
+        'description' => 'Stödjer HTML: &lt;strong&gt;, &lt;em&gt;, &lt;a href=""&gt;, &lt;br&gt;',
+        'section'     => 'blogtree_frontpage_banner',
+        'type'        => 'textarea',
     ]);
 });
 

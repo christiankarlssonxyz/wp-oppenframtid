@@ -440,9 +440,20 @@
 
 .banner-caption {
     margin-top: var(--space-sm);
-    font-size: .8rem;
+    font-size: .9rem;
+    line-height: 1.6;
     color: var(--color-muted);
     text-align: center;
+    padding: 0 var(--space-sm);
+}
+
+.banner-caption a {
+    color: var(--color-accent-alt);
+    text-decoration: underline;
+}
+
+.banner-caption a:hover {
+    color: var(--color-text);
 }
 
 /* ── Frontpage bannerbild ────────────────────────────────────────────────────── */

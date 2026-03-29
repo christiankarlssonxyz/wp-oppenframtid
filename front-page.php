@@ -114,11 +114,11 @@ get_header();
         <img src="<?php echo esc_url($_banner_src[0]); ?>"
              width="<?php echo (int) $_banner_src[1]; ?>"
              height="<?php echo (int) $_banner_src[2]; ?>"
-             alt="<?php echo esc_attr($_banner_caption); ?>"
+             alt="<?php echo esc_attr(wp_strip_all_tags($_banner_caption)); ?>"
              class="frontpage-banner__img"
              loading="lazy">
         <?php if ($_banner_caption): ?>
-        <figcaption class="banner-caption"><?php echo esc_html($_banner_caption); ?></figcaption>
+        <figcaption class="banner-caption"><?php echo wp_kses_post($_banner_caption); ?></figcaption>
         <?php endif; ?>
     </figure>
     <?php endif; ?>
@@ -303,11 +303,11 @@ get_header();
         <img src="<?php echo esc_url($_banner_src[0]); ?>"
              width="<?php echo (int) $_banner_src[1]; ?>"
              height="<?php echo (int) $_banner_src[2]; ?>"
-             alt="<?php echo esc_attr($_banner_caption); ?>"
+             alt="<?php echo esc_attr(wp_strip_all_tags($_banner_caption)); ?>"
              class="frontpage-banner__img"
              loading="lazy">
         <?php if ($_banner_caption): ?>
-        <figcaption class="banner-caption"><?php echo esc_html($_banner_caption); ?></figcaption>
+        <figcaption class="banner-caption"><?php echo wp_kses_post($_banner_caption); ?></figcaption>
         <?php endif; ?>
     </figure>
     <?php endif; ?>

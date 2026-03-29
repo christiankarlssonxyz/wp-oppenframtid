@@ -71,11 +71,11 @@ $paged = get_query_var('paged') ?: 1;
             <img src="<?php echo esc_url($banner_src[0]); ?>"
                  width="<?php echo (int) $banner_src[1]; ?>"
                  height="<?php echo (int) $banner_src[2]; ?>"
-                 alt="<?php echo esc_attr($banner_caption); ?>"
+                 alt="<?php echo esc_attr(wp_strip_all_tags($banner_caption)); ?>"
                  class="topic-banner__img"
                  loading="lazy">
             <?php if ($banner_caption): ?>
-            <figcaption class="banner-caption"><?php echo esc_html($banner_caption); ?></figcaption>
+            <figcaption class="banner-caption"><?php echo wp_kses_post($banner_caption); ?></figcaption>
             <?php endif; ?>
         </figure>
         <?php endif; ?>
