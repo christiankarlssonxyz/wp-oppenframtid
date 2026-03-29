@@ -1,5 +1,33 @@
 <aside class="sidebar">
 
+    <!-- ── Ämnen ──────────────────────────────────────────────────────────── -->
+    <?php
+    $fp_topics = get_terms([
+        'taxonomy'   => 'topic',
+        'parent'     => 0,
+        'hide_empty' => true,
+        'number'     => 10,
+    ]);
+    if ($fp_topics && !is_wp_error($fp_topics)): ?>
+    <div class="sidebar-widget">
+        <h3 class="sidebar-widget__title">Ämnen</h3>
+        <ul class="sidebar-topics">
+            <?php foreach ($fp_topics as $fp_topic):
+                $fp_color = get_term_meta($fp_topic->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+            ?>
+            <li>
+                <a href="<?php echo esc_url(get_term_link($fp_topic)); ?>"
+                   class="sidebar-topics__link"
+                   style="--topic-color: <?php echo esc_attr($fp_color); ?>">
+                    <?php echo esc_html($fp_topic->name); ?>
+                    <span class="sidebar-topics__count"><?php echo $fp_topic->count; ?></span>
+                </a>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php endif; ?>
+
     <!-- ── Integritetsgranskning ─────────────────────────────────────────────── -->
     <div class="sidebar-widget">
         <h3 class="sidebar-widget__title">Integritet &amp; öppen källkod</h3>

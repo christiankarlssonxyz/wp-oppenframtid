@@ -86,6 +86,15 @@ function blogtree_process_csv(string $filepath): array {
     // Normalisera rubriknamn (trimma, lowercase)
     $headers = array_map(fn($h) => strtolower(trim($h)), $headers);
 
+    // Stöd för alternativa kolumnnamn (t.ex. WordPress-export)
+    $aliases = [
+        'post_name'       => 'slug',
+        'pubdate'         => 'date',
+        'topic_slug_meta' => 'topics',
+        'topic'           => 'topics',
+    ];
+    $headers = array_map(fn($h) => $aliases[$h] ?? $h, $headers);
+
     $required = ['title', 'slug'];
     foreach ($required as $req) {
         if (!in_array($req, $headers, true)) {
@@ -106,15 +115,23 @@ function blogtree_process_csv(string $filepath): array {
         $data = array_combine($headers, $row);
 
         $title  = sanitize_text_field($data['title']  ?? '');
-        $slug   = sanitize_title($data['slug']        ?? '');
+        // Ta bort __trashed-suffix som WordPress lägger till vid papperskorgen
+        $slug   = sanitize_title(str_replace('__trashed', '', $data['slug'] ?? ''));
         $content  = wp_kses_post($data['content']     ?? '');
         $excerpt  = sanitize_textarea_field($data['excerpt'] ?? '');
         $date_raw = sanitize_text_field($data['date'] ?? '');
         $status   = sanitize_key($data['status']      ?? 'draft');
-        $topics_raw = $data['topics'] ?? '';
+        $topics_raw     = $data['topics']     ?? '';
+        $categories_raw = $data['categories'] ?? '';
+        $tags_raw       = $data['tags']       ?? '';
 
         if (!$title || !$slug) {
             $results['errors'][] = "Rad $row_num: title och slug krävs, hoppas över.";
+            continue;
+        }
+
+        // Hoppa över inlägg i papperskorgen
+        if ($status === 'trash') {
             continue;
         }
 
@@ -162,7 +179,7 @@ function blogtree_process_csv(string $filepath): array {
             continue;
         }
 
-        // Koppla ämnen
+        // Koppla ämnen (custom taxonomy, sluggar kommaseparerade)
         if ($topics_raw) {
             $topic_slugs = array_filter(array_map('trim', explode(',', $topics_raw)));
             $term_ids    = [];
@@ -174,6 +191,36 @@ function blogtree_process_csv(string $filepath): array {
             }
             if ($term_ids) {
                 wp_set_post_terms($post_id, $term_ids, 'topic');
+            }
+        }
+
+        // Koppla kategorier (namn kommaseparerade, skapas om de saknas)
+        if ($categories_raw) {
+            $cat_names = array_filter(array_map('trim', explode(',', $categories_raw)));
+            $cat_ids   = [];
+            foreach ($cat_names as $cat_name) {
+                $cat_name = sanitize_text_field($cat_name);
+                $term     = get_term_by('name', $cat_name, 'category');
+                if ($term) {
+                    $cat_ids[] = $term->term_id;
+                } else {
+                    $new = wp_insert_term($cat_name, 'category');
+                    if (!is_wp_error($new)) {
+                        $cat_ids[] = $new['term_id'];
+                    }
+                }
+            }
+            if ($cat_ids) {
+                wp_set_post_terms($post_id, $cat_ids, 'category');
+            }
+        }
+
+        // Koppla taggar (namn pipeseparerade: "a | b | c", skapas om de saknas)
+        if ($tags_raw) {
+            $tag_names = array_filter(array_map('trim', explode('|', $tags_raw)));
+            $tag_names = array_map('sanitize_text_field', $tag_names);
+            if ($tag_names) {
+                wp_set_post_tags($post_id, $tag_names);
             }
         }
 
@@ -278,7 +325,9 @@ function blogtree_import_page(): void {
                 <tr><td><code>excerpt</code></td> <td>Nej</td> <td>Utdrag / ingress</td></tr>
                 <tr><td><code>date</code></td>    <td>Nej</td> <td>Publiceringsdatum, t.ex. <code>2024-03-15</code></td></tr>
                 <tr><td><code>status</code></td>  <td>Nej</td> <td><code>publish</code>, <code>draft</code>, <code>pending</code>, <code>private</code> (standard: <code>draft</code>)</td></tr>
-                <tr><td><code>topics</code></td>  <td>Nej</td> <td>Komma-separerade ämnes-sluggar, t.ex. <code>teknik,linux</code></td></tr>
+                <tr><td><code>topics</code></td>      <td>Nej</td> <td>Komma-separerade ämnes-sluggar, t.ex. <code>teknik,linux</code></td></tr>
+                <tr><td><code>categories</code></td> <td>Nej</td> <td>Komma-separerade kategorinamn (skapas om de saknas), t.ex. <code>Omvärlд,Teknik</code></td></tr>
+                <tr><td><code>tags</code></td>        <td>Nej</td> <td>Pipe-separerade taggnamn (skapas om de saknas), t.ex. <code>politik | demokrati</code></td></tr>
             </tbody>
         </table>
 

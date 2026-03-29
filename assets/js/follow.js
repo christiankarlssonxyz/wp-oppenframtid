@@ -28,6 +28,12 @@
                 if (!data.success) return;
                 btn.classList.toggle('is-following', data.data.following);
                 btn.textContent = data.data.following ? 'Följer' : 'Följ';
+                // Dispatcha event så konto/foljer-sidan kan ta bort raden
+                if (!data.data.following) {
+                    document.dispatchEvent(new CustomEvent('blogtreeUnfollowed', {
+                        detail: { termId: termId }
+                    }));
+                }
             })
             .finally(function () { btn.disabled = false; });
     });

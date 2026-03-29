@@ -70,10 +70,29 @@ add_action('topic_edit_form_fields', function ($term) {
     $preview   = $banner_id ? wp_get_attachment_image_src($banner_id, 'medium') : false;
     ?>
     <tr class="form-field">
+        <th><label for="topic-header-label">Övre rubrik (label)</label></th>
+        <td>
+            <?php $header_label = get_term_meta($term->term_id, 'wpblogtree_topic_header_label', true); ?>
+            <input type="text" id="topic-header-label" name="topic_header_label"
+                   value="<?php echo esc_attr($header_label); ?>"
+                   placeholder="ÄMNE" class="regular-text">
+            <p class="description">Liten text ovanför rubriken på ämnessidan. Lämna tomt för standardtexten "ÄMNE".</p>
+        </td>
+    </tr>
+    <tr class="form-field">
         <th><label for="topic-color">Färg</label></th>
         <td>
             <input type="color" id="topic-color" name="topic_color" value="<?php echo esc_attr($color); ?>">
             <p class="description">Visas på ämnessidan och i ämneskorten på startsidan.</p>
+        </td>
+    </tr>
+    <tr class="form-field">
+        <th><label for="topic-gradient-color">Gradientfärg (hero)</label></th>
+        <td>
+            <?php $gradient_color = get_term_meta($term->term_id, 'wpblogtree_topic_gradient_color', true) ?: ''; ?>
+            <input type="color" id="topic-gradient-color" name="topic_gradient_color"
+                   value="<?php echo esc_attr($gradient_color ?: $color); ?>">
+            <p class="description">Andra färgen i gradientbakgrunden i hero. Lämna som ämnesfärgen för ingen gradient.</p>
         </td>
     </tr>
     <tr class="form-field">
@@ -119,8 +138,24 @@ add_action('topic_edit_form_fields', function ($term) {
 });
 
 add_action('edited_topic', function ($term_id) {
+    if (isset($_POST['topic_header_label'])) {
+        $label = sanitize_text_field($_POST['topic_header_label']);
+        if ($label) {
+            update_term_meta($term_id, 'wpblogtree_topic_header_label', $label);
+        } else {
+            delete_term_meta($term_id, 'wpblogtree_topic_header_label');
+        }
+    }
     if (isset($_POST['topic_color'])) {
         update_term_meta($term_id, 'wpblogtree_topic_color', sanitize_hex_color($_POST['topic_color']));
+    }
+    if (isset($_POST['topic_gradient_color'])) {
+        $grad = sanitize_hex_color($_POST['topic_gradient_color']);
+        if ($grad) {
+            update_term_meta($term_id, 'wpblogtree_topic_gradient_color', $grad);
+        } else {
+            delete_term_meta($term_id, 'wpblogtree_topic_gradient_color');
+        }
     }
     if (isset($_POST['topic_banner_id'])) {
         $banner_id = absint($_POST['topic_banner_id']);

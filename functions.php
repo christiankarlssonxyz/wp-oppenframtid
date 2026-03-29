@@ -39,3 +39,21 @@ require_once get_template_directory() . '/inc/integrity.php';
 
 // ── CSV-import av inlägg ────────────────────────────────────────────────────────
 require_once get_template_directory() . '/inc/import.php';
+
+// ── JSON-export/import av taggar och kategorier ─────────────────────────────────
+require_once get_template_directory() . '/inc/terms.php';
+
+// ── Linktree-sida ───────────────────────────────────────────────────────────────
+require_once get_template_directory() . '/inc/linktree.php';
+
+// ── Autentisering (login/register/logout-redirects) ────────────────────────────
+require_once get_template_directory() . '/inc/auth.php';
+
+// ── Roller och behörigheter ─────────────────────────────────────────────────────
+require_once get_template_directory() . '/inc/roles.php';
+
+// ── Spara inlägg ───────────────────────────────────────────────────────────────
+require_once get_template_directory() . '/inc/saved.php';
+
+// ── Kommentarsrapportering ──────────────────────────────────────────────────────
+require_once get_template_directory() . '/inc/reports.php';

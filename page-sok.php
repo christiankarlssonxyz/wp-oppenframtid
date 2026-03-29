@@ -1,8 +1,9 @@
 <?php
 /**
- * Template Name: Sök
+ * page-sok.php – Söksida
  *
  * Söksida med fuzzy-sökning mot REST API, filter och realtidsresultat.
+ * Används automatiskt för sidan med slug "sok".
  */
 get_header();
 ?>

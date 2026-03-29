@@ -34,7 +34,11 @@ setcookie('blogtree_visited', time(), [
 ]);
 
 get_header();
+
+$_fp_color    = get_theme_mod('blogtree_frontpage_color', '#2c7be5');
+$_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_color;
 ?>
+<style>:root { --topic-color: <?php echo esc_attr($_fp_color); ?>; --fp-gradient: <?php echo esc_attr($_fp_gradient); ?>; }</style>
 
 <?php if ($is_returning): ?>
 

@@ -21,16 +21,21 @@
         'hide_empty' => true,
         'number'     => 10,
     ]);
-    if ($topics && !is_wp_error($topics)): ?>
+    if ($topics && !is_wp_error($topics)):
+        $current_term = (is_tax('topic') || is_singular('post')) ? get_queried_object() : null;
+        $current_term_id = ($current_term instanceof WP_Term && $current_term->taxonomy === 'topic')
+            ? $current_term->term_id : 0;
+    ?>
     <div class="sidebar-widget">
         <h3 class="sidebar-widget__title">Ämnen</h3>
         <ul class="sidebar-topics">
             <?php foreach ($topics as $topic):
-                $color = get_term_meta($topic->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+                $color     = get_term_meta($topic->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+                $is_active = ($topic->term_id === $current_term_id);
             ?>
             <li>
                 <a href="<?php echo esc_url(get_term_link($topic)); ?>"
-                   class="sidebar-topics__link"
+                   class="sidebar-topics__link<?php echo $is_active ? ' is-active' : ''; ?>"
                    style="--topic-color: <?php echo esc_attr($color); ?>">
                     <?php echo esc_html($topic->name); ?>
                     <span class="sidebar-topics__count"><?php echo $topic->count; ?></span>

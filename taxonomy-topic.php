@@ -18,12 +18,14 @@ if ( ! $term || ! isset( $term->term_id ) ) {
 
 get_header();
 
-$color = get_term_meta($term->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
-$paged = get_query_var('paged') ?: 1;
+$color          = get_term_meta($term->term_id, 'wpblogtree_topic_color', true) ?: '#2c3e50';
+$gradient_color = get_term_meta($term->term_id, 'wpblogtree_topic_gradient_color', true) ?: $color;
+$paged          = get_query_var('paged') ?: 1;
 ?>
+<style>:root { --topic-color: <?php echo esc_attr($color); ?>; }</style>
 
 <!-- ── ÄMNESRUBRIK ────────────────────────────────────────────────────────────── -->
-<section class="topic-header" style="--topic-color: <?php echo esc_attr($color); ?>">
+<section class="topic-header" style="--topic-color: <?php echo esc_attr($color); ?>; --topic-gradient: <?php echo esc_attr($gradient_color); ?>">
     <div class="container">
 
         <?php if ($term->parent):
@@ -35,22 +37,26 @@ $paged = get_query_var('paged') ?: 1;
             </nav>
         <?php endif; ?>
 
-        <p class="topic-header__label">ÄMNE</p>
-        <h1 class="topic-header__title"><?php echo esc_html($term->name); ?></h1>
+        <p class="topic-header__label">
+            <?php echo esc_html(get_term_meta($term->term_id, 'wpblogtree_topic_header_label', true) ?: 'ÄMNE'); ?>
+        </p>
+
+        <div class="topic-header__title-row">
+            <h1 class="topic-header__title"><?php echo esc_html($term->name); ?></h1>
+            <?php if (is_user_logged_in()):
+                $user_id   = get_current_user_id();
+                $followed  = (array) get_user_meta($user_id, 'blogtree_followed_topics', true);
+                $following = in_array($term->term_id, $followed);
+            ?>
+            <button class="follow-btn <?php echo $following ? 'is-following' : ''; ?>"
+                    data-term-id="<?php echo esc_attr($term->term_id); ?>">
+                <?php echo $following ? 'Följer' : 'Följ'; ?>
+            </button>
+            <?php endif; ?>
+        </div>
 
         <?php if ($term->description): ?>
             <p class="topic-header__desc"><?php echo esc_html($term->description); ?></p>
-        <?php endif; ?>
-
-        <?php if (is_user_logged_in()):
-            $user_id   = get_current_user_id();
-            $followed  = (array) get_user_meta($user_id, 'blogtree_followed_topics', true);
-            $following = in_array($term->term_id, $followed);
-        ?>
-        <button class="follow-btn <?php echo $following ? 'is-following' : ''; ?>"
-                data-term-id="<?php echo esc_attr($term->term_id); ?>">
-            <?php echo $following ? 'Följer' : 'Följ'; ?>
-        </button>
         <?php endif; ?>
 
     </div>
@@ -79,6 +85,8 @@ $paged = get_query_var('paged') ?: 1;
             <?php endif; ?>
         </figure>
         <?php endif; ?>
+
+        <h2 class="section-title"><?php esc_html_e('Senaste inlägg', 'blogtree'); ?></h2>
 
         <?php
         $loop = new WP_Query([

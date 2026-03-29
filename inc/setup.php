@@ -44,6 +44,34 @@ add_action('after_setup_theme', function () {
 // ── Stäng av admin-toolbar för alla användare ──────────────────────────────────
 add_filter('show_admin_bar', '__return_false');
 
+// ── Startsida – färger i Customizer ──────────────────────────────────────────
+add_action('customize_register', function ($wp_customize) {
+
+    $wp_customize->add_section('blogtree_frontpage_colors', [
+        'title'    => 'Startsida – färger',
+        'priority' => 19,
+    ]);
+
+    $wp_customize->add_setting('blogtree_frontpage_color', [
+        'default'           => '#2c7be5',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'blogtree_frontpage_color', [
+        'label'   => 'Primärfärg (hero + hover)',
+        'section' => 'blogtree_frontpage_colors',
+    ]));
+
+    $wp_customize->add_setting('blogtree_frontpage_gradient_color', [
+        'default'           => '',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'blogtree_frontpage_gradient_color', [
+        'label'       => 'Gradientfärg (hero)',
+        'description' => 'Lämna tom för att använda enbart primärfärgen.',
+        'section'     => 'blogtree_frontpage_colors',
+    ]));
+});
+
 // ── Startsida – bannerbild i Customizer ───────────────────────────────────────
 add_action('customize_register', function ($wp_customize) {
 

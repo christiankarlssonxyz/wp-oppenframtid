@@ -1,8 +1,9 @@
 <?php
 /**
- * Template Name: Integritetssida
+ * page-integritet.php – Integritetssida
  *
  * Visar integritets- och säkerhetsgranskning genererad från audit.json.
+ * Används automatiskt för sidan med slug "integritet".
  */
 get_header();
 ?>
