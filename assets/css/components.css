@@ -2621,8 +2621,9 @@
     transition: background .15s, color .15s, border-color .15s;
 }
 [data-theme="dark"] .mikro-filter-btn {
-    border-color: #4a4d5a;
-    color: #c8cad4;
+    background: #4a4f5a;
+    border-color: #4a4f5a;
+    color: #fff;
 }
 .mikro-filter-btn:hover,
 .mikro-filter-btn.is-active {
