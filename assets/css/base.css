@@ -18,6 +18,14 @@
     --color-accent:     #2c3e50;
     --color-accent-alt: #3498db;
     --color-danger:     #e74c3c;
+    --color-danger-dark:  #c0392b;
+    --color-success:      #27ae60;
+    --color-success-dark: #1e8449;
+    --color-warning:      #e67e22;
+    --color-btn-text:      #ffffff;
+    --color-btn-text-dark: #4a4f5a;
+    --color-role-admin:   #8e44ad;
+    --color-role-mod:     #2980b9;
 
     /* Typografi */
     --font-sans:  system-ui, -apple-system, 'Segoe UI', sans-serif;

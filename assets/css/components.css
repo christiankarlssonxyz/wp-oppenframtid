@@ -26,11 +26,11 @@
 
 .btn--primary {
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-btn-text);
 }
 
 [data-theme="dark"] .btn--primary {
-    color: #4a4f5a;
+    color: var(--color-btn-text-dark);
 }
 
 .btn--primary:hover {
@@ -193,7 +193,7 @@
 
 .follow-btn.is-following {
     background: var(--topic-color, var(--color-accent));
-    color: #fff;
+    color: var(--color-btn-text);
 }
 
 /* ── Post-actions (under meta-rad på single) ────────────────────────────────── */
@@ -229,14 +229,14 @@
 
 /* Gilla — aktiv */
 .like-btn.is-liked {
-    border-color: #e74c3c;
-    color: #e74c3c;
-    background: color-mix(in srgb, #e74c3c 8%, transparent);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 8%, transparent);
 }
 
 .like-btn.is-liked svg {
-    fill: #e74c3c;
-    stroke: #e74c3c;
+    fill: var(--color-danger);
+    stroke: var(--color-danger);
 }
 
 /* Spara — aktiv */
@@ -253,8 +253,8 @@
 
 /* Kopiera — bekräftelse */
 .copy-btn.is-copied {
-    border-color: #27ae60;
-    color: #27ae60;
+    border-color: var(--color-success);
+    color: var(--color-success);
 }
 
 /* ── Single post ────────────────────────────────────────────────────────────── */
@@ -373,7 +373,7 @@
 
 .pagination .current {
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-btn-text);
     border-color: var(--color-accent);
 }
 
@@ -619,7 +619,7 @@
 }
 
 .integrity-badge__shield {
-    color: #27ae60;
+    color: var(--color-success);
     flex-shrink: 0;
 }
 
@@ -652,7 +652,7 @@
     content: '✓';
     position: absolute;
     left: 0;
-    color: #27ae60;
+    color: var(--color-success);
     font-weight: 700;
 }
 
@@ -684,7 +684,7 @@
     font-size: clamp(3rem, 10vw, 5rem);
     font-weight: 700;
     line-height: 1;
-    color: #27ae60;
+    color: var(--color-success);
 }
 
 .audit-score__label {
@@ -725,9 +725,9 @@
     border-left-width: 4px;
 }
 
-.audit-pass { border-left-color: #27ae60; }
-.audit-warn { border-left-color: #e67e22; }
-.audit-fail { border-left-color: #e74c3c; }
+.audit-pass { border-left-color: var(--color-success); }
+.audit-warn { border-left-color: var(--color-warning); }
+.audit-fail { border-left-color: var(--color-danger); }
 .audit-info { border-left-color: var(--color-accent-alt); }
 
 .audit-check__header {
@@ -748,9 +748,9 @@
     white-space: nowrap;
 }
 
-.audit-pass .audit-check__status { color: #27ae60; }
-.audit-warn .audit-check__status { color: #e67e22; }
-.audit-fail .audit-check__status { color: #e74c3c; }
+.audit-pass .audit-check__status { color: var(--color-success); }
+.audit-warn .audit-check__status { color: var(--color-warning); }
+.audit-fail .audit-check__status { color: var(--color-danger); }
 .audit-info .audit-check__status { color: var(--color-accent-alt); }
 
 .audit-check__desc {
@@ -796,7 +796,7 @@
     border-radius: 99px;
 }
 
-.audit-sev-critical { background: #fde8e8; color: #c0392b; }
+.audit-sev-critical { background: #fde8e8; color: var(--color-danger-dark); }
 .audit-sev-high     { background: #fef0e0; color: #d35400; }
 .audit-sev-medium   { background: #fef9e0; color: #b7770d; }
 .audit-sev-low      { background: #e8f4fd; color: #1a6ea8; }
@@ -1256,7 +1256,7 @@
 .linktree-topic-card__name {
     font-weight: 700;
     font-size: 1rem;
-    color: #fff;
+    color: var(--color-btn-text);
 }
 
 .linktree-topic-card__count {
@@ -1340,7 +1340,7 @@
 .linktree-subscribe-card__title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--color-btn-text);
     margin: 0;
 }
 
@@ -1354,7 +1354,7 @@
     display: inline-block;
     margin-top: var(--space-xs);
     padding: 8px 22px;
-    background: #fff;
+    background: var(--color-btn-text);
     color: var(--topic-color, var(--color-accent));
     font-weight: 700;
     font-size: .9rem;
@@ -1439,13 +1439,13 @@
 }
 
 .auth-card__error {
-    background: color-mix(in srgb, #e74c3c 10%, var(--color-bg));
-    border: 1px solid #e74c3c;
+    background: color-mix(in srgb, var(--color-danger) 10%, var(--color-bg));
+    border: 1px solid var(--color-danger);
     border-radius: var(--radius-sm);
     padding: var(--space-sm) var(--space-md);
     margin-bottom: var(--space-md);
     font-size: .9rem;
-    color: #c0392b;
+    color: var(--color-danger-dark);
 }
 
 .auth-card__error ul {
@@ -1645,15 +1645,15 @@
 }
 
 .konto-notice--success {
-    background: color-mix(in srgb, #27ae60 10%, var(--color-bg));
-    border: 1px solid #27ae60;
-    color: #1e8449;
+    background: color-mix(in srgb, var(--color-success) 10%, var(--color-bg));
+    border: 1px solid var(--color-success);
+    color: var(--color-success-dark);
 }
 
 .konto-notice--error {
-    background: color-mix(in srgb, #e74c3c 10%, var(--color-bg));
-    border: 1px solid #e74c3c;
-    color: #c0392b;
+    background: color-mix(in srgb, var(--color-danger) 10%, var(--color-bg));
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger-dark);
 }
 
 /* Profilformulär */
@@ -1809,8 +1809,8 @@
 }
 
 .konto-unfollow-btn:hover {
-    border-color: #e74c3c;
-    color: #e74c3c;
+    border-color: var(--color-danger);
+    color: var(--color-danger);
 }
 
 /* Ta bort-knapp på sparade */
@@ -1834,8 +1834,8 @@
 }
 
 .konto-unsave-btn:hover {
-    border-color: #e74c3c;
-    color: #e74c3c;
+    border-color: var(--color-danger);
+    color: var(--color-danger);
 }
 
 /* Tom lista */
@@ -1909,15 +1909,15 @@
 }
 
 .members-notice--success {
-    background: color-mix(in srgb, #27ae60 10%, var(--color-bg));
-    border: 1px solid #27ae60;
-    color: #1e8449;
+    background: color-mix(in srgb, var(--color-success) 10%, var(--color-bg));
+    border: 1px solid var(--color-success);
+    color: var(--color-success-dark);
 }
 
 .members-notice--error {
-    background: color-mix(in srgb, #e74c3c 10%, var(--color-bg));
-    border: 1px solid #e74c3c;
-    color: #c0392b;
+    background: color-mix(in srgb, var(--color-danger) 10%, var(--color-bg));
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger-dark);
 }
 
 .members-table-wrap {
@@ -2010,9 +2010,9 @@
     color: var(--color-muted);
 }
 
-.members-role-badge--administrator { border-color: #8e44ad; color: #8e44ad; }
-.members-role-badge--moderator     { border-color: #2980b9; color: #2980b9; }
-.members-role-badge--author        { border-color: #27ae60; color: #27ae60; }
+.members-role-badge--administrator { border-color: var(--color-role-admin); color: var(--color-role-admin); }
+.members-role-badge--moderator     { border-color: var(--color-role-mod); color: var(--color-role-mod); }
+.members-role-badge--author        { border-color: var(--color-success); color: var(--color-success); }
 
 .members-delete-btn {
     background: none;
@@ -2025,8 +2025,8 @@
 }
 
 .members-delete-btn:hover {
-    color: #e74c3c;
-    background: color-mix(in srgb, #e74c3c 8%, transparent);
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 8%, transparent);
 }
 
 /* ── Rapportera-modal ───────────────────────────────────────────────────────── */
@@ -2138,15 +2138,15 @@
 }
 
 .report-modal__status--success {
-    background: color-mix(in srgb, #27ae60 10%, var(--color-bg));
-    color: #1e8449;
-    border: 1px solid #27ae60;
+    background: color-mix(in srgb, var(--color-success) 10%, var(--color-bg));
+    color: var(--color-success-dark);
+    border: 1px solid var(--color-success);
 }
 
 .report-modal__status--error {
-    background: color-mix(in srgb, #e74c3c 10%, var(--color-bg));
-    color: #c0392b;
-    border: 1px solid #e74c3c;
+    background: color-mix(in srgb, var(--color-danger) 10%, var(--color-bg));
+    color: var(--color-danger-dark);
+    border: 1px solid var(--color-danger);
 }
 
 .report-modal__footer {
@@ -2171,7 +2171,7 @@
 }
 
 .report-comment-btn:hover {
-    color: #e74c3c;
+    color: var(--color-danger);
 }
 
 /* Modereringssida */
@@ -2220,15 +2220,15 @@
 }
 
 .mod-comment__badge--held {
-    background: color-mix(in srgb, #e74c3c 12%, transparent);
-    color: #c0392b;
-    border: 1px solid #e74c3c;
+    background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+    color: var(--color-danger-dark);
+    border: 1px solid var(--color-danger);
 }
 
 .mod-comment__badge--visible {
-    background: color-mix(in srgb, #27ae60 12%, transparent);
-    color: #1e8449;
-    border: 1px solid #27ae60;
+    background: color-mix(in srgb, var(--color-success) 12%, transparent);
+    color: var(--color-success-dark);
+    border: 1px solid var(--color-success);
 }
 
 .mod-comment__text {
@@ -2273,13 +2273,13 @@
 }
 
 .mod-action-btn--delete {
-    background: color-mix(in srgb, #e74c3c 8%, transparent);
-    border: 1px solid #e74c3c;
-    color: #c0392b;
+    background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger-dark);
 }
 
 .mod-action-btn--delete:hover {
-    background: color-mix(in srgb, #e74c3c 16%, transparent);
+    background: color-mix(in srgb, var(--color-danger) 16%, transparent);
 }
 
 /* Moderatornotis-toggle */
@@ -2331,7 +2331,7 @@
 
 .mod-tab__badge {
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-btn-text);
     font-size: .72rem;
     font-weight: 700;
     border-radius: 99px;
@@ -2400,11 +2400,11 @@
 }
 
 .report-modal__status--success {
-    color: #27ae60;
+    color: var(--color-success);
 }
 
 .report-modal__status--error {
-    color: #e74c3c;
+    color: var(--color-danger);
 }
 
 /* ── Admin-kommentarshantering ───────────────────────────────────────────────── */
@@ -2527,14 +2527,14 @@
 /* Admin gillar – publikt på kommentar */
 .comment-admin-like {
     font-size: .78rem;
-    color: #e74c3c;
+    color: var(--color-danger);
     margin: var(--space-xs) 0;
 }
 
 /* Admin liked badge (admin-vy) */
 .mod-admin-liked-badge {
     font-size: .75rem;
-    color: #e74c3c;
+    color: var(--color-danger);
     margin-left: auto;
 }
 
@@ -2639,7 +2639,7 @@
 [data-theme="dark"] .mikro-filter-select {
     background-color: #4a4f5a;
     border-color: #4a4f5a;
-    color: #fff;
+    color: var(--color-btn-text);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
@@ -2724,7 +2724,7 @@
     transition: opacity .15s;
 }
 .mikro-chip:hover { opacity: .75; text-decoration: none; }
-.mikro-chip--topic { background: #4a4f5a; color: #fff; }
+.mikro-chip--topic { background: #4a4f5a; color: var(--color-btn-text); }
 .mikro-chip--cat   { background: var(--color-surface-alt, #eee); color: var(--color-text); }
 [data-theme="dark"] .mikro-chip--cat { color: #4a4f5a; }
 .mikro-chip--tag   { background: transparent; border: 1px solid var(--color-border); color: var(--color-text-muted); }
@@ -2911,7 +2911,7 @@
     margin-top: 4px;
     transition: color .15s;
 }
-.mikro-write-form__counter.is-over { color: #c0392b; font-weight: 600; }
+.mikro-write-form__counter.is-over { color: var(--color-danger-dark); font-weight: 600; }
 
 .mikro-write-form__row {
     display: flex;
@@ -3087,8 +3087,8 @@
 }
 .post-actions-bar__btn:last-child { border-right: none; }
 .post-actions-bar__btn:hover { background: var(--color-surface); }
-.post-actions-bar__btn.is-liked { color: #e74c3c; }
-.post-actions-bar__btn.is-liked svg { fill: #e74c3c; stroke: #e74c3c; }
+.post-actions-bar__btn.is-liked { color: var(--color-danger); }
+.post-actions-bar__btn.is-liked svg { fill: var(--color-danger); stroke: var(--color-danger); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LÄS MER
@@ -3395,7 +3395,7 @@
 /* Admin gillar */
 .comment-admin-like {
     font-size: .78rem;
-    color: #e74c3c;
+    color: var(--color-danger);
     padding-left: 46px;
 }
 
@@ -3431,7 +3431,7 @@
     font-family: inherit;
     transition: color .15s;
 }
-.report-comment-btn:hover { color: var(--color-danger, #e74c3c); }
+.report-comment-btn:hover { color: var(--color-danger, var(--color-danger)); }
 
 /* Svar-formulär */
 .comment-reply-form {
@@ -3481,7 +3481,7 @@
     font-family: inherit;
     transition: color .15s;
 }
-.comment-like-btn:hover { color: #e74c3c; }
-.comment-like-btn.is-liked { color: #e74c3c; }
+.comment-like-btn:hover { color: var(--color-danger); }
+.comment-like-btn.is-liked { color: var(--color-danger); }
 .comment-like-btn:disabled { opacity: .5; cursor: default; }
 .comment-like-btn__count { font-size: .78rem; font-weight: 600; min-width: 10px; }

@@ -63,3 +63,6 @@ require_once get_template_directory() . '/inc/mikroinlagg.php';
 
 // ── Läs mer-sektion på enskilda inlägg ─────────────────────────────────────────
 require_once get_template_directory() . '/inc/read-more.php';
+
+// ── Adminmeny och temainställningar ────────────────────────────────────────────
+require_once get_template_directory() . '/inc/admin-theme.php';
