@@ -35,8 +35,9 @@ setcookie('blogtree_visited', time(), [
 
 get_header();
 
-$_fp_color    = get_theme_mod('blogtree_frontpage_color', '#2c7be5');
-$_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_color;
+$_fp_color      = get_theme_mod('blogtree_frontpage_color', '#2c7be5');
+$_fp_gradient   = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_color;
+$_card_show_img = (bool) get_theme_mod('blogtree_card_show_image', '1');
 ?>
 <style>:root { --topic-color: <?php echo esc_attr($_fp_color); ?>; --fp-gradient: <?php echo esc_attr($_fp_gradient); ?>; }</style>
 
@@ -82,7 +83,7 @@ $_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_c
                 $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
             ?>
             <article class="post-card">
-                <?php if (has_post_thumbnail()): ?>
+                <?php if ($_card_show_img && has_post_thumbnail()): ?>
                 <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
                     <?php the_post_thumbnail('blogtree-card'); ?>
                 </a>
@@ -142,7 +143,7 @@ $_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_c
                 $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
             ?>
             <article class="post-card">
-                <?php if (has_post_thumbnail()): ?>
+                <?php if ($_card_show_img && has_post_thumbnail()): ?>
                 <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
                     <?php the_post_thumbnail('blogtree-card'); ?>
                 </a>
@@ -333,7 +334,7 @@ $_fp_gradient = get_theme_mod('blogtree_frontpage_gradient_color', '') ?: $_fp_c
                 $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
             ?>
             <article class="post-card">
-                <?php if (has_post_thumbnail()): ?>
+                <?php if ($_card_show_img && has_post_thumbnail()): ?>
                 <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
                     <?php the_post_thumbnail('blogtree-card'); ?>
                 </a>

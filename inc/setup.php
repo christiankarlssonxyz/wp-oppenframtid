@@ -171,6 +171,25 @@ add_action('customize_register', function ($wp_customize) {
     ]);
 });
 
+// ── Startsida – inläggskort i Customizer ──────────────────────────────────────
+add_action('customize_register', function ($wp_customize) {
+
+    $wp_customize->add_section('blogtree_frontpage_cards', [
+        'title'    => 'Startsida – inläggskort',
+        'priority' => 20,
+    ]);
+
+    $wp_customize->add_setting('blogtree_card_show_image', [
+        'default'           => '1',
+        'sanitize_callback' => 'absint',
+    ]);
+    $wp_customize->add_control('blogtree_card_show_image', [
+        'label'   => 'Visa bild på inläggskort',
+        'section' => 'blogtree_frontpage_cards',
+        'type'    => 'checkbox',
+    ]);
+});
+
 // ── Startsida – fokusområden i Customizer ─────────────────────────────────────
 add_action('customize_register', function ($wp_customize) {
 
