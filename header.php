@@ -152,7 +152,8 @@
                 'menu_class'     => 'nav-list',
                 'fallback_cb'    => false,
             ]); ?>
-            <a href="<?php echo esc_url(home_url('/mikroinlagg/')); ?>" class="nav-list__mikro-link">Mikroinlägg</a>
+            <a href="<?php echo esc_url(home_url('/mikroinlagg/')); ?>"
+               class="nav-list__mikro-link<?php echo (is_post_type_archive('mikroinlagg') || get_post_type() === 'mikroinlagg') ? ' current-menu-item' : ''; ?>">Mikroinlägg</a>
         </nav>
     </div>
 

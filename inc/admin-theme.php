@@ -345,15 +345,22 @@ add_action('admin_post_blogtree_save_mikro_hero', function () {
     check_admin_referer('blogtree_save_mikro_hero');
 
     update_option('blogtree_mikro_hero', [
-        'label'    => sanitize_text_field($_POST['mikro_hero_label']    ?? 'MIKROINLÄGG'),
-        'title'    => sanitize_text_field($_POST['mikro_hero_title']    ?? 'Mikroinlägg'),
-        'desc'     => sanitize_text_field($_POST['mikro_hero_desc']     ?? ''),
-        'color'    => sanitize_hex_color($_POST['mikro_hero_color']     ?? '#2c3e50') ?: '#2c3e50',
-        'gradient' => sanitize_hex_color($_POST['mikro_hero_gradient']  ?? '') ?: '',
+        'label'     => sanitize_text_field($_POST['mikro_hero_label']    ?? 'MIKROINLÄGG'),
+        'title'     => sanitize_text_field($_POST['mikro_hero_title']    ?? 'Mikroinlägg'),
+        'desc'      => sanitize_text_field($_POST['mikro_hero_desc']     ?? ''),
+        'color'     => sanitize_hex_color($_POST['mikro_hero_color']     ?? '#2c3e50') ?: '#2c3e50',
+        'gradient'  => sanitize_hex_color($_POST['mikro_hero_gradient']  ?? '') ?: '',
+        'banner_id' => absint($_POST['mikro_hero_banner_id'] ?? 0),
     ]);
 
     wp_redirect(add_query_arg(['page' => 'blogtree-mikroinlagg', 'updated' => '1'], admin_url('admin.php')));
     exit;
+});
+
+// ── Ladda in media-uppladdare på mikroinlägg-admin-sidan ──────────────────────
+add_action('admin_enqueue_scripts', function ($hook) {
+    if ($hook !== 'wp-oppenframtid_page_blogtree-mikroinlagg') return;
+    wp_enqueue_media();
 });
 
 // ── Sida: Mikroinlägg ─────────────────────────────────────────────────────────
@@ -361,11 +368,13 @@ function blogtree_admin_page_mikroinlagg(): void {
     $saved   = get_option('blogtree_mikro_hero', []);
     $updated = $_GET['updated'] ?? '';
 
-    $label    = $saved['label']    ?? 'MIKROINLÄGG';
-    $title    = $saved['title']    ?? 'Mikroinlägg';
-    $desc     = $saved['desc']     ?? '';
-    $color    = $saved['color']    ?? '#2c3e50';
-    $gradient = $saved['gradient'] ?? '';
+    $label     = $saved['label']     ?? 'MIKROINLÄGG';
+    $title     = $saved['title']     ?? 'Mikroinlägg';
+    $desc      = $saved['desc']      ?? '';
+    $color     = $saved['color']     ?? '#2c3e50';
+    $gradient  = $saved['gradient']  ?? '';
+    $banner_id = (int) ($saved['banner_id'] ?? 0);
+    $banner_src = $banner_id ? wp_get_attachment_image_url($banner_id, 'blogtree-mikro-banner') : '';
     ?>
     <div class="wrap blogtree-admin-wrap">
         <h1>Mikroinlägg</h1>
@@ -420,6 +429,61 @@ function blogtree_admin_page_mikroinlagg(): void {
                             <input type="color" id="mikro_hero_gradient" name="mikro_hero_gradient"
                                    value="<?php echo esc_attr($gradient ?: $color); ?>">
                             <p class="description">Lämna samma som primärfärgen för enfärgad bakgrund.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Bannerbild</th>
+                        <td>
+                            <div style="margin-bottom:10px">
+                                <img id="mikro-banner-preview"
+                                     src="<?php echo esc_url($banner_src); ?>"
+                                     style="max-width:400px;height:auto;border-radius:4px;display:<?php echo $banner_src ? 'block' : 'none'; ?>">
+                            </div>
+                            <input type="hidden" id="mikro_hero_banner_id" name="mikro_hero_banner_id"
+                                   value="<?php echo esc_attr($banner_id ?: ''); ?>">
+                            <button type="button" class="button" id="mikro-banner-btn">
+                                <?php echo $banner_id ? 'Byt bannerbild' : 'Välj bannerbild'; ?>
+                            </button>
+                            <button type="button" class="button" id="mikro-banner-remove"
+                                    style="margin-left:4px;<?php echo $banner_id ? '' : 'display:none;'; ?>">
+                                Ta bort
+                            </button>
+                            <p class="description" style="margin-top:8px">
+                                Visas under hero-sektionen. Rekommenderat format: 1 200 × 400 px (3:1).
+                            </p>
+                            <script>
+                            (function($) {
+                                var frame;
+                                $('#mikro-banner-btn').on('click', function(e) {
+                                    e.preventDefault();
+                                    if (frame) { frame.open(); return; }
+                                    frame = wp.media({
+                                        title:    'Välj bannerbild',
+                                        button:   { text: 'Använd som bannerbild' },
+                                        multiple: false,
+                                        library:  { type: 'image' }
+                                    });
+                                    frame.on('select', function() {
+                                        var att = frame.state().get('selection').first().toJSON();
+                                        var url = att.sizes && att.sizes['blogtree-mikro-banner']
+                                            ? att.sizes['blogtree-mikro-banner'].url
+                                            : att.url;
+                                        $('#mikro_hero_banner_id').val(att.id);
+                                        $('#mikro-banner-preview').attr('src', url).show();
+                                        $('#mikro-banner-btn').text('Byt bannerbild');
+                                        $('#mikro-banner-remove').show();
+                                    });
+                                    frame.open();
+                                });
+                                $('#mikro-banner-remove').on('click', function(e) {
+                                    e.preventDefault();
+                                    $('#mikro_hero_banner_id').val('');
+                                    $('#mikro-banner-preview').attr('src', '').hide();
+                                    $('#mikro-banner-btn').text('Välj bannerbild');
+                                    $(this).hide();
+                                });
+                            })(jQuery);
+                            </script>
                         </td>
                     </tr>
                 </table>

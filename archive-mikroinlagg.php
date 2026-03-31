@@ -9,11 +9,12 @@ $paged      = get_query_var('paged') ?: 1;
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 $_mh          = get_option('blogtree_mikro_hero', []);
-$_mh_label    = $_mh['label']    ?? 'MIKROINLÄGG';
-$_mh_title    = $_mh['title']    ?? 'Mikroinlägg';
-$_mh_desc     = $_mh['desc']     ?? '';
-$_mh_color    = $_mh['color']    ?? '#2c3e50';
+$_mh_label    = $_mh['label']     ?? 'MIKROINLÄGG';
+$_mh_title    = $_mh['title']     ?? 'Mikroinlägg';
+$_mh_desc     = $_mh['desc']      ?? '';
+$_mh_color    = $_mh['color']     ?? '#2c3e50';
 $_mh_gradient = ($_mh['gradient'] ?? '') ?: $_mh_color;
+$_mh_banner   = (int) ($_mh['banner_id'] ?? 0);
 ?>
 <section class="topic-header"
          style="--topic-color: <?php echo esc_attr($_mh_color); ?>; --topic-gradient: <?php echo esc_attr($_mh_gradient); ?>">
@@ -29,6 +30,7 @@ $_mh_gradient = ($_mh['gradient'] ?? '') ?: $_mh_color;
         <?php endif; ?>
     </div>
 </section>
+
 <?php
 $filter_tax = sanitize_key($_GET['filter'] ?? '');
 $filter_val = sanitize_text_field($_GET['term'] ?? '');
@@ -60,6 +62,19 @@ $loop = new WP_Query($query_args);
 
         <!-- ── Huvud ──────────────────────────────────────────────────────── -->
         <main class="mikro-main">
+
+            <?php if ($_mh_banner):
+                $banner_src = wp_get_attachment_image_src($_mh_banner, 'blogtree-mikro-banner');
+                if ($banner_src): ?>
+            <figure class="topic-banner">
+                <img src="<?php echo esc_url($banner_src[0]); ?>"
+                     width="<?php echo (int) $banner_src[1]; ?>"
+                     height="<?php echo (int) $banner_src[2]; ?>"
+                     alt=""
+                     class="topic-banner__img"
+                     loading="lazy">
+            </figure>
+            <?php endif; endif; ?>
 
             <div class="mikro-header">
                 <h1 class="mikro-header__title">Mikroinlägg</h1>
