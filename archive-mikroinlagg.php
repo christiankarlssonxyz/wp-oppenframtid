@@ -6,6 +6,30 @@
 get_header();
 
 $paged      = get_query_var('paged') ?: 1;
+
+// ── Hero ──────────────────────────────────────────────────────────────────────
+$_mh          = get_option('blogtree_mikro_hero', []);
+$_mh_label    = $_mh['label']    ?? 'MIKROINLÄGG';
+$_mh_title    = $_mh['title']    ?? 'Mikroinlägg';
+$_mh_desc     = $_mh['desc']     ?? '';
+$_mh_color    = $_mh['color']    ?? '#2c3e50';
+$_mh_gradient = ($_mh['gradient'] ?? '') ?: $_mh_color;
+?>
+<section class="topic-header"
+         style="--topic-color: <?php echo esc_attr($_mh_color); ?>; --topic-gradient: <?php echo esc_attr($_mh_gradient); ?>">
+    <div class="container">
+        <?php if ($_mh_label): ?>
+        <p class="topic-header__label"><?php echo esc_html($_mh_label); ?></p>
+        <?php endif; ?>
+        <div class="topic-header__title-row">
+            <h1 class="topic-header__title"><?php echo esc_html($_mh_title); ?></h1>
+        </div>
+        <?php if ($_mh_desc): ?>
+        <p class="topic-header__desc"><?php echo esc_html($_mh_desc); ?></p>
+        <?php endif; ?>
+    </div>
+</section>
+<?php
 $filter_tax = sanitize_key($_GET['filter'] ?? '');
 $filter_val = sanitize_text_field($_GET['term'] ?? '');
 

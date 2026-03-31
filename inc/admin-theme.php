@@ -39,11 +39,11 @@ add_action('admin_menu', function () {
 
     add_submenu_page(
         'blogtree-theme',
-        'Färger',
-        'Färger',
+        'Mikroinlägg',
+        'Mikroinlägg',
         'manage_options',
-        'blogtree-farger',
-        'blogtree_admin_page_farger'
+        'blogtree-mikroinlagg',
+        'blogtree_admin_page_mikroinlagg'
     );
 });
 
@@ -116,13 +116,316 @@ function blogtree_admin_page_om(): void {
     <?php
 }
 
-// ── Sida: Anpassa ──────────────────────────────────────────────────────────────
+// ── Sida: Anpassa (flikar: Bilddimensioner | Färger) ──────────────────────────
 function blogtree_admin_page_anpassa(): void {
+    $tab     = sanitize_key($_GET['tab'] ?? 'bilder');
+    $updated = $_GET['updated'] ?? '';
+
+    $base_url = admin_url('admin.php?page=blogtree-anpassa');
     ?>
     <div class="wrap blogtree-admin-wrap">
         <h1>Anpassa</h1>
+
+        <nav class="nav-tab-wrapper" style="margin-bottom:20px">
+            <a href="<?php echo esc_url($base_url . '&tab=bilder'); ?>"
+               class="nav-tab <?php echo $tab === 'bilder' ? 'nav-tab-active' : ''; ?>">
+                Bilddimensioner
+            </a>
+            <a href="<?php echo esc_url($base_url . '&tab=farger'); ?>"
+               class="nav-tab <?php echo $tab === 'farger' ? 'nav-tab-active' : ''; ?>">
+                Färger
+            </a>
+        </nav>
+
+        <?php if ($tab === 'bilder'): ?>
+        <?php blogtree_admin_tab_bilder(); ?>
+        <?php else: ?>
+        <?php blogtree_admin_tab_farger($updated); ?>
+        <?php endif; ?>
+
+    </div>
+    <?php
+}
+
+// ── Flik: Bilddimensioner ─────────────────────────────────────────────────────
+function blogtree_admin_tab_bilder(): void {
+    $sizes = [
+        [
+            'name'   => 'blogtree-card-thumb',
+            'w'      => 800,
+            'h'      => 450,
+            'ratio'  => '16:9',
+            'usage'  => 'Inläggskort på ämnessidor och startsidan',
+            'note'   => 'Ladda upp via "Kortbild"-rutan i inläggsredigeraren',
+        ],
+        [
+            'name'   => 'blogtree-topic-banner',
+            'w'      => 1200,
+            'h'      => 400,
+            'ratio'  => '3:1',
+            'usage'  => 'Bannerbild på ämnessidor',
+            'note'   => 'Ladda upp via ämnesinställningarna',
+        ],
+        [
+            'name'   => 'blogtree-mikro-banner',
+            'w'      => 1200,
+            'h'      => 400,
+            'ratio'  => '3:1',
+            'usage'  => 'Bannerbild på enskilt mikroinlägg',
+            'note'   => 'Ladda upp via "Utvald bild" i mikroinläggsredigeraren',
+        ],
+        [
+            'name'   => 'blogtree-frontpage-banner',
+            'w'      => 1200,
+            'h'      => 500,
+            'ratio'  => '2,4:1',
+            'usage'  => 'Bannerbild på startsidan',
+            'note'   => 'Inställningar → Utseende → Startsida – bannerbild',
+        ],
+        [
+            'name'   => 'blogtree-hero',
+            'w'      => 1200,
+            'h'      => 600,
+            'ratio'  => '2:1',
+            'usage'  => 'Hero-bild',
+            'note'   => '',
+        ],
+        [
+            'name'   => 'blogtree-card',
+            'w'      => 600,
+            'h'      => 400,
+            'ratio'  => '3:2',
+            'usage'  => 'Generellt inläggskort (äldre storlek)',
+            'note'   => 'Ersatt av blogtree-card-thumb i de flesta vyer',
+        ],
+    ];
+    ?>
+    <div class="blogtree-card">
+        <h2>Bildstorlekar</h2>
+        <p style="margin-bottom:16px;color:#555">
+            Ladda alltid upp bilder i minst den rekommenderade storleken.
+            För skärpa på skärmar med hög upplösning (retina) kan du ladda upp dubbel storlek —
+            WordPress väljer rätt storlek automatiskt.
+        </p>
+        <table class="widefat striped" style="table-layout:fixed">
+            <thead>
+                <tr>
+                    <th style="width:220px">Namn</th>
+                    <th style="width:120px">Storlek (px)</th>
+                    <th style="width:80px">Format</th>
+                    <th>Var används den</th>
+                    <th>Tips</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($sizes as $s): ?>
+            <tr>
+                <td><code><?php echo esc_html($s['name']); ?></code></td>
+                <td><?php echo esc_html($s['w'] . ' × ' . $s['h']); ?></td>
+                <td><?php echo esc_html($s['ratio']); ?></td>
+                <td><?php echo esc_html($s['usage']); ?></td>
+                <td style="color:#777;font-size:.85em"><?php echo esc_html($s['note']); ?></td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <p style="margin-top:16px;color:#777;font-size:.85em">
+            <strong>OBS:</strong> Om du ändrar en bildstorlek eller lägger till nya bilder,
+            kör "Regenerate Thumbnails" för att uppdatera redan uppladdade bilder.
+        </p>
+    </div>
+    <?php
+}
+
+// ── Flik: Färger ──────────────────────────────────────────────────────────────
+function blogtree_admin_tab_farger(string $updated = ''): void {
+    $saved  = get_option('blogtree_custom_colors', []);
+    $fields = blogtree_color_fields();
+    ?>
+    <?php if ($updated === '1'): ?>
+    <div class="notice notice-success is-dismissible"><p>Färginställningarna har sparats.</p></div>
+    <?php elseif ($updated === 'reset'): ?>
+    <div class="notice notice-success is-dismissible"><p>Färgerna har återställts till temats standardvärden.</p></div>
+    <?php endif; ?>
+
+    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+        <?php wp_nonce_field('blogtree_save_colors'); ?>
+        <input type="hidden" name="action" value="blogtree_save_colors">
+
+        <!-- Ljust läge -->
         <div class="blogtree-card">
-            <p>Här samlas temats inställningar. Fler alternativ tillkommer.</p>
+            <h2>Ljust läge</h2>
+            <table class="blogtree-colors-table">
+                <thead>
+                    <tr>
+                        <th>Variabel</th>
+                        <th>Vad den styr</th>
+                        <th>Färg</th>
+                        <th>Standard</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($fields['light'] as $key => $f):
+                    $current = $saved['light'][$key] ?? $f['default'];
+                ?>
+                <tr>
+                    <td>
+                        <span class="blogtree-color-var">--<?php echo esc_html($key); ?></span><br>
+                        <strong><?php echo esc_html($f['label']); ?></strong>
+                    </td>
+                    <td><?php echo esc_html($f['desc']); ?></td>
+                    <td>
+                        <input type="color"
+                               name="color_light_<?php echo esc_attr($key); ?>"
+                               value="<?php echo esc_attr($current); ?>">
+                    </td>
+                    <td>
+                        <span class="blogtree-swatch" style="background:<?php echo esc_attr($f['default']); ?>"></span>
+                        <code><?php echo esc_html($f['default']); ?></code>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mörkt läge -->
+        <div class="blogtree-card">
+            <h2>Mörkt läge</h2>
+            <table class="blogtree-colors-table">
+                <thead>
+                    <tr>
+                        <th>Variabel</th>
+                        <th>Vad den styr</th>
+                        <th>Färg</th>
+                        <th>Standard</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($fields['dark'] as $key => $f):
+                    $current = $saved['dark'][$key] ?? $f['default'];
+                ?>
+                <tr>
+                    <td>
+                        <span class="blogtree-color-var">--<?php echo esc_html($key); ?></span><br>
+                        <strong><?php echo esc_html($f['label']); ?></strong>
+                    </td>
+                    <td><?php echo esc_html($f['desc']); ?></td>
+                    <td>
+                        <input type="color"
+                               name="color_dark_<?php echo esc_attr($key); ?>"
+                               value="<?php echo esc_attr($current); ?>">
+                    </td>
+                    <td>
+                        <span class="blogtree-swatch" style="background:<?php echo esc_attr($f['default']); ?>"></span>
+                        <code><?php echo esc_html($f['default']); ?></code>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <p>
+            <?php submit_button('Spara färger', 'primary', 'submit', false); ?>
+            &nbsp;
+            <button type="submit" name="reset" value="1"
+                    class="button button-secondary"
+                    onclick="return confirm('Återställa alla färger till temats standardvärden?')">
+                Återställ till standard
+            </button>
+        </p>
+    </form>
+    <?php
+}
+
+// ── Spara mikroinläggs-hero ────────────────────────────────────────────────────
+add_action('admin_post_blogtree_save_mikro_hero', function () {
+    if (!current_user_can('manage_options')) wp_die('Behörighet saknas.');
+    check_admin_referer('blogtree_save_mikro_hero');
+
+    update_option('blogtree_mikro_hero', [
+        'label'    => sanitize_text_field($_POST['mikro_hero_label']    ?? 'MIKROINLÄGG'),
+        'title'    => sanitize_text_field($_POST['mikro_hero_title']    ?? 'Mikroinlägg'),
+        'desc'     => sanitize_text_field($_POST['mikro_hero_desc']     ?? ''),
+        'color'    => sanitize_hex_color($_POST['mikro_hero_color']     ?? '#2c3e50') ?: '#2c3e50',
+        'gradient' => sanitize_hex_color($_POST['mikro_hero_gradient']  ?? '') ?: '',
+    ]);
+
+    wp_redirect(add_query_arg(['page' => 'blogtree-mikroinlagg', 'updated' => '1'], admin_url('admin.php')));
+    exit;
+});
+
+// ── Sida: Mikroinlägg ─────────────────────────────────────────────────────────
+function blogtree_admin_page_mikroinlagg(): void {
+    $saved   = get_option('blogtree_mikro_hero', []);
+    $updated = $_GET['updated'] ?? '';
+
+    $label    = $saved['label']    ?? 'MIKROINLÄGG';
+    $title    = $saved['title']    ?? 'Mikroinlägg';
+    $desc     = $saved['desc']     ?? '';
+    $color    = $saved['color']    ?? '#2c3e50';
+    $gradient = $saved['gradient'] ?? '';
+    ?>
+    <div class="wrap blogtree-admin-wrap">
+        <h1>Mikroinlägg</h1>
+
+        <?php if ($updated === '1'): ?>
+        <div class="notice notice-success is-dismissible"><p>Inställningarna har sparats.</p></div>
+        <?php endif; ?>
+
+        <div class="blogtree-card">
+            <h2>Hero-sektion</h2>
+            <p style="margin-bottom:20px;color:#555">
+                Visas överst på mikroinläggssidan (<code>/mikroinlagg/</code>).
+            </p>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <?php wp_nonce_field('blogtree_save_mikro_hero'); ?>
+                <input type="hidden" name="action" value="blogtree_save_mikro_hero">
+
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th><label for="mikro_hero_label">Etikett</label></th>
+                        <td>
+                            <input type="text" id="mikro_hero_label" name="mikro_hero_label"
+                                   value="<?php echo esc_attr($label); ?>" class="regular-text">
+                            <p class="description">Liten text ovanför titeln, t.ex. "MIKROINLÄGG".</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="mikro_hero_title">Titel</label></th>
+                        <td>
+                            <input type="text" id="mikro_hero_title" name="mikro_hero_title"
+                                   value="<?php echo esc_attr($title); ?>" class="regular-text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="mikro_hero_desc">Beskrivning</label></th>
+                        <td>
+                            <input type="text" id="mikro_hero_desc" name="mikro_hero_desc"
+                                   value="<?php echo esc_attr($desc); ?>" class="regular-text">
+                            <p class="description">Valfri text under titeln. Lämna tom för att dölja.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="mikro_hero_color">Primärfärg</label></th>
+                        <td>
+                            <input type="color" id="mikro_hero_color" name="mikro_hero_color"
+                                   value="<?php echo esc_attr($color); ?>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="mikro_hero_gradient">Gradientfärg</label></th>
+                        <td>
+                            <input type="color" id="mikro_hero_gradient" name="mikro_hero_gradient"
+                                   value="<?php echo esc_attr($gradient ?: $color); ?>">
+                            <p class="description">Lämna samma som primärfärgen för enfärgad bakgrund.</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <?php submit_button('Spara inställningar'); ?>
+            </form>
         </div>
     </div>
     <?php
@@ -135,7 +438,7 @@ add_action('admin_post_blogtree_save_colors', function () {
 
     if (isset($_POST['reset'])) {
         delete_option('blogtree_custom_colors');
-        wp_redirect(add_query_arg(['page' => 'blogtree-farger', 'updated' => 'reset'], admin_url('admin.php')));
+        wp_redirect(add_query_arg(['page' => 'blogtree-anpassa', 'tab' => 'farger', 'updated' => 'reset'], admin_url('admin.php')));
         exit;
     }
 
@@ -152,7 +455,7 @@ add_action('admin_post_blogtree_save_colors', function () {
     }
 
     update_option('blogtree_custom_colors', $saved);
-    wp_redirect(add_query_arg(['page' => 'blogtree-farger', 'updated' => '1'], admin_url('admin.php')));
+    wp_redirect(add_query_arg(['page' => 'blogtree-anpassa', 'tab' => 'farger', 'updated' => '1'], admin_url('admin.php')));
     exit;
 });
 
@@ -218,110 +521,3 @@ function blogtree_color_fields(): array {
     ];
 }
 
-// ── Sida: Färger ───────────────────────────────────────────────────────────────
-function blogtree_admin_page_farger(): void {
-    $saved  = get_option('blogtree_custom_colors', []);
-    $fields = blogtree_color_fields();
-
-    $updated = $_GET['updated'] ?? '';
-    ?>
-    <div class="wrap blogtree-admin-wrap">
-        <h1>Färger</h1>
-
-        <?php if ($updated === '1'): ?>
-        <div class="notice notice-success is-dismissible"><p>Färginställningarna har sparats.</p></div>
-        <?php elseif ($updated === 'reset'): ?>
-        <div class="notice notice-success is-dismissible"><p>Färgerna har återställts till temats standardvärden.</p></div>
-        <?php endif; ?>
-
-        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-            <?php wp_nonce_field('blogtree_save_colors'); ?>
-            <input type="hidden" name="action" value="blogtree_save_colors">
-
-            <!-- Ljust läge -->
-            <div class="blogtree-card">
-                <h2>Ljust läge</h2>
-                <table class="blogtree-colors-table">
-                    <thead>
-                        <tr>
-                            <th>Variabel</th>
-                            <th>Vad den styr</th>
-                            <th>Färg</th>
-                            <th>Standard</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($fields['light'] as $key => $f):
-                        $current = $saved['light'][$key] ?? $f['default'];
-                    ?>
-                    <tr>
-                        <td>
-                            <span class="blogtree-color-var">--<?php echo esc_html($key); ?></span><br>
-                            <strong><?php echo esc_html($f['label']); ?></strong>
-                        </td>
-                        <td><?php echo esc_html($f['desc']); ?></td>
-                        <td>
-                            <input type="color"
-                                   name="color_light_<?php echo esc_attr($key); ?>"
-                                   value="<?php echo esc_attr($current); ?>">
-                        </td>
-                        <td>
-                            <span class="blogtree-swatch" style="background:<?php echo esc_attr($f['default']); ?>"></span>
-                            <code><?php echo esc_html($f['default']); ?></code>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Mörkt läge -->
-            <div class="blogtree-card">
-                <h2>Mörkt läge</h2>
-                <table class="blogtree-colors-table">
-                    <thead>
-                        <tr>
-                            <th>Variabel</th>
-                            <th>Vad den styr</th>
-                            <th>Färg</th>
-                            <th>Standard</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($fields['dark'] as $key => $f):
-                        $current = $saved['dark'][$key] ?? $f['default'];
-                    ?>
-                    <tr>
-                        <td>
-                            <span class="blogtree-color-var">--<?php echo esc_html($key); ?></span><br>
-                            <strong><?php echo esc_html($f['label']); ?></strong>
-                        </td>
-                        <td><?php echo esc_html($f['desc']); ?></td>
-                        <td>
-                            <input type="color"
-                                   name="color_dark_<?php echo esc_attr($key); ?>"
-                                   value="<?php echo esc_attr($current); ?>">
-                        </td>
-                        <td>
-                            <span class="blogtree-swatch" style="background:<?php echo esc_attr($f['default']); ?>"></span>
-                            <code><?php echo esc_html($f['default']); ?></code>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <p>
-                <?php submit_button('Spara färger', 'primary', 'submit', false); ?>
-                &nbsp;
-                <button type="submit" name="reset" value="1"
-                        class="button button-secondary"
-                        onclick="return confirm('Återställa alla färger till temats standardvärden?')">
-                    Återställ till standard
-                </button>
-            </p>
-        </form>
-    </div>
-    <?php
-}

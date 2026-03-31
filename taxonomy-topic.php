@@ -138,9 +138,9 @@ $paged          = get_query_var('paged') ?: 1;
             <div class="post-grid">
                 <?php while ($loop->have_posts()): $loop->the_post(); ?>
                 <article class="post-card">
-                    <?php if (has_post_thumbnail()): ?>
+                    <?php $card_img_id = blogtree_card_thumb_id(get_the_ID()); if ($card_img_id): ?>
                     <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                        <?php the_post_thumbnail('medium'); ?>
+                        <?php echo wp_get_attachment_image($card_img_id, 'blogtree-card-thumb'); ?>
                     </a>
                     <?php endif; ?>
                     <div class="post-card__body">

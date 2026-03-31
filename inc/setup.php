@@ -35,9 +35,14 @@ add_action('after_setup_theme', function () {
 
     // Bildstorlekar
     add_image_size('blogtree-card', 600, 400, true);
+    add_image_size('blogtree-card-thumb', 800, 450, true);
     add_image_size('blogtree-hero', 1200, 600, true);
     add_image_size('blogtree-frontpage-banner', 1200, 500, true);
     add_image_size('blogtree-topic-banner', 1200, 400, true);
+    add_image_size('blogtree-mikro-banner', 1200, 400, true);
+
+    // Stöd för utvald bild på mikroinlägg
+    add_post_type_support('mikroinlagg', 'thumbnail');
 
 });
 

@@ -83,9 +83,9 @@ $_card_show_img = (bool) get_theme_mod('blogtree_card_show_image', '1');
                 $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
             ?>
             <article class="post-card">
-                <?php if ($_card_show_img && has_post_thumbnail()): ?>
+                <?php $card_img_id = blogtree_card_thumb_id(get_the_ID()); if ($_card_show_img && $card_img_id): ?>
                 <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                    <?php the_post_thumbnail('blogtree-card'); ?>
+                    <?php echo wp_get_attachment_image($card_img_id, 'blogtree-card-thumb'); ?>
                 </a>
                 <?php endif; ?>
                 <div class="post-card__body">
@@ -143,9 +143,9 @@ $_card_show_img = (bool) get_theme_mod('blogtree_card_show_image', '1');
                 $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
             ?>
             <article class="post-card">
-                <?php if ($_card_show_img && has_post_thumbnail()): ?>
+                <?php $card_img_id = blogtree_card_thumb_id(get_the_ID()); if ($_card_show_img && $card_img_id): ?>
                 <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                    <?php the_post_thumbnail('blogtree-card'); ?>
+                    <?php echo wp_get_attachment_image($card_img_id, 'blogtree-card-thumb'); ?>
                 </a>
                 <?php endif; ?>
                 <div class="post-card__body">
@@ -334,9 +334,9 @@ $_card_show_img = (bool) get_theme_mod('blogtree_card_show_image', '1');
                 $first_topic = (!is_wp_error($topics) && !empty($topics)) ? $topics[0] : null;
             ?>
             <article class="post-card">
-                <?php if ($_card_show_img && has_post_thumbnail()): ?>
+                <?php $card_img_id = blogtree_card_thumb_id(get_the_ID()); if ($_card_show_img && $card_img_id): ?>
                 <a href="<?php the_permalink(); ?>" class="post-card__image" tabindex="-1" aria-hidden="true">
-                    <?php the_post_thumbnail('blogtree-card'); ?>
+                    <?php echo wp_get_attachment_image($card_img_id, 'blogtree-card-thumb'); ?>
                 </a>
                 <?php endif; ?>
                 <div class="post-card__body">

@@ -20,6 +20,22 @@ get_header();
     <div class="mikro-layout">
         <main class="mikro-main">
 
+            <?php
+            $banner_id = get_post_thumbnail_id($post_id);
+            if ($banner_id):
+                $banner_src = wp_get_attachment_image_src($banner_id, 'blogtree-mikro-banner');
+                if ($banner_src):
+            ?>
+            <figure class="topic-banner">
+                <img src="<?php echo esc_url($banner_src[0]); ?>"
+                     width="<?php echo (int) $banner_src[1]; ?>"
+                     height="<?php echo (int) $banner_src[2]; ?>"
+                     alt=""
+                     class="topic-banner__img"
+                     loading="eager">
+            </figure>
+            <?php endif; endif; ?>
+
             <div class="mikro-single">
                 <?php blogtree_mikro_card($post_id); ?>
             </div>
