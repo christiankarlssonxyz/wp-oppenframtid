@@ -167,6 +167,14 @@ function blogtree_admin_tab_bilder(): void {
             'note'   => 'Ladda upp via ämnesinställningarna',
         ],
         [
+            'name'   => '— delningsbild (OG)',
+            'w'      => 1200,
+            'h'      => 630,
+            'ratio'  => '1,91:1',
+            'usage'  => 'Visas när ett inlägg i ämnet delas på sociala medier (Facebook, LinkedIn, iMessage m.fl.)',
+            'note'   => 'Ladda upp via ämnesinställningarna → "Delningsbild". Om inlägget har en featured image används den istället.',
+        ],
+        [
             'name'   => 'blogtree-mikro-banner',
             'w'      => 1200,
             'h'      => 400,

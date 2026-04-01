@@ -33,31 +33,30 @@ add_action('admin_enqueue_scripts', function ($hook) {
         wp_enqueue_media();
         wp_add_inline_script('media-editor', "
 (function($){
-    var mediaUploader;
-    $(document).on('click', '#topic-banner-btn', function(e){
-        e.preventDefault();
-        if(mediaUploader){ mediaUploader.open(); return; }
-        mediaUploader = wp.media({
-            title: 'Välj bannerbild',
-            button: { text: 'Välj bild' },
-            multiple: false,
-            library: { type: 'image' }
+    function makePicker(btnId, removeId, inputId, previewId, title){
+        var picker;
+        $(document).on('click', '#' + btnId, function(e){
+            e.preventDefault();
+            if(picker){ picker.open(); return; }
+            picker = wp.media({ title: title, button: { text: 'Välj bild' }, multiple: false, library: { type: 'image' } });
+            picker.on('select', function(){
+                var att = picker.state().get('selection').first().toJSON();
+                $('#' + inputId).val(att.id);
+                var thumb = att.sizes && att.sizes.medium ? att.sizes.medium.url : att.url;
+                $('#' + previewId).attr('src', thumb).show();
+                $('#' + removeId).show();
+            });
+            picker.open();
         });
-        mediaUploader.on('select', function(){
-            var att = mediaUploader.state().get('selection').first().toJSON();
-            $('#topic-banner-id').val(att.id);
-            var thumb = att.sizes && att.sizes.medium ? att.sizes.medium.url : att.url;
-            $('#topic-banner-preview').attr('src', thumb).show();
-            $('#topic-banner-remove').show();
+        $(document).on('click', '#' + removeId, function(e){
+            e.preventDefault();
+            $('#' + inputId).val('');
+            $('#' + previewId).hide().attr('src','');
+            $(this).hide();
         });
-        mediaUploader.open();
-    });
-    $(document).on('click', '#topic-banner-remove', function(e){
-        e.preventDefault();
-        $('#topic-banner-id').val('');
-        $('#topic-banner-preview').hide().attr('src','');
-        $(this).hide();
-    });
+    }
+    makePicker('topic-banner-btn',   'topic-banner-remove',   'topic-banner-id',   'topic-banner-preview',   'Välj bannerbild');
+    makePicker('topic-og-image-btn', 'topic-og-image-remove', 'topic-og-image-id', 'topic-og-image-preview', 'Välj delningsbild');
 })(jQuery);
         ");
     }
@@ -115,6 +114,30 @@ add_action('topic_edit_form_fields', function ($term) {
         </td>
     </tr>
     <tr class="form-field">
+        <th><label>Delningsbild (OG-bild)</label></th>
+        <td>
+            <?php
+            $og_id      = (int) get_term_meta($term->term_id, 'wpblogtree_topic_og_image_id', true);
+            $og_preview = $og_id ? wp_get_attachment_image_src($og_id, 'medium') : false;
+            ?>
+            <input type="hidden" id="topic-og-image-id" name="topic_og_image_id" value="<?php echo esc_attr($og_id ?: ''); ?>">
+            <?php if ($og_preview): ?>
+            <img id="topic-og-image-preview"
+                 src="<?php echo esc_url($og_preview[0]); ?>"
+                 style="max-width:300px;height:auto;display:block;margin-bottom:8px;border-radius:4px;">
+            <?php else: ?>
+            <img id="topic-og-image-preview" src="" style="max-width:300px;height:auto;display:none;margin-bottom:8px;border-radius:4px;">
+            <?php endif; ?>
+            <button type="button" id="topic-og-image-btn" class="button">Välj bild</button>
+            <button type="button" id="topic-og-image-remove" class="button" style="<?php echo $og_id ? '' : 'display:none;'; ?>margin-left:4px;">Ta bort bild</button>
+            <p class="description">
+                Rekommenderat format: <strong>1 200 × 630 px</strong> (1,91:1).<br>
+                Visas när ett inlägg i det här ämnet delas på sociala medier (Facebook, LinkedIn, iMessage m.fl.).<br>
+                Om inlägget har en featured image används den istället.
+            </p>
+        </td>
+    </tr>
+    <tr class="form-field">
         <th><label for="topic-banner-caption">Bildtext</label></th>
         <td>
             <?php
@@ -163,6 +186,14 @@ add_action('edited_topic', function ($term_id) {
             update_term_meta($term_id, 'wpblogtree_topic_banner_id', $banner_id);
         } else {
             delete_term_meta($term_id, 'wpblogtree_topic_banner_id');
+        }
+    }
+    if (isset($_POST['topic_og_image_id'])) {
+        $og_id = absint($_POST['topic_og_image_id']);
+        if ($og_id) {
+            update_term_meta($term_id, 'wpblogtree_topic_og_image_id', $og_id);
+        } else {
+            delete_term_meta($term_id, 'wpblogtree_topic_og_image_id');
         }
     }
     if (isset($_POST['topic_banner_caption'])) {

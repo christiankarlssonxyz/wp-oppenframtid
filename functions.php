@@ -69,3 +69,6 @@ require_once get_template_directory() . '/inc/admin-theme.php';
 
 // ── Dedikerad kortbild för inläggskort ─────────────────────────────────────────
 require_once get_template_directory() . '/inc/card-thumb.php';
+
+// ── Open Graph & Twitter Card meta-taggar ──────────────────────────────────────
+require_once get_template_directory() . '/inc/opengraph.php';
