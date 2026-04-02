@@ -639,3 +639,91 @@
     color: var(--color-muted);
     margin: 0;
 }
+
+/* ── Mobil header ≤540px ─────────────────────────────────────────────────────── */
+
+/* Mobilauth-blocket syns bara i navmenyn på mobil */
+.nav-mobile-auth { display: none; }
+
+@media (max-width: 540px) {
+
+    /* Dölj tema/auth-knappar direkt i headern */
+    .site-header__actions .theme-mode-btn,
+    .site-header__actions .nav-register-btn,
+    .site-header__actions .nav-login-btn {
+        display: none;
+    }
+
+    /* Ordning: logo | sök | hamburgare */
+    .site-header__inner {
+        justify-content: flex-start;
+    }
+    .site-header__actions {
+        order: 2;
+        margin-left: auto;
+        gap: var(--space-sm);
+    }
+    .site-header__menu-btn {
+        order: 3;
+        margin-left: 0;
+    }
+
+    /* Ta bort tom kantlinje på nav-rad när menyn är stängd */
+    .site-header__nav-row {
+        border: none;
+        margin: 0;
+    }
+
+    /* Fullskärmsöverlajd */
+    .site-header__nav.is-open {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 98;
+        padding-top: 68px; /* frigör plats för sticky header ovanpå */
+        padding-inline: var(--space-md);
+        padding-bottom: var(--space-md);
+        overflow-y: auto;
+        flex-direction: column;
+        justify-content: flex-start;
+        border: none;
+    }
+
+    /* Större menyval i fullskärmsvyn */
+    .site-header__nav.is-open .nav-list a,
+    .site-header__nav.is-open .nav-list__mikro-link {
+        font-size: 1.25rem;
+        padding: var(--space-md) 0;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    /* Förhindra scroll bakom overlay */
+    body.nav-is-open {
+        overflow: hidden;
+    }
+
+    /* Auth-sektion längst ned i mobilmenyn */
+    .nav-mobile-auth {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+        margin-top: auto;
+        padding-top: var(--space-md);
+        border-top: 1px solid var(--color-border);
+        width: 100%;
+    }
+
+    .nav-mobile-auth__btns {
+        display: flex;
+        gap: var(--space-sm);
+    }
+
+    .nav-mobile-auth .nav-register-btn,
+    .nav-mobile-auth .nav-login-btn {
+        flex: 1;
+        text-align: center;
+        display: inline-block;
+    }
+}

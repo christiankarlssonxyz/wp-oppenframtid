@@ -154,6 +154,33 @@
             ]); ?>
             <a href="<?php echo esc_url(home_url('/mikroinlagg/')); ?>"
                class="nav-list__mikro-link<?php echo (is_post_type_archive('mikroinlagg') || get_post_type() === 'mikroinlagg') ? ' current-menu-item' : ''; ?>">Mikroinlägg</a>
+
+            <?php if (!is_user_logged_in()): ?>
+            <div class="nav-mobile-auth">
+                <button class="theme-mode-btn" id="theme-toggle" aria-label="Byt färgläge">
+                    <span class="theme-mode-btn__light" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <span>Ljust läge</span>
+                    </span>
+                    <span class="theme-mode-btn__dark" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                        <span>Mörkt läge</span>
+                    </span>
+                </button>
+                <div class="nav-mobile-auth__btns">
+                    <a href="<?php echo esc_url(home_url('/registrera/')); ?>" class="nav-register-btn">Skapa konto</a>
+                    <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>" class="nav-login-btn">Logga in</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </nav>
     </div>
 
