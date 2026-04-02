@@ -310,6 +310,8 @@
 /* Desktop nav */
 @media (min-width: 768px) {
     .site-header__menu-btn { display: none; }
+    .nav-mobile-auth  { display: none !important; }
+    .nav-mobile-close { display: none !important; }
 
     .site-header__inner {
         padding-bottom: var(--space-md);
