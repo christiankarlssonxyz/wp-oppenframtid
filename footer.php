@@ -22,14 +22,24 @@
 <script>
 // Hamburgermeny – öppna/stäng nav på mobil
 (function () {
-    var btn = document.querySelector('.site-header__menu-btn');
-    var nav = document.querySelector('.site-header__nav');
+    var btn   = document.querySelector('.site-header__menu-btn');
+    var close = document.querySelector('.nav-mobile-close');
+    var nav   = document.querySelector('.site-header__nav');
     if (!btn || !nav) return;
-    btn.addEventListener('click', function () {
-        var open = nav.classList.toggle('is-open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        document.body.classList.toggle('nav-is-open', open);
-    });
+
+    function openNav() {
+        nav.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('nav-is-open');
+    }
+    function closeNav() {
+        nav.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('nav-is-open');
+    }
+
+    btn.addEventListener('click', openNav);
+    if (close) close.addEventListener('click', closeNav);
 })();
 </script>
 

@@ -146,6 +146,11 @@
     <!-- ── Rad 2: Centrerad nav (desktop) / Mobilmeny ───────────────────────── -->
     <div class="site-header__nav-row">
         <nav class="site-header__nav" aria-label="Huvudmeny">
+            <button class="nav-mobile-close" aria-label="Stäng meny">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
             <?php wp_nav_menu([
                 'theme_location' => 'primary',
                 'container'      => false,
