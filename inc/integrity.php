@@ -23,6 +23,7 @@ add_action('after_setup_theme', function () {
 
 // ── Formatdetektering ──────────────────────────────────────────────────────────
 function blogtree_detect_audit_format(array $data): string {
+    if (isset($data['revisions']) && is_array($data['revisions'])) return 'revisions';
     return isset($data['findings']) && is_array($data['findings']) ? 'findings' : 'checklist';
 }
 
@@ -239,9 +240,11 @@ function blogtree_integrity_admin_page(): void {
             if (!$decoded) {
                 $error = 'data/audit.json innehåller ogiltig JSON.';
             } else {
-                if (blogtree_detect_audit_format($decoded) === 'findings') {
+                $fmt = blogtree_detect_audit_format($decoded);
+                if ($fmt === 'findings') {
                     $decoded = blogtree_convert_findings_to_checklist($decoded);
                 }
+                // revisions-format sparas direkt
                 update_option('blogtree_audit_data', wp_json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
                 $message = 'Synkad från data/audit.json.';
             }
@@ -483,8 +486,124 @@ function blogtree_generate_integrity_page(): int|WP_Error {
     return wp_insert_post($post_data, true);
 }
 
-// ── Renderer – bygger sidans HTML ─────────────────────────────────────────────
+// ── Renderer – dispatcher beroende på format ──────────────────────────────────
 function blogtree_render_integrity_content(array $data): string {
+    if (isset($data['revisions'])) {
+        return blogtree_render_revisions($data['revisions']);
+    }
+    return blogtree_render_checklist($data);
+}
+
+// ── Renderer – revisionshistorik (tidslinje) ──────────────────────────────────
+function blogtree_render_revisions(array $revisions): string {
+    $sev_labels = [
+        'critical' => 'Kritisk', 'high' => 'Hög', 'medium' => 'Medium',
+        'low' => 'Låg', 'info' => 'Info',
+    ];
+    $sev_class = [
+        'critical' => 'audit-sev-critical', 'high' => 'audit-sev-high',
+        'medium'   => 'audit-sev-medium',   'low'  => 'audit-sev-low',
+        'info'     => 'audit-sev-info',
+    ];
+
+    ob_start();
+    ?>
+<!-- blogtree:audit-generated -->
+<div class="audit-report">
+<div class="audit-timeline">
+<?php foreach ($revisions as $rev):
+    $s       = $rev['summary'] ?? [];
+    $total   = (int)($s['total']      ?? 0);
+    $fixed   = (int)($s['remediated'] ?? 0);
+    $open    = (int)($s['open']       ?? 0);
+    $hi      = (int)(($s['critical'] ?? 0) + ($s['high'] ?? 0));
+    $findings = $rev['findings'] ?? [];
+?>
+<div class="audit-revision">
+
+    <div class="audit-revision__header">
+        <div class="audit-revision__meta">
+            <span class="audit-revision__version">v<?php echo esc_html($rev['version'] ?? ''); ?></span>
+            <span class="audit-revision__date"><?php echo esc_html($rev['date'] ?? ''); ?></span>
+            <span class="audit-revision__auditor"><?php echo esc_html($rev['auditor'] ?? ''); ?></span>
+        </div>
+        <div class="audit-revision__chips">
+            <span class="audit-chip audit-chip--total"><?php echo $total; ?> fynd</span>
+            <?php if ($hi > 0): ?>
+            <span class="audit-chip audit-chip--high"><?php echo $hi; ?> hög/kritisk</span>
+            <?php endif; ?>
+            <span class="audit-chip audit-chip--fixed"><?php echo $fixed; ?> åtgärdade</span>
+            <?php if ($open > 0): ?>
+            <span class="audit-chip audit-chip--open"><?php echo $open; ?> öppna</span>
+            <?php endif; ?>
+        </div>
+        <?php if (!empty($rev['scope'])): ?>
+        <div class="audit-revision__scope">
+            <?php foreach ($rev['scope'] as $sc): ?>
+            <span><?php echo esc_html($sc); ?></span>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($findings): ?>
+    <div class="audit-checks">
+    <?php foreach ($findings as $f):
+        $is_fixed     = ($f['status'] ?? '') === 'fixed';
+        $is_pass      = ($f['status'] ?? '') === 'pass';
+        $sev          = $f['severity'] ?? 'info';
+        $status_class = ($is_fixed || $is_pass) ? 'audit-pass audit-fixed' : 'audit-warn';
+    ?>
+    <div class="audit-check <?php echo esc_attr($status_class); ?>">
+        <div class="audit-check__header">
+            <span class="audit-check__name"><?php echo esc_html($f['title'] ?? ''); ?></span>
+            <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+                <?php if ($is_fixed): ?>
+                <span class="audit-check__severity audit-sev-fixed">
+                    <?php echo esc_html(ucfirst($sev_labels[$sev] ?? $sev)); ?> – åtgärdad
+                </span>
+                <?php elseif ($is_pass): ?>
+                <span class="audit-check__severity audit-sev-fixed">Godkänd</span>
+                <?php else: ?>
+                <span class="audit-check__severity <?php echo esc_attr($sev_class[$sev] ?? 'audit-sev-info'); ?>">
+                    <?php echo esc_html($sev_labels[$sev] ?? $sev); ?>
+                </span>
+                <?php endif; ?>
+                <span class="audit-check__status"><?php echo $is_fixed ? 'Åtgärdad' : ($is_pass ? 'Godkänd' : 'Öppen'); ?></span>
+            </div>
+        </div>
+        <?php if (!empty($f['file'])): ?>
+        <p class="audit-check__file">
+            <code><?php echo esc_html($f['file'] . (!empty($f['line']) ? ':' . $f['line'] : '')); ?></code>
+        </p>
+        <?php endif; ?>
+        <p class="audit-check__desc"><?php echo esc_html($f['description'] ?? ''); ?></p>
+        <?php if (!empty($f['code_snippet'])): ?>
+        <pre class="audit-check__code"><?php echo esc_html($f['code_snippet']); ?></pre>
+        <?php endif; ?>
+        <?php if (!empty($f['fix'])): ?>
+        <div class="audit-check__fix"><strong>✅ Fix:</strong> <?php echo esc_html($f['fix']); ?></div>
+        <?php elseif (!empty($f['recommendation'])): ?>
+        <div class="audit-check__alternative"><strong>Åtgärd:</strong> <?php echo esc_html($f['recommendation']); ?></div>
+        <?php endif; ?>
+        <?php if (!empty($f['references'])): ?>
+        <p class="audit-check__refs"><?php echo esc_html(implode(' · ', $f['references'])); ?></p>
+        <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+</div>
+<?php endforeach; ?>
+</div>
+</div>
+    <?php
+    return ob_get_clean();
+}
+
+// ── Renderer – checklist-format (gammalt format, bakåtkompatibelt) ─────────────
+function blogtree_render_checklist(array $data): string {
     $meta    = $data['meta']    ?? [];
     $summary = $data['summary'] ?? [];
     $cats    = $data['categories'] ?? [];
