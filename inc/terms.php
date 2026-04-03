@@ -93,8 +93,10 @@ add_action('admin_post_blogtree_terms_import', function () {
         exit;
     }
 
-    $ext = strtolower(pathinfo($_FILES['terms_file']['name'], PATHINFO_EXTENSION));
-    if ($ext !== 'json') {
+    $ext        = strtolower(pathinfo($_FILES['terms_file']['name'], PATHINFO_EXTENSION));
+    $mime       = mime_content_type($_FILES['terms_file']['tmp_name']);
+    $valid_json = ($ext === 'json' && in_array($mime, ['application/json', 'text/plain', 'application/octet-stream'], true));
+    if (!$valid_json) {
         wp_redirect(add_query_arg([
             'page'   => 'blogtree-terms',
             'result' => 'wrong_type',

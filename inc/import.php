@@ -44,9 +44,11 @@ add_action('admin_post_blogtree_import', function () {
 
     $file = $_FILES['import_file'];
 
-    // Kontrollera filtyp
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if ($ext !== 'csv') {
+    // Kontrollera filtyp via filändelse och MIME-typ
+    $ext       = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $mime      = mime_content_type($file['tmp_name']);
+    $valid_csv = ($ext === 'csv' && in_array($mime, ['text/plain', 'text/csv', 'application/csv', 'application/octet-stream'], true));
+    if (!$valid_csv) {
         wp_redirect(add_query_arg([
             'page'   => 'blogtree-import',
             'result' => 'wrong_type',

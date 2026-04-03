@@ -200,6 +200,12 @@ function blogtree_integrity_admin_page(): void {
                     $invalid[] = esc_html($files['name'][$i]) . ' (för stor, max 512 KB)';
                     continue;
                 }
+                $ext  = strtolower(pathinfo($files['name'][$i], PATHINFO_EXTENSION));
+                $mime = mime_content_type($tmp);
+                if ($ext !== 'json' || !in_array($mime, ['application/json', 'text/plain', 'application/octet-stream'], true)) {
+                    $invalid[] = esc_html($files['name'][$i]) . ' (fel filtyp)';
+                    continue;
+                }
                 $content = file_get_contents($tmp);
                 $decoded = json_decode($content, true);
                 if ($decoded === null) {
