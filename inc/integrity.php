@@ -494,7 +494,7 @@ function blogtree_render_integrity_content(array $data): string {
     return blogtree_render_checklist($data);
 }
 
-// ── Renderer – revisionshistorik (tidslinje) ──────────────────────────────────
+// ── Renderer – revisionshistorik med accordion ────────────────────────────────
 function blogtree_render_revisions(array $revisions): string {
     $sev_labels = [
         'critical' => 'Kritisk', 'high' => 'Hög', 'medium' => 'Medium',
@@ -511,32 +511,39 @@ function blogtree_render_revisions(array $revisions): string {
 <!-- blogtree:audit-generated -->
 <div class="audit-report">
 <div class="audit-timeline">
-<?php foreach ($revisions as $rev):
-    $s       = $rev['summary'] ?? [];
-    $total   = (int)($s['total']      ?? 0);
-    $fixed   = (int)($s['remediated'] ?? 0);
-    $open    = (int)($s['open']       ?? 0);
-    $hi      = (int)(($s['critical'] ?? 0) + ($s['high'] ?? 0));
+<?php foreach ($revisions as $ri => $rev):
+    $s        = $rev['summary'] ?? [];
+    $total    = (int)($s['total']      ?? 0);
+    $fixed    = (int)($s['remediated'] ?? 0);
+    $open     = (int)($s['open']       ?? 0);
+    $hi       = (int)(($s['critical'] ?? 0) + ($s['high'] ?? 0));
     $findings = $rev['findings'] ?? [];
+    $rev_id   = 'rev-' . $ri;
 ?>
 <div class="audit-revision">
 
-    <div class="audit-revision__header">
-        <div class="audit-revision__meta">
+    <!-- ── Revisionsrad (klickbar, fäller ut fynd) ── -->
+    <button class="audit-revision__toggle" aria-expanded="false" aria-controls="<?php echo esc_attr($rev_id); ?>">
+        <span class="audit-revision__arrow" aria-hidden="true"></span>
+        <span class="audit-revision__summary">
             <span class="audit-revision__version">v<?php echo esc_html($rev['version'] ?? ''); ?></span>
             <span class="audit-revision__date"><?php echo esc_html($rev['date'] ?? ''); ?></span>
-            <span class="audit-revision__auditor"><?php echo esc_html($rev['auditor'] ?? ''); ?></span>
-        </div>
-        <div class="audit-revision__chips">
-            <span class="audit-chip audit-chip--total"><?php echo $total; ?> fynd</span>
-            <?php if ($hi > 0): ?>
-            <span class="audit-chip audit-chip--high"><?php echo $hi; ?> hög/kritisk</span>
-            <?php endif; ?>
-            <span class="audit-chip audit-chip--fixed"><?php echo $fixed; ?> åtgärdade</span>
-            <?php if ($open > 0): ?>
-            <span class="audit-chip audit-chip--open"><?php echo $open; ?> öppna</span>
-            <?php endif; ?>
-        </div>
+            <span class="audit-revision__chips">
+                <span class="audit-chip audit-chip--total"><?php echo $total; ?> fynd</span>
+                <?php if ($hi > 0): ?>
+                <span class="audit-chip audit-chip--high"><?php echo $hi; ?> hög/kritisk</span>
+                <?php endif; ?>
+                <span class="audit-chip audit-chip--fixed"><?php echo $fixed; ?> åtgärdade</span>
+                <?php if ($open > 0): ?>
+                <span class="audit-chip audit-chip--open"><?php echo $open; ?> öppna</span>
+                <?php endif; ?>
+            </span>
+        </span>
+    </button>
+
+    <!-- ── Fyndlista (dold tills revision öppnas) ── -->
+    <div class="audit-revision__body" id="<?php echo esc_attr($rev_id); ?>" hidden>
+
         <?php if (!empty($rev['scope'])): ?>
         <div class="audit-revision__scope">
             <?php foreach ($rev['scope'] as $sc): ?>
@@ -544,60 +551,86 @@ function blogtree_render_revisions(array $revisions): string {
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
-    </div>
 
-    <?php if ($findings): ?>
-    <div class="audit-checks">
-    <?php foreach ($findings as $f):
-        $is_fixed     = ($f['status'] ?? '') === 'fixed';
-        $is_pass      = ($f['status'] ?? '') === 'pass';
-        $sev          = $f['severity'] ?? 'info';
-        $status_class = ($is_fixed || $is_pass) ? 'audit-pass audit-fixed' : 'audit-warn';
-    ?>
-    <div class="audit-check <?php echo esc_attr($status_class); ?>">
-        <div class="audit-check__header">
-            <span class="audit-check__name"><?php echo esc_html($f['title'] ?? ''); ?></span>
-            <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
-                <?php if ($is_fixed): ?>
-                <span class="audit-check__severity audit-sev-fixed">
-                    <?php echo esc_html(ucfirst($sev_labels[$sev] ?? $sev)); ?> – åtgärdad
+        <?php foreach ($findings as $fi => $f):
+            $is_fixed     = ($f['status'] ?? '') === 'fixed';
+            $is_pass      = ($f['status'] ?? '') === 'pass';
+            $sev          = $f['severity'] ?? 'info';
+            $status_class = ($is_fixed || $is_pass) ? 'audit-pass audit-fixed' : 'audit-warn';
+            $finding_id   = $rev_id . '-f' . $fi;
+        ?>
+        <div class="audit-check-acc <?php echo esc_attr($status_class); ?>">
+
+            <!-- ── Fyndrad (klickbar, fäller ut detaljer) ── -->
+            <button class="audit-check-acc__toggle" aria-expanded="false" aria-controls="<?php echo esc_attr($finding_id); ?>">
+                <span class="audit-check-acc__arrow" aria-hidden="true"></span>
+                <span class="audit-check__name"><?php echo esc_html($f['title'] ?? ''); ?></span>
+                <span class="audit-check-acc__badges">
+                    <?php if ($is_fixed): ?>
+                    <span class="audit-check__severity audit-sev-fixed">
+                        <?php echo esc_html(ucfirst($sev_labels[$sev] ?? $sev)); ?> – åtgärdad
+                    </span>
+                    <?php elseif ($is_pass): ?>
+                    <span class="audit-check__severity audit-sev-fixed">Godkänd</span>
+                    <?php else: ?>
+                    <span class="audit-check__severity <?php echo esc_attr($sev_class[$sev] ?? 'audit-sev-info'); ?>">
+                        <?php echo esc_html($sev_labels[$sev] ?? $sev); ?>
+                    </span>
+                    <?php endif; ?>
+                    <span class="audit-check__status"><?php echo $is_fixed ? 'Åtgärdad' : ($is_pass ? 'Godkänd' : 'Öppen'); ?></span>
                 </span>
-                <?php elseif ($is_pass): ?>
-                <span class="audit-check__severity audit-sev-fixed">Godkänd</span>
-                <?php else: ?>
-                <span class="audit-check__severity <?php echo esc_attr($sev_class[$sev] ?? 'audit-sev-info'); ?>">
-                    <?php echo esc_html($sev_labels[$sev] ?? $sev); ?>
-                </span>
+            </button>
+
+            <!-- ── Fynddetaljer (dolda tills fynd öppnas) ── -->
+            <div class="audit-check-acc__body" id="<?php echo esc_attr($finding_id); ?>" hidden>
+                <?php if (!empty($f['file'])): ?>
+                <p class="audit-check__file">
+                    <code><?php echo esc_html($f['file'] . (!empty($f['line']) ? ':' . $f['line'] : '')); ?></code>
+                </p>
                 <?php endif; ?>
-                <span class="audit-check__status"><?php echo $is_fixed ? 'Åtgärdad' : ($is_pass ? 'Godkänd' : 'Öppen'); ?></span>
+                <p class="audit-check__desc"><?php echo esc_html($f['description'] ?? ''); ?></p>
+                <?php if (!empty($f['code_snippet'])): ?>
+                <pre class="audit-check__code"><?php echo esc_html($f['code_snippet']); ?></pre>
+                <?php endif; ?>
+                <?php if (!empty($f['fix'])): ?>
+                <div class="audit-check__fix"><strong>✅ Fix:</strong> <?php echo esc_html($f['fix']); ?></div>
+                <?php elseif (!empty($f['recommendation'])): ?>
+                <div class="audit-check__alternative"><strong>Åtgärd:</strong> <?php echo esc_html($f['recommendation']); ?></div>
+                <?php endif; ?>
+                <?php if (!empty($f['references'])): ?>
+                <p class="audit-check__refs"><?php echo esc_html(implode(' · ', $f['references'])); ?></p>
+                <?php endif; ?>
             </div>
+
         </div>
-        <?php if (!empty($f['file'])): ?>
-        <p class="audit-check__file">
-            <code><?php echo esc_html($f['file'] . (!empty($f['line']) ? ':' . $f['line'] : '')); ?></code>
-        </p>
-        <?php endif; ?>
-        <p class="audit-check__desc"><?php echo esc_html($f['description'] ?? ''); ?></p>
-        <?php if (!empty($f['code_snippet'])): ?>
-        <pre class="audit-check__code"><?php echo esc_html($f['code_snippet']); ?></pre>
-        <?php endif; ?>
-        <?php if (!empty($f['fix'])): ?>
-        <div class="audit-check__fix"><strong>✅ Fix:</strong> <?php echo esc_html($f['fix']); ?></div>
-        <?php elseif (!empty($f['recommendation'])): ?>
-        <div class="audit-check__alternative"><strong>Åtgärd:</strong> <?php echo esc_html($f['recommendation']); ?></div>
-        <?php endif; ?>
-        <?php if (!empty($f['references'])): ?>
-        <p class="audit-check__refs"><?php echo esc_html(implode(' · ', $f['references'])); ?></p>
-        <?php endif; ?>
+        <?php endforeach; ?>
     </div>
-    <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
 
 </div>
 <?php endforeach; ?>
 </div>
 </div>
+<script>
+(function () {
+    document.querySelectorAll('.audit-revision__toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var body   = document.getElementById(btn.getAttribute('aria-controls'));
+            var open   = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+            if (open) { body.hidden = true; } else { body.hidden = false; }
+        });
+    });
+    document.querySelectorAll('.audit-check-acc__toggle').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var body = document.getElementById(btn.getAttribute('aria-controls'));
+            var open = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+            if (open) { body.hidden = true; } else { body.hidden = false; }
+        });
+    });
+})();
+</script>
     <?php
     return ob_get_clean();
 }
