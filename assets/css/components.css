@@ -739,7 +739,14 @@
     gap: var(--space-md);
 }
 
-.audit-check__name { font-weight: 600; }
+.audit-check__name {
+    font-weight: 600;
+    color: var(--color-muted);
+}
+
+[data-theme="dark"] .audit-check__name {
+    color: var(--color-text);
+}
 
 .audit-check__status {
     font-size: .75rem;
@@ -773,6 +780,7 @@
 
 .audit-check__code {
     background: #f6f8fa;
+    color: #24292e;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     padding: var(--space-sm) var(--space-md);
@@ -780,6 +788,11 @@
     overflow-x: auto;
     white-space: pre;
     margin: var(--space-sm) 0;
+}
+
+[data-theme="dark"] .audit-check__code {
+    background: #0d1117;
+    color: #c9d1d9;
 }
 
 .audit-check__refs {
